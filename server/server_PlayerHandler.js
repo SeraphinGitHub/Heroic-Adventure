@@ -60,12 +60,13 @@ const playerAttack = (player, otherPlayer) => {
    if(player.isAttacking) {
       player.isAttacking = false;
 
-      if(!otherPlayer.isDead) {
-         
+      if(!otherPlayer.isDead && !otherPlayer.isGettingDamage) {
+
+         otherPlayer.isGettingDamage = true;
          otherPlayer.damageValue = player.calcDamage();
          otherPlayer.health -= otherPlayer.damageValue;
-         setTimeout(() => otherPlayer.damageValue = "", 0);
-         
+
+         setTimeout(() => otherPlayer.isGettingDamage = false, 0);
          if(otherPlayer.health <= 0) otherPlayer.death();
       }
    }

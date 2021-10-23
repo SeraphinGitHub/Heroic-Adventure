@@ -6,8 +6,7 @@ class Player {
       this.id = id;
 
       // Health & Death
-      // this.health = 200;
-      this.health = 1;
+      this.health = 50;
       this.deathCounts = 0;
       this.deathMessage = "You died !";
       this.deathMessage_OffsetX = 130;
@@ -37,6 +36,7 @@ class Player {
       this.isDead = false;
       this.isRunning = false;
       this.isAttacking = false;
+      this.isGettingDamage = false;
    }
 
    update() {

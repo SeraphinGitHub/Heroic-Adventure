@@ -59,6 +59,8 @@ window.addEventListener("mouseup", (event) => {
 // =====================================================================
 // Animation
 // =====================================================================
+let isDeathScreen = false;
+
 const drawPlayer = (player, ctx) => {
    
    // ========== Player ==========
@@ -76,11 +78,10 @@ const drawPlayer = (player, ctx) => {
 
 
    // ========== Enemy Damage Taken ==========
-   if(player.damageValue) {
-      
+   if(player.isGettingDamage) {
+
       const offsetX = -30;
       const offsetY = -30;
-
       const textSize = 30;
       const textColor = "yellow";
       const textValue = `-${player.damageValue}`;
@@ -89,15 +90,10 @@ const drawPlayer = (player, ctx) => {
       floatTextArray.push(newMessage);
    }
 
-
+   
    // ========== Death Screen ==========
-   if(player.isDead) {
-
-      const textSize = 60;
-      const textColor = "red";
-      
-      ctx.fillStyle = textColor;
-      ctx.font = `${textSize}px Orbitron-ExtraBold`;
-      ctx.fillText(player.deathMessage, canvas.width/2 - player.deathMessage_OffsetX, canvas.height/2);
+   if(player.isDead && !isDeathScreen) {
+      isDeathScreen = true;
+      socket.emit("death", player.id);
    }
 }

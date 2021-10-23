@@ -44,7 +44,7 @@ const handleFloatingMessages = () => {
       message.update();
       message.draw();
       
-      if(message.displayDuration <= 0 ) {
+      if(message.displayDuration <= 0) {
          floatTextArray.splice(i, 1);
          i--;
       }
@@ -59,4 +59,10 @@ socket.on("newSituation", (playerData) => {
    ctx.clearRect(0, 0, canvas.width, canvas.height);
    playerData.forEach(player => drawPlayer(player, ctx));
    handleFloatingMessages();
+});
+
+socket.on("deathScreen", (data) => {
+   
+   const aze = document.querySelector(".death-screen");
+   aze.style = "visibility: visible";
 });

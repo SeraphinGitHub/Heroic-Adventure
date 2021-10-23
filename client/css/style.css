@@ -66,7 +66,8 @@
 .chat-form input {
    border-radius: 10px;
    font-size: 20px;
-   font-style: Verdana;
+   /* font-family: "Orbitron-Regular"; */
+   font-family: "Verdana";
 }
 
 .chat-box {
@@ -88,4 +89,9 @@
    padding-left: 15px;
    border: none;
    background: rgb(105, 197, 255);
+}
+
+.death-screen {
+   visibility: hidden;
+   font-size: 30px;
 }

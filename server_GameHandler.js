@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
    
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
-      if(DEBUG === "false") return;
+      if(DEBUG_MODE === "false") return;
       const response = eval(data);
       socket.emit("evalResponse", response);
    });
@@ -73,6 +73,12 @@ io.on("connection", (socket) => {
          socketList[i].emit("addMessage", `${playerName} : ${data}`);
       }
    });
+
+
+   // ==========  Toggle Death Screen  ==========
+   socket.on("death", (id) => {
+      socketList[id].emit("deathScreen", true);
+   });
 });
 
 
@@ -86,4 +92,5 @@ setInterval(() => {
       let socket = socketList[i];
       socket.emit("newSituation", playerData);
    }
+
 }, 1000/60);
