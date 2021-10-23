@@ -4,8 +4,8 @@
 // =====================================================================
 // Scrips import
 // =====================================================================
-const Player = require("../classes/Player.js");
-const collision = require("../collisions.js");
+const Player = require("./classes/Player.js");
+const collision = require("./collisions.js");
 
 
 // =====================================================================
@@ -40,6 +40,39 @@ exports.onDisconnect = (socket) => {
 
 
 // =====================================================================
+// Player collision
+// =====================================================================
+const playerCollide = (player, otherPlayer) => {
+
+   if(player !== otherPlayer
+   && !player.isDead
+   && collision.circleCollision(player, otherPlayer)) {
+   
+      playerAttack(player, otherPlayer);
+   }
+}
+
+
+// =====================================================================
+// Player Attack
+// =====================================================================
+const playerAttack = (player, otherPlayer) => {
+   if(player.isAttacking) {
+      player.isAttacking = false;
+
+      if(!otherPlayer.isDead) {
+         
+         otherPlayer.damageValue = player.calcDamage();
+         otherPlayer.health -= otherPlayer.damageValue;
+         setTimeout(() => otherPlayer.damageValue = "", 0);
+         
+         if(otherPlayer.health <= 0) otherPlayer.death();
+      }
+   }
+}
+
+
+// =====================================================================
 // Player update
 // =====================================================================
 exports.updateSituation = () => {
@@ -51,19 +84,7 @@ exports.updateSituation = () => {
       for(let j in playerList) {
          let otherPlayer = playerList[j];
 
-         if(player !== otherPlayer && collision.circleCollision(player, otherPlayer)) {
-
-            if(player.isAttacking) {
-
-               player.isAttacking = false;
-               otherPlayer.health -= player.calcDamage();
-               otherPlayer.displayDamage = player.calcDamage();
-
-               setTimeout(() => otherPlayer.displayDamage = "", 200)
-               
-               if(otherPlayer.health <= 0) otherPlayer.death();
-            }
-         }
+         playerCollide(player, otherPlayer);
       }
       
       player.update();

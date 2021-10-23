@@ -26,29 +26,18 @@
 
 
 /* ==========  Game  ========== */
-.game,
-.death-screen {
+.game {
    position: absolute;
+   height: 700px;
+   width: 1000px;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
 }
 
-.game {
-   width: 1000px;
-   height: 700px;
-}
-
 .canvas-1 {
    border: 1px solid black;
    background: yellowgreen;
-}
-
-.death-screen {
-   visibility: hidden;
-   color: red;
-   font-family: "Orbitron-ExtraBold";
-   font-size: 60px;
 }
 
 

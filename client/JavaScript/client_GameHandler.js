@@ -33,39 +33,30 @@ chatForm.onsubmit = (event) => {
 
 
 // =====================================================================
-// Animation
+// Floating Messages
 // =====================================================================
-const deathScreen = document.querySelector(".death-screen");
-// deathScreen.style = "visibility: visible";
+let floatTextArray = [];
 
-const drawPlayer = (player, color) => {
-
-   // Player Display
-   ctx.fillStyle = color;
-   ctx.beginPath();
-   ctx.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
-   ctx.fill();
-   ctx.closePath();
-
-   // Player Health Display
-   ctx.fillStyle = "black";
-   ctx.font = "30px Orbitron-Regular";
-   ctx.fillText(Math.floor(player.health), player.x - 35, player.y);
-
-   // Player Damage Taken Display
-   if(player.displayDamage) {
-      ctx.fillStyle = "yellow";
-      ctx.font = "30px Orbitron-ExtraBold";
-      ctx.fillText(`-${player.displayDamage}`, player.x - 35, player.y - 30);
+const handleFloatingMessages = () => {
+   for(let i = 0; i < floatTextArray.length; i++) {
+      
+      let message = floatTextArray[i];
+      message.update();
+      message.draw();
+      
+      if(message.displayDuration <= 0 ) {
+         floatTextArray.splice(i, 1);
+         i--;
+      }
    }
 }
 
+
+// =====================================================================
+// Client Sync
+// =====================================================================
 socket.on("newSituation", (playerData) => {
    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-   playerData.forEach(player => {
-      // ========== temporary ==========
-      if(!player.isDead) drawPlayer(player, "red");
-      else drawPlayer(player, "blue");
-   });
+   playerData.forEach(player => drawPlayer(player, ctx));
+   handleFloatingMessages();
 });

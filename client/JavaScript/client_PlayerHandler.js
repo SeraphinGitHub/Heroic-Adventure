@@ -54,3 +54,50 @@ window.addEventListener("mousedown", (event) => {
 window.addEventListener("mouseup", (event) => {
    if(event && insideCanvas) socket.emit("attack", false);
 });
+
+
+// =====================================================================
+// Animation
+// =====================================================================
+const drawPlayer = (player, ctx) => {
+   
+   // ========== Player ==========
+   ctx.fillStyle = player.color; // <== Debug Mode
+   ctx.beginPath();
+   ctx.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   ctx.fill();
+   ctx.closePath();
+
+
+   // ========== PLayer Health ==========
+   ctx.fillStyle = "black";
+   ctx.font = "30px Orbitron-Regular";
+   ctx.fillText(Math.floor(player.health), player.x - 35, player.y);
+
+
+   // ========== Enemy Damage Taken ==========
+   if(player.damageValue) {
+      
+      const offsetX = -30;
+      const offsetY = -30;
+
+      const textSize = 30;
+      const textColor = "yellow";
+      const textValue = `-${player.damageValue}`;
+
+      const newMessage = new FloatingMessage(ctx, player.x, player.y, offsetX, offsetY, textSize, textColor, textValue);
+      floatTextArray.push(newMessage);
+   }
+
+
+   // ========== Death Screen ==========
+   if(player.isDead) {
+
+      const textSize = 60;
+      const textColor = "red";
+      
+      ctx.fillStyle = textColor;
+      ctx.font = `${textSize}px Orbitron-ExtraBold`;
+      ctx.fillText(player.deathMessage, canvas.width/2 - player.deathMessage_OffsetX, canvas.height/2);
+   }
+}

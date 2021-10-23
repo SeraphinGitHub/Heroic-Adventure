@@ -2,9 +2,9 @@
   "name": "01_multiplayer_rpg_game",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "server_GameHandler.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node server_GameHandler.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "node": "14.17.0"
   },
   "dependencies": {
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "nodemon": "^2.0.13",
     "socket.io": "^4.2.0",

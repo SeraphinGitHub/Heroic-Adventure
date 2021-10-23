@@ -1,6 +1,7 @@
 
 "use strict"
 
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -12,7 +13,7 @@ const io = new Server(server);
 // =====================================================================
 // Scrips import
 // =====================================================================
-const playerHandler = require("./server/characters/playerHandler.js");
+const playerHandler = require("./server/server_PlayerHandler.js");
 
 
 // =====================================================================
@@ -32,8 +33,7 @@ server.listen(3000, () => {
 // =====================================================================
 // Global Variables
 // =====================================================================
-const DEBUG = true; // <==
-
+const DEBUG = process.env.DEBUG;
 const playerMax = 100;
 let socketList = {};
 
@@ -43,10 +43,10 @@ let socketList = {};
 // =====================================================================
 io.on("connection", (socket) => {
    // console.log("User connected !");  
-
+   
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
-      if(!DEBUG) return;
+      if(DEBUG === "false") return;
       const response = eval(data);
       socket.emit("evalResponse", response);
    });
@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
 
 
 // =====================================================================
-// Sync
+// Server Sync
 // =====================================================================
 setInterval(() => {
    let playerData = playerHandler.updateSituation();
