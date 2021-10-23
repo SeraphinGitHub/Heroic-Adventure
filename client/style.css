@@ -1,0 +1,168 @@
+* {
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   justify-content: space-around !important;
+   height: 100vh;
+}
+
+.flexCenter {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   width: 100%;
+}
+
+/* Orbitron Regular */
+@font-face {
+   font-family: "Orbitron-Regular";
+   src: url("fonts/Orbitron-Regular.ttf");
+}
+
+/* Orbitron Extra Bold */
+@font-face {
+   font-family: "Orbitron-ExtraBold";
+   src: url("fonts/Orbitron-ExtraBold.ttf");
+}
+
+
+/* ============================================ */
+/*          ---  Button Class  ---              */
+/* ============================================ */
+.btn {
+   border: none;
+   height: 70px;
+   width: 100%;
+   border-radius: 20px;
+   
+   font-family: "Verdana";
+   line-height: 100%;
+   font-weight: 400;
+   font-size: 140%;   
+}
+
+.green-btn { background: linear-gradient(to bottom right, greenyellow, rgb(0, 170, 0)) }
+
+.red-btn { background: linear-gradient(to bottom right, pink, red) }
+
+.orange-btn { background: linear-gradient(to top right, rgb(255, 94, 0), rgb(255, 217, 0)) }
+
+.blue-btn { background: linear-gradient(to bottom right, dodgerblue, lightskyblue) }
+
+.violet-btn { background: linear-gradient(to bottom right, pink, rgb(185, 23, 255)) }
+
+.btn:hover {
+   box-shadow: gray 5px 5px 8px;
+}
+
+.btn:active {
+   border-top: solid grey 5px;
+   border-left: solid grey 5px;
+   transition-duration: 0s;
+}
+
+
+/* ===================================================================== */
+/* Chat
+/* ===================================================================== */
+.chat,
+.controls-message {
+   width: 18%;
+}
+
+.chat,
+.controls-message {
+   align-content: space-between;
+   height: 600px; /* <== Chat Height Size */
+   background: white;
+   padding: 4px;
+   border: 2px solid gray;
+   border-radius: 15px;
+}
+
+.chat-display-mess {
+   overflow-y: scroll;
+   height: 76%;
+   width: 100%;
+   padding: 10px;
+   background: rgb(206, 227, 255);
+}
+
+.message,
+.controls-message div p {
+   margin-bottom: 8px;
+}
+
+.chat-enter input {
+   height: 100%;
+   width: 100%;
+   padding-left: 15px;
+   border: none;
+   background: rgb(105, 197, 255);
+}
+
+.chat-display-mess,
+.chat-enter input,
+.clear-chat-btn {
+   border-radius: 10px;
+}
+
+.chat-display-mess,
+.chat-enter input,
+.controls-message div p {
+   font-size: 18px;
+   font-family: "Verdana";
+}
+
+.chat-enter,
+.clear-chat-btn {
+   height: 55px;
+}
+
+
+/* ===================================================================== */
+/* Game Window
+/* ===================================================================== */
+.death-screen {
+   visibility: hidden;
+}
+
+.death-message,
+.respawn-timer {
+   text-align: center;
+   font-family: "Orbitron-ExtraBold";
+   color: red;
+}
+
+.death-message {
+   font-size: 60px;
+}
+
+.respawn-timer {
+   font-size: 30px;
+}
+
+.canvas-1 {
+   border: 1px solid black;
+   background: yellowgreen;
+}
+
+
+/* ===================================================================== */
+/* Display Controls Message
+/* ===================================================================== */
+.controls-message {
+   height: 500px;
+}
+
+.controls-message div {
+   height: 96%;
+   width: 100%;
+   padding: 10px;
+   padding-left: 50px;
+   border-radius: 10px;
+   background: rgb(206, 227, 255);
+}

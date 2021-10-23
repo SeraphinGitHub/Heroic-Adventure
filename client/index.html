@@ -6,28 +6,56 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- ==== Prevent Favicon Error ==== -->
         <link rel="icon" href="data:;base64,=">
-        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/style.css">
-        <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/css/style.css"> -->
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/style.css">
+        <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/style.css"> -->
         <title>Multi Player RPG</title>
     </head>
     
     <body class="flexCenter">
-        <section class="flexCenter absolute chat">
-            <div class="chat-box">
+
+        <!-- Chat -->
+        <section class="flexCenter chat">
+            <div class="chat-display-mess">
                 <!-- <p></p> -->
             </div>
 
-            <form class="flexCenter chat-form">
+            <form class="flexCenter chat-enter">
                 <input type="text">
             </form>
+
+            <button class="btn orange-btn clear-chat-btn">Clear Chat</button>
         </section>
 
-        <section class="flexCenter absolute game">
+
+        <!-- Game window -->
+        <section class="flexCenter game-window">
             <canvas class="canvas-1"></canvas>
 
             <div class="absolute death-screen">
                 <p class="death-message"></p>
                 <p class="respawn-timer"></p>
+            </div>
+        </section>
+
+
+        <!-- Display Controls -->
+        <section class="flexCenter controls-message">
+            <div>
+                <p>==== Welcome to ====</p>
+                <p>Multi Player Arena</p>
+                <br>
+                <p>[Attack: left click]</p>
+                <p>[Heal: r]</p>
+                <p>[Up: z]</p>
+                <p>[Down: s]</p>
+                <p>[Left: q]</p>
+                <p>[Right: d]</p>
+                <p>[Run: space bar]</p>
+                <br>
+                <p>If you want to try, open</p>
+                <p>another tab</p>
+                <br>
+                <p>Enjoy =)</p>
             </div>
         </section>
         

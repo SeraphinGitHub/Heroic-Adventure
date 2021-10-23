@@ -17,27 +17,6 @@ const controls = {
    heal: "r",
 }
 
-// Display Controls
-const initMessage = [
-   "== Welcome to ==",
-   "Multi Player Arena",
-   "",
-   "[Attack: left click]",
-   "[Heal: r]",
-   "[Up: z]",
-   "[Down: s]",
-   "[Left: q]",
-   "[Right: d]",
-   "[Run: space bar]",
-   "",
-   "If you want to try,",
-   "open another tab",
-   "",
-   "Enjoy =)",
-];
-
-initMessage.forEach(line => socket.emit("sendMessage", line));
-
 const playerCommand = (event, state) => {
    let controlsLength = Object.keys(controls).length;
 
