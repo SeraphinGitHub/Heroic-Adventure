@@ -1,4 +1,6 @@
 
+"use strict"
+
 // =====================================================================
 // Global variables
 // =====================================================================
@@ -18,28 +20,56 @@ canvas.addEventListener("mouseleave", () => insideCanvas = false);
 // =====================================================================
 // Movements
 // =====================================================================
-const up = "z";
-const down = "s";
-const left = "q";
-const right = "d";
-const run = " ";
+const keyDownEvent = "keydown";
+const keyUpEvent = "keyup";
 
-window.addEventListener("keydown", (event) => {
+const playerKeys = {
+   up: "z",
+   down: "s",
+   left: "q",
+   right: "d",
+   run: " ",
+}
+
+
+const aze = (event, keyOn, eventString) => {
+   if(event.key === keyOn) {
+
+      let state;
+      if(eventString === keyDownEvent) state = true;
+      if(eventString === keyUpEvent) state = false;
+      socket.emit(keyOn.keys, state);
+   }
+}
+
+window.addEventListener(keyDownEvent, (event) => {
    if(insideCanvas) {
-      if(event.key === up) socket.emit("up", true);
-      if(event.key === down) socket.emit("down", true);
-      if(event.key === left) socket.emit("left", true);
-      if(event.key === right) socket.emit("right", true);
-      if(event.key === run) socket.emit("running", true);
+      // if(event.key === up) socket.emit("up", true);
+      // if(event.key === down) socket.emit("down", true);
+      // if(event.key === left) socket.emit("left", true);
+      // if(event.key === right) socket.emit("right", true);
+      // if(event.key === run) socket.emit("run", true);
+
+      aze(event, playerKeys.up, keyDownEvent);
+      aze(event, playerKeys.down, keyDownEvent);
+      aze(event, playerKeys.left, keyDownEvent);
+      aze(event, playerKeys.right, keyDownEvent);
+      aze(event, playerKeys.run, keyDownEvent);
    }
 });
-   
-window.addEventListener("keyup", (event) => {
-   if(event.key === up) socket.emit("up", false);
-   if(event.key === down) socket.emit("down", false);
-   if(event.key === left) socket.emit("left", false);
-   if(event.key === right) socket.emit("right", false);
-   if(event.key === run) socket.emit("running", false);
+
+window.addEventListener(keyUpEvent, (event) => {
+   // if(event.key === up) socket.emit("up", false);
+   // if(event.key === down) socket.emit("down", false);
+   // if(event.key === left) socket.emit("left", false);
+   // if(event.key === right) socket.emit("right", false);
+   // if(event.key === run) socket.emit("run", false);
+
+   aze(event, playerKeys.up, keyUpEvent);
+      aze(event, playerKeys.down, keyUpEvent);
+      aze(event, playerKeys.left, keyUpEvent);
+      aze(event, playerKeys.right, keyUpEvent);
+      aze(event, playerKeys.run, keyUpEvent);
 });
 
 
