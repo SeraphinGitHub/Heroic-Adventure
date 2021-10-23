@@ -33,7 +33,7 @@ server.listen(3000, () => {
 // =====================================================================
 // Global Variables
 // =====================================================================
-const DEBUG = process.env.DEBUG;
+const DEBUG_MODE = process.env.DEBUG_MODE;
 const playerMax = 100;
 let socketList = {};
 
@@ -76,8 +76,12 @@ io.on("connection", (socket) => {
 
 
    // ==========  Toggle Death Screen  ==========
-   socket.on("death", (id) => {
-      socketList[id].emit("deathScreen", true);
+   socket.on("death", (player) => {
+      socketList[player.id].emit("showDeathScreen", player);
+   });
+
+   socket.on("respawn", (id) => {
+      socketList[id].emit("hideDeathScreen");
    });
 });
 

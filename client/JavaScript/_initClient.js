@@ -6,7 +6,8 @@
 // =====================================================================
 const scripts = [
    "client_GameHandler.js",
-   "client_Classes.js",
+   "classes/FloatingMessage.js",
+   "classes/GameBar.js",
    "client_PlayerHandler.js",
 ];
 

@@ -11,8 +11,8 @@
         <title>Multi Player RPG</title>
     </head>
     
-    <body>
-        <section class="flexCenter chat">
+    <body class="flexCenter">
+        <section class="flexCenter absolute chat">
             <div class="chat-box">
                 <!-- <p></p> -->
             </div>
@@ -22,9 +22,13 @@
             </form>
         </section>
 
-        <section class="game">       
+        <section class="flexCenter absolute game">
             <canvas class="canvas-1"></canvas>
-            <div class="death-screen">You died Again !</div>
+
+            <div class="absolute death-screen">
+                <p class="death-message"></p>
+                <p class="respawn-timer"></p>
+            </div>
         </section>
         
         <script src="/socket.io/socket.io.js"></script>

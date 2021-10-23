@@ -3,6 +3,10 @@
    padding: 0;
 }
 
+.absolute {
+   position: absolute;
+}
+
 .flexCenter {
    display: flex;
    flex-wrap: wrap;
@@ -24,15 +28,34 @@
 }
 
 
-
 /* ==========  Game  ========== */
 .game {
-   position: absolute;
    height: 700px;
    width: 1000px;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
+}
+
+
+/* ==========  UI  ========== */
+.death-screen {
+   visibility: hidden;
+}
+
+.death-message,
+.respawn-timer {
+   text-align: center;
+   font-family: "Orbitron-ExtraBold";
+   color: red;
+}
+
+.death-message {
+   font-size: 60px;
+}
+
+.respawn-timer {
+   font-size: 30px;
 }
 
 .canvas-1 {
@@ -41,10 +64,8 @@
 }
 
 
-
 /* ==========  Chat  ========== */
 .chat {
-   position: absolute;
    align-content: space-between;
    top: 50%;
    left: 12%;
@@ -89,9 +110,4 @@
    padding-left: 15px;
    border: none;
    background: rgb(105, 197, 255);
-}
-
-.death-screen {
-   visibility: hidden;
-   font-size: 30px;
 }

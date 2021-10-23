@@ -1,9 +1,6 @@
 
 "use strict"
 
-// =====================================================================
-// Floating Messages
-// =====================================================================
 class FloatingMessage {
    constructor(ctx, x, y, offsetX, offsetY, size, color, value) {
 

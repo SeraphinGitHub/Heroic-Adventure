@@ -8,8 +8,8 @@ const socket = io();
 const canvas = document.querySelector(".canvas-1");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 1000;
 canvas.height = 700;
+canvas.width = 1000;
 
 
 // =====================================================================
@@ -57,12 +57,12 @@ const handleFloatingMessages = () => {
 // =====================================================================
 socket.on("newSituation", (playerData) => {
    ctx.clearRect(0, 0, canvas.width, canvas.height);
-   playerData.forEach(player => drawPlayer(player, ctx));
-   handleFloatingMessages();
-});
-
-socket.on("deathScreen", (data) => {
    
-   const aze = document.querySelector(".death-screen");
-   aze.style = "visibility: visible";
+   playerData.forEach(player => {
+      drawPlayer(player, ctx);
+      drawHealthBar(player, ctx);
+      playerDeathScreen(player);
+   });
+   
+   handleFloatingMessages();
 });
