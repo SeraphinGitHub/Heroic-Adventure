@@ -32,7 +32,8 @@ server.listen(3000, () => {
 // =====================================================================
 // Global Variables
 // =====================================================================
-const DEBUG = false;
+const DEBUG = true; // <==
+
 const playerMax = 100;
 let socketList = {};
 
@@ -79,10 +80,10 @@ io.on("connection", (socket) => {
 // Sync
 // =====================================================================
 setInterval(() => {
-   let pack = playerHandler.updateSituation();
+   let playerData = playerHandler.updateSituation();
    
    for(let i in socketList) {
       let socket = socketList[i];
-      socket.emit("newSituation", pack);
+      socket.emit("newSituation", playerData);
    }
 }, 1000/60);

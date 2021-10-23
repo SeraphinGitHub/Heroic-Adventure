@@ -43,26 +43,31 @@ exports.onDisconnect = (socket) => {
 // Player update
 // =====================================================================
 exports.updateSituation = () => {
-   let pack = [];
+   let playerData = [];
    
    for(let i in playerList) {
       let player = playerList[i];
-      
-      if(player.isAttacking) {
-         player.isAttacking = false;
 
-         for(let j in playerList) {
-            let otherPlayer = playerList[j];
+      for(let j in playerList) {
+         let otherPlayer = playerList[j];
 
-            if(player !== otherPlayer && collision.circleCollision(player, otherPlayer)) {
-               otherPlayer.health -= player.damage;
+         if(player !== otherPlayer && collision.circleCollision(player, otherPlayer)) {
+
+            if(player.isAttacking) {
+
+               player.isAttacking = false;
+               otherPlayer.health -= player.calcDamage();
+               otherPlayer.displayDamage = player.calcDamage();
+
+               setTimeout(() => otherPlayer.displayDamage = "", 200)
+               
                if(otherPlayer.health <= 0) otherPlayer.death();
             }
          }
       }
       
       player.update();
-      pack.push(player);
+      playerData.push(player);
    }
-   return pack;
+   return playerData;
 }

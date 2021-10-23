@@ -4,13 +4,16 @@
 class Player {
    constructor(id) {
       this.id = id;
+
       this.walkSpeed = 7;
       this.runSpeed = 15;
-      this.health = 100;
-      this.damage = 15;
+      this.health = 200;
+      this.damageMin = 15;
+      this.damageMax = 20;
+      this.displayDamage = "";
 
-      this.x = 150;
-      this.y = 100;
+      this.x = 200;
+      this.y = 200;
       this.radius = 60;
       this.angle = 0;
 
@@ -23,30 +26,38 @@ class Player {
       this.isRunning = false;
       this.isAttacking = false;
    }
+   
+   randomize(factor) {
+      return Math.floor(Math.random() * factor);
+   }
 
    update() {
-      let walkSpeed = this.walkSpeed;
-      let runSpeed = this.runSpeed;
+      let moveSpeed;
+      if(!this.isRunning) moveSpeed = this.walkSpeed;
+      else moveSpeed = this.runSpeed;
 
-      if(this.isRunning) walkSpeed = runSpeed;
-
-      if(this.up) this.y -= walkSpeed;
-      if(this.down) this.y += walkSpeed;
-      if(this.left) this.x -= walkSpeed;
-      if(this.right) this.x += walkSpeed;
+      if(this.up) this.y -= moveSpeed;
+      if(this.down) this.y += moveSpeed;
+      if(this.left) this.x -= moveSpeed;
+      if(this.right) this.x += moveSpeed;
 
       if(this.up && this.left
       ||this.up && this.right
       ||this.down && this.left
       ||this.down && this.right) {
-         walkSpeed *= 0.7;
+         moveSpeed *= 0.7;
       }
+   }
+
+   calcDamage() {
+      return this.damageMin + this.randomize(this.damageMax - this.damageMin);
    }
 
    death() {
       this.walkSpeed = 0;
       this.health = 0
       this.damage = 0;
+      this.displayDamage = "";
       this.isDead = true;
    }
 }
