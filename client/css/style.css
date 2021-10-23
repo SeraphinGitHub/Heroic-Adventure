@@ -4,12 +4,67 @@
 }
 
 .canvas-1 {
-   width: 800px;
-   height: 500px;
+   width: 1000px;
+   height: 700px;
    border: 1px solid black;
    background: yellowgreen;
    position: absolute;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
+}
+
+.flexCenter {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   width: 100%;
+}
+
+.chat {
+   position: absolute;
+   align-content: space-between;
+   top: 50%;
+   left: 12%;
+   height: auto;
+   width: 400px;
+   background: white;
+   padding: 4px;
+   transform: translate(-50%, -50%);
+   border: 2px solid gray;
+   border-radius: 15px;
+}
+
+.chat-box,
+.chat-form {
+   position: relative;
+}
+
+.chat-box,
+.chat-form input {
+   border-radius: 10px;
+   font-size: 20px;
+   font-style: Verdana;
+}
+
+.chat-box {
+   overflow-y: scroll;
+   height: 500px;
+   width: 100%;
+   margin-bottom: 4px;
+   padding: 15px;
+   background: rgb(206, 227, 255);
+}
+
+.chat-form {
+   height: 50px;
+}
+
+.chat-form input {
+   height: 100%;
+   width: 100%;
+   padding-left: 15px;
+   border: none;
+   background: rgb(105, 197, 255);
 }

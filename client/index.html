@@ -4,16 +4,23 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
         <!-- ==== Prevent Favicon Error ==== -->
         <link rel="icon" href="data:;base64,=">
-        <!-- =============================== -->
-
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/style.css">
         <title>Multi Player RPG</title>
     </head>
     
     <body>
+        <section class="flexCenter chat">
+            <div class="chat-box">
+                <!-- <p></p> -->
+            </div>
+
+            <form class="flexCenter chat-form">
+                <input type="text">
+            </form>
+        </section>
+
         <canvas class="canvas-1"></canvas>
         <script src="/socket.io/socket.io.js"></script>
         <script src="http://localhost:3000/client/JavaScript/gameHandler.js"></script>
