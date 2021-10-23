@@ -14,7 +14,29 @@ const controls = {
    left: "q",
    right: "d",
    run: " ",
+   heal: "r",
 }
+
+// Display Controls
+const initMessage = [
+   "== Welcome to ==",
+   "Multi Player Arena",
+   "",
+   "[Attack: left click]",
+   "[Heal: r]",
+   "[Up: z]",
+   "[Down: s]",
+   "[Left: q]",
+   "[Right: d]",
+   "[Run: space bar]",
+   "",
+   "If you want to try,",
+   "open another tab",
+   "",
+   "Enjoy =)",
+];
+
+initMessage.forEach(line => socket.emit("sendMessage", line));
 
 const playerCommand = (event, state) => {
    let controlsLength = Object.keys(controls).length;
@@ -59,27 +81,35 @@ window.addEventListener("mouseup", (event) => {
 // =====================================================================
 // Animation
 // =====================================================================
+
+// ========== Player ==========
 const drawPlayer = (player, ctx) => {
-   
-   // ========== Player ==========
+
    ctx.fillStyle = player.color; // <== Debug Mode
    ctx.beginPath();
    ctx.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
    ctx.fill();
    ctx.closePath();
+}
 
-   // ========== Player Attack Area ==========
+
+// ========== Attack Area ==========
+const drawAttackArea = (player, ctx) => {
+
    ctx.fillStyle = player.atkColor; // <== Debug Mode
    ctx.beginPath();
    ctx.arc(player.x + player.atkOffset_X, player.y + player.atkOffset_Y, player.atkRadius, player.atkAngle, Math.PI * 2);
    ctx.fill();
    ctx.closePath();
+}
 
-   // ========== Enemy Damage Taken ==========
+
+// ========== Enemy Damage Taken ==========
+const enemyDamageTaken = (player, ctx) => {
    if(player.isGettingDamage) {
       
       const offsetX = -30;
-      const offsetY = -30;
+      const offsetY = -100;
       const textSize = 30;
       const textColor = "yellow";
       const textValue = `-${player.calcDamage}`;
@@ -90,17 +120,36 @@ const drawPlayer = (player, ctx) => {
 }
 
 
-const drawHealthBar = (player, ctx) => {
-   let healthBarWidth = 100;
-   let healthBarHeight = 30;
-   let healthBarColor = "green";
+let width = 130;
+let height = 12;
 
-   const healthBar = new GameBar(ctx, player.x, player.y, 0, 0, healthBarWidth, healthBarHeight, healthBarColor);
-   healthBar.draw();
+// ========== HealthBar ==========
+const drawHealthBar = (player, ctx) => {
+   let color = "lime";
+   const bar = new GameBar(ctx, player.x, player.y, -width/2, -108, width, height, color, player.baseHealth, player.health);
+   bar.draw();
 
    ctx.fillStyle = "black";
-   ctx.font = "30px Orbitron-Regular";
-   ctx.fillText(Math.floor(player.health), player.x -35, player.y -5);
+   ctx.font = "26px Orbitron-Regular";
+   ctx.fillText(Math.floor(player.health), player.x -35, player.y -15);
+}
+
+
+// ========== ManaBar ==========
+const drawManaBar = (player, ctx) => {
+   let color = "dodgerblue";
+   if(player.isDead) color = "gray";
+   const bar = new GameBar(ctx, player.x, player.y, -width/2, -94, width, height, color, player.baseMana, player.mana);
+   bar.draw();
+}
+
+
+// ========== EnergBar ==========
+const drawEnergyBar = (player, ctx) => {
+   let color = "gold";
+   if(player.isDead) color = "gray";
+   const bar = new GameBar(ctx, player.x, player.y, -width/2, -80, width, height, color, player.baseEnergy, player.energy);
+   bar.draw();
 }
 
 

@@ -8,8 +8,8 @@ const socket = io();
 const canvas = document.querySelector(".canvas-1");
 const ctx = canvas.getContext("2d");
 
-canvas.height = 700;
-canvas.width = 1000;
+canvas.height = 850;
+canvas.width = 1200;
 
 
 // =====================================================================
@@ -60,7 +60,13 @@ socket.on("newSituation", (playerData) => {
    
    playerData.forEach(player => {
       drawPlayer(player, ctx);
+      drawAttackArea(player, ctx);
+      enemyDamageTaken(player, ctx);
+
       drawHealthBar(player, ctx);
+      drawManaBar(player, ctx);
+      drawEnergyBar(player, ctx);
+
       playerDeathScreen(player);
    });
    

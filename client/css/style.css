@@ -30,8 +30,8 @@
 
 /* ==========  Game  ========== */
 .game {
-   height: 700px;
-   width: 1000px;
+   height: 850px;
+   width: 1200px;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
@@ -67,10 +67,10 @@
 /* ==========  Chat  ========== */
 .chat {
    align-content: space-between;
-   top: 50%;
-   left: 12%;
+   top: 40%;
+   left: 9%;
    height: auto;
-   width: 400px;
+   width: 300px;
    background: white;
    padding: 4px;
    transform: translate(-50%, -50%);
@@ -93,7 +93,7 @@
 
 .chat-box {
    overflow-y: scroll;
-   height: 500px;
+   height: 400px;
    width: 100%;
    margin-bottom: 4px;
    padding: 15px;

@@ -28,6 +28,7 @@ exports.onConnect = (socket) => {
 
    socket.on("run", data => player.isRunning = data);
    socket.on("attack", data => player.isAttacking = data);
+   socket.on("heal", data => player.isHealing = data);
 }
 
 
@@ -36,6 +37,40 @@ exports.onConnect = (socket) => {
 // =====================================================================
 exports.onDisconnect = (socket) => {
    delete playerList[socket.id];
+}
+
+
+// =====================================================================
+// Player Running
+// =====================================================================
+const playerRunning = (player) => {
+   
+   if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
+   if(player.energy > player.baseEnergy) player.energy = player.baseEnergy;
+
+   if(player.isRunning) {
+      player.energy -= player.energyCost;
+      if(player.energy < player.energyCost) player.isRunning = false;
+   }
+}
+
+
+// =====================================================================
+// Player Healing
+// =====================================================================
+const playerHealing = (player) => {
+   
+   if(player.mana < player.baseMana) player.mana += player.regenMana;
+
+   if(player.isHealing && player.mana >= player.spellCost && player.health < player.baseHealth) {
+      player.isHealing = false;
+
+      player.calcHealing = player.healRnG();
+      player.health += player.calcHealing;
+      player.mana -= player.spellCost;
+
+      if(player.health > player.baseHealth) player.health = player.baseHealth;
+   }
 }
 
 
@@ -69,6 +104,9 @@ exports.updateSituation = () => {
    
    for(let i in playerList) {
       let player = playerList[i];
+
+      playerRunning(player);
+      playerHealing(player);
 
       for(let j in playerList) {
          let otherPlayer = playerList[j];

@@ -20,20 +20,32 @@ class Player {
       this.atkAngle = 0;
       this.atkColor = "orangered";
 
-      // Specs
-      this.baseHealth = 500;
-      this.baseTiredness = 70;
+      // Health
+      this.baseHealth = 300;
       this.deathCounts = 0;
       this.baseRespawnTimer = 10; //<== seconds
+      
+      // Energy
+      this.baseEnergy = 90;
+      this.energyCost = 1.2;
+      this.regenEnergy = 0.2;
+
+      // Mana
+      this.baseMana = 150;
+      this.spellCost = 100;
+      this.regenMana = 0.12;
+      this.baseHealing = this.baseHealth * 0.25;
+      this.calcHealing;
       
       // Damages
       this.baseAttackSpeed = 1.2; //<== seconds
       this.baseDamage = 15;
       this.calcDamage;
-
+      
       // Specs = BaseSpecs
       this.health = this.baseHealth;
-      this.tiredness = this.baseTiredness;
+      this.mana = this.baseMana;
+      this.energy = this.baseEnergy;
       this.attackSpeed = this.baseAttackSpeed;
       this.respawnTimer = this.baseRespawnTimer;
 
@@ -49,6 +61,7 @@ class Player {
       this.isDead = false;
       this.isRunning = false;
       this.isAttacking = false;
+      this.isHealing = false;
       this.isGettingDamage = false;
       this.isRespawning = false;
    }
@@ -118,6 +131,10 @@ class Player {
 
    RnG(factor) {
       return Math.floor(Math.random() * factor);
+   }
+
+   healRnG() {
+      return this.baseHealing + this.RnG(this.baseHealing - this.baseHealing * 0.15);
    }
 
    damageRnG() {
