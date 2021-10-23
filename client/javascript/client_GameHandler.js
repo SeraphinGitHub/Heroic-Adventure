@@ -79,6 +79,8 @@ const handleFloatingMessages = () => {
 socket.on("newSituation", (playerData) => {
    ctx.clearRect(0, 0, canvas.width, canvas.height);
    
+   drawMap();
+
    playerData.forEach(player => {
       drawPlayer(player, ctx);
       drawAttackArea(player, ctx);

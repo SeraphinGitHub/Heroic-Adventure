@@ -9,6 +9,7 @@ const scripts = [
    "classes/FloatingMessage.js",
    "classes/GameBar.js",
    "client_PlayerHandler.js",
+   "client_Map.js",
 ];
 
 const instantiate = (scriptName) => {
