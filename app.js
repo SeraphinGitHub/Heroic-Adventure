@@ -22,7 +22,7 @@ server.listen(3000, () => {
 
 
 // =====================================================================
-// Global Variables & Classes
+// Global Variables
 // =====================================================================
 const DEBUG = true;
 
@@ -30,7 +30,11 @@ const playerMax = 100;
 let socketList = {};
 let playerList = {};
 
-const collision = (first, second) => {
+
+// =====================================================================
+// Collision
+// =====================================================================
+const squareCollision = (first, second) => {
    if(!(first.x > second.x + second.width
       ||first.x + first.width < second.x
       ||first.y > second.y + second.height
@@ -39,48 +43,72 @@ const collision = (first, second) => {
    }
 }
 
+const circleCollision = (first, second) => {
+   let dx = second.x - first.x;
+   let dy = second.y - first.y;
+   let distance = Math.sqrt(dx * dx + dy * dy);
+   let sumRadius = first.radius + second.radius;
+
+   if(distance <= sumRadius) return true;
+}
+
+
+// =====================================================================
+// Classes
+// =====================================================================
 class Player {
    constructor(id) {
       this.id = id;
-      this.speed = 2;
+      this.speed = 7;
       this.runSpeed = 15;
-      this.diagSpeed = this.speed * 0.7;
       this.health = 100;
+      this.damage = 15;
 
       this.x = 150;
       this.y = 100;
-      this.width = 80;
-      this.height = 80;
+      this.radius = 60;
+      this.angle = 0;
 
       this.up = false;
       this.down = false;
       this.left = false;
       this.right = false;
 
+      this.isDead = false;
       this.isRunning = false;
+      this.isAttacking = false;
    }
 
    update() {
-      if(this.up) this.y -= this.speed;
-      if(this.down) this.y += this.speed;
-      if(this.left) this.x -= this.speed;
-      if(this.right) this.x += this.speed;
+      let speed = this.speed;
+      let runSpeed = this.runSpeed;
+
+      if(this.isRunning) speed = runSpeed;
+
+      if(this.up) this.y -= speed;
+      if(this.down) this.y += speed;
+      if(this.left) this.x -= speed;
+      if(this.right) this.x += speed;
 
       if(this.up && this.left
       ||this.up && this.right
       ||this.down && this.left
       ||this.down && this.right) {
-         this.speed = this.diagSpeed;
+         speed *= 0.7;
       }
+   }
 
-      if(this.isRunning) this.speed = this.runSpeed;
-      // if(!this.isRunning) this.speed = this.runSpeed;
+   death() {
+      this.speed = 0;
+      this.health = 0
+      this.damage = 0;
+      this.isDead = true;
    }
 }
 
 
 // =====================================================================
-// Static functions
+// Player Situation
 // =====================================================================
 Player.onConnect = (socket) => {
    const player = new Player(socket.id);
@@ -90,24 +118,31 @@ Player.onConnect = (socket) => {
    socket.on("down", (data) => player.down = data);
    socket.on("left", (data) => player.left = data);
    socket.on("right", (data) => player.right = data);
+
    socket.on("running", (data) => player.isRunning = data);
+   socket.on("attack", (data) => player.isAttacking = data);
 }
 
 Player.OnDisconnect = (socket) => {
    delete playerList[socket.id];
 }
 
-Player.updatePosition = () => {
+Player.updateSituation = () => {
    let pack = [];
 
    for(let i in playerList) {
       let player = playerList[i];
+      
+      if(player.isAttacking) {
+         player.isAttacking = false;
 
-      for(let j in playerList) {
-         let enemy = playerList[j];
+         for(let j in playerList) {
+            let otherPlayer = playerList[j];
 
-         if(enemy !== player && collision(player, enemy)) {
-            player.health -= 0.1;
+            if(player !== otherPlayer && circleCollision(player, otherPlayer)) {
+               otherPlayer.health -= player.damage;
+               if(otherPlayer.health <= 0) otherPlayer.death();
+            }
          }
       }
       
@@ -122,7 +157,15 @@ Player.updatePosition = () => {
 // Handle sockets connections
 // =====================================================================
 io.on("connection", (socket) => {
-   console.log("User connected !");  
+   // console.log("User connected !");  
+
+   // ==========  Debugging  ==========
+   socket.on("evalServer", (data) => {
+      if(!DEBUG) return;
+      const response = eval(data);
+      socket.emit("evalResponse", response);
+   });
+
 
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
@@ -132,7 +175,7 @@ io.on("connection", (socket) => {
 
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
-      console.log("User disconnected !");
+      // console.log("User disconnected !");
       delete socketList[socket.id];
       Player.OnDisconnect(socket);
    });
@@ -142,15 +185,8 @@ io.on("connection", (socket) => {
    socket.on("sendMessage", (data) => {
       const playerName = socket.id;
       for(let i in socketList) {
-         socketList[i].emit("addMessage", `${playerName} : ${data}`)
+         socketList[i].emit("addMessage", `${playerName} : ${data}`);
       }
-   });
-
-   // ==========  Debugging  ==========
-   socket.on("evalServer", (data) => {
-      if(!DEBUG) return;
-      const response = eval(data);
-      socket.emit("evalResponse", response);
    });
 });
 
@@ -159,10 +195,10 @@ io.on("connection", (socket) => {
 // Sync
 // =====================================================================
 setInterval(() => {
-   let pack = Player.updatePosition();
+   let pack = Player.updateSituation();
    
    for(let i in socketList) {
       let socket = socketList[i];
-      socket.emit("newPosition", pack);
+      socket.emit("newSituation", pack);
    }
 }, 1000/60);

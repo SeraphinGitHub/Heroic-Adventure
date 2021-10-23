@@ -3,17 +3,6 @@
    padding: 0;
 }
 
-.canvas-1 {
-   width: 1000px;
-   height: 700px;
-   border: 1px solid black;
-   background: yellowgreen;
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-}
-
 .flexCenter {
    display: flex;
    flex-wrap: wrap;
@@ -22,6 +11,49 @@
    width: 100%;
 }
 
+/* Orbitron Regular */
+@font-face {
+   font-family: "Orbitron-Regular";
+   src: url("../fonts/Orbitron-Regular.ttf");
+}
+
+/* Orbitron Extra Bold */
+@font-face {
+   font-family: "Orbitron-ExtraBold";
+   src: url("../fonts/Orbitron-ExtraBold.ttf");
+}
+
+
+
+/* ==========  Game  ========== */
+.game,
+.death-screen {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+}
+
+.game {
+   width: 1000px;
+   height: 700px;
+}
+
+.canvas-1 {
+   border: 1px solid black;
+   background: yellowgreen;
+}
+
+.death-screen {
+   visibility: hidden;
+   color: red;
+   font-family: "Orbitron-ExtraBold";
+   font-size: 60px;
+}
+
+
+
+/* ==========  Chat  ========== */
 .chat {
    position: absolute;
    align-content: space-between;

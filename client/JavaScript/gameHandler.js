@@ -2,28 +2,30 @@
 // =====================================================================
 // Global variables
 // =====================================================================
+const socket = io();
 const canvas = document.querySelector(".canvas-1");
 const ctx = canvas.getContext("2d");
+
 canvas.width = 1000;
 canvas.height = 700;
 
-const socket = io();
+let insideCanvas = false;
 
-// Controls
+canvas.addEventListener("mouseover", () => insideCanvas = true);
+canvas.addEventListener("mouseleave", () => insideCanvas = false);
+
+
+// =====================================================================
+// Movements
+// =====================================================================
 const up = "z";
 const down = "s";
 const left = "q";
 const right = "d";
 const run = " ";
 
-let isChatting = false;
-
-
-// =====================================================================
-// Movements
-// =====================================================================
 window.addEventListener("keydown", (event) => {
-   if(!isChatting) {
+   if(insideCanvas) {
       if(event.key === up) socket.emit("up", true);
       if(event.key === down) socket.emit("down", true);
       if(event.key === left) socket.emit("left", true);
@@ -33,31 +35,23 @@ window.addEventListener("keydown", (event) => {
 });
    
 window.addEventListener("keyup", (event) => {
-   if(!isChatting) {
-      if(event.key === up) socket.emit("up", false);
-      if(event.key === down) socket.emit("down", false);
-      if(event.key === left) socket.emit("left", false);
-      if(event.key === right) socket.emit("right", false);
-      if(event.key === run) socket.emit("running", false);
-   }
+   if(event.key === up) socket.emit("up", false);
+   if(event.key === down) socket.emit("down", false);
+   if(event.key === left) socket.emit("left", false);
+   if(event.key === right) socket.emit("right", false);
+   if(event.key === run) socket.emit("running", false);
 });
 
 
 // =====================================================================
-// Animation
+// Attack
 // =====================================================================
-socket.on("newPosition", (data) => {
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
-   for(let i = 0; i < data.length; i++) {
-      let player = data[i];
-      
-      ctx.fillStyle = "red";
-      ctx.fillRect(player.x, player.y, player.width, player.height);
-      
-      ctx.fillStyle = "black";
-      ctx.font = "20px Verdana";
-      ctx.fillText(Math.floor(player.health), player.x + 20, player.y + 30);
-   }
+window.addEventListener("mousedown", (event) => {
+   if(event && insideCanvas) socket.emit("attack", true);
+});
+
+window.addEventListener("mouseup", (event) => {
+   if(event && insideCanvas) socket.emit("attack", false);
 });
 
 
@@ -68,31 +62,44 @@ const chatBox = document.querySelector(".chat-box");
 const chatForm = document.querySelector(".chat-form");
 const chatInput = document.querySelector(".chat-form input");
 
-chatInput.addEventListener("click", () => isChatting = true);
-canvas.addEventListener("click", () => isChatting = false);
+let chatResponse = (data) => chatBox.innerHTML += `<p>${data}</p>`;
 
-socket.on("addMessage", (data) => {
-   chatBox.innerHTML += `<p>${data}</p>`;
-});
-
-socket.on("evalResponse", (data) => {
-   console.log(data);
-});
+socket.on("addMessage", (data) => chatResponse(data));
+socket.on("evalResponse", (data) => chatResponse(data));
 
 chatForm.onsubmit = (event) => {
    event.preventDefault();
    if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
-   else socket.emit("sendMessage", chatInput.value);
+   else if(chatInput.value !== "") socket.emit("sendMessage", chatInput.value);
    chatInput.value = "";
 }
 
 
 // =====================================================================
-// Sync
+// Animation
 // =====================================================================
-// setInterval(() => {
-//    socket.emit("newPosition", {
-//       x: player.x,
-//       y: player.y,
-//    });
-// }, 1000/30);
+const deathScreen = document.querySelector(".death-screen");
+
+const drawPlayer = (player, color) => {
+   ctx.fillStyle = color;
+   ctx.beginPath();
+   ctx.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   ctx.fill();
+   ctx.closePath();
+
+   ctx.fillStyle = "black";
+   ctx.font = "30px Orbitron-Regular";
+   ctx.fillText(Math.floor(player.health), player.x - 30, player.y - 10);
+}
+
+socket.on("newSituation", (data) => {
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+   data.forEach(player => {
+
+      // ========== temporary ==========
+      if(!player.isDead) drawPlayer(player, "red");
+      else drawPlayer(player, "blue");
+      // ===============================
+   });
+});
