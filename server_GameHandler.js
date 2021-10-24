@@ -77,12 +77,14 @@ io.on("connection", (socket) => {
 
 
    // ==========  Toggle Death Screen  ==========
-   socket.on("death", (player) => {
-      socketList[player.id].emit("showDeathScreen", player);
+   socket.on("death", (respawnSpec) => {
+      let player = socketList[respawnSpec.id];
+      if(player) player.emit("showDeathScreen", respawnSpec);
    });
 
    socket.on("respawn", (id) => {
-      socketList[id].emit("hideDeathScreen");
+      let player = socketList[id];
+      if(player) player.emit("hideDeathScreen");
    });
 });
 

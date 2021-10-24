@@ -4,7 +4,7 @@
 // =====================================================================
 // Collision for square hitbox
 // =====================================================================
-exports.squareCollision = (first, second) => {
+exports.square_toSquare_Collision = (first, second) => {
    if(!(first.x > second.x + second.width
       ||first.x + first.width < second.x
       ||first.y > second.y + second.height
@@ -17,17 +17,18 @@ exports.squareCollision = (first, second) => {
 // =====================================================================
 // Collision for circle hitbox
 // =====================================================================
-exports.circleCollision = (first, second) => {
-   let dx = second.x - (first.x + first.atkOffset_X);
-   let dy = second.y - (first.y + first.atkOffset_Y);
+exports.circle_toCircle_Collision = (first, second) => {
+   let dx = second.x - (first.x + first.attkOffset_X);
+   let dy = second.y - (first.y + first.attkOffset_Y);
    let distance = Math.sqrt(dx * dx + dy * dy);
-   let sumRadius = first.atkRadius + second.radius;
+   let sumRadius = first.attkRadius + second.radius;
 
    if(distance <= sumRadius) return true;
 }
 
+
 // ========== ORIGINALE ==========
-// exports.circleCollision = (first, second) => {
+// exports.circle_toCircle_Collision = (first, second) => {
 //    let dx = second.x - first.x;
 //    let dy = second.y - first.y;
 //    let distance = Math.sqrt(dx * dx + dy * dy);

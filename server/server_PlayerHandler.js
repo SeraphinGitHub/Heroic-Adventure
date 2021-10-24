@@ -51,6 +51,7 @@ const playerRunning = (player) => {
    if(player.isRunning) {
       player.energy -= player.energyCost;
       if(player.energy < player.energyCost) player.isRunning = false;
+      if(player.energy <= 0) player.energy = 0;
    }
 }
 
@@ -61,7 +62,8 @@ const playerRunning = (player) => {
 const playerHealing = (player) => {
    
    if(player.mana < player.baseMana) player.mana += player.regenMana;
-
+   if(player.mana > player.baseMana) player.mana = player.baseMana;
+   
    if(player.isHealing && player.mana >= player.spellCost && player.health < player.baseHealth) {
       player.isHealing = false;
 
@@ -77,19 +79,39 @@ const playerHealing = (player) => {
 // =====================================================================
 // Player Attack
 // =====================================================================
-const playerAttack = (player, otherPlayer) => {
+const playerAttack = (player, damagingOtherPlayer) => {
    
-   if(player.isAttacking) {
-      player.isAttacking = false;
+   if(player.attackCooldown < player.baseAttackCooldown) player.attackCooldown += player.attackSpeed;
+   if(player.attackCooldown > player.baseAttackCooldown) player.attackCooldown = player.baseAttackCooldown;
+   
+   if(player.isAttacking && player.attackCooldown === player.baseAttackCooldown) {  
 
-      if(!otherPlayer.isDead && !otherPlayer.isGettingDamage) {
+      player.isAttacking = false;
+      player.attackCooldown = 0;
+      damagingOtherPlayer(player)
+   }
+}
+
+
+// =====================================================================
+// Damaging Other PLayer
+// =====================================================================
+const damagingOtherPlayer = (player) => {
+
+   for(let j in playerList) {
+      let otherPlayer = playerList[j];
+
+      if(player !== otherPlayer
+      && !player.isDead
+      && !otherPlayer.isDead
+      && !otherPlayer.isGettingDamage
+      && collision.circle_toCircle_Collision(player, otherPlayer)) {
          
          otherPlayer.isGettingDamage = true;
          otherPlayer.calcDamage = player.damageRnG();
          otherPlayer.health -= otherPlayer.calcDamage;
-
+   
          setTimeout(() => otherPlayer.isGettingDamage = false, 0);
-
          if(otherPlayer.health <= 0) otherPlayer.death();
       }
    }
@@ -107,18 +129,8 @@ exports.updateSituation = () => {
 
       playerRunning(player);
       playerHealing(player);
+      playerAttack(player, damagingOtherPlayer);
 
-      for(let j in playerList) {
-         let otherPlayer = playerList[j];
-
-         if(player !== otherPlayer
-         && !player.isDead
-         && collision.circleCollision(player, otherPlayer)) {
-
-            playerAttack(player, otherPlayer);
-         }
-      }
-      
       player.update();
       playerData.push(player);
    }

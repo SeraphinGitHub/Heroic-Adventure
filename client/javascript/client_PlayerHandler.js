@@ -58,10 +58,8 @@ window.addEventListener("mouseup", (event) => {
 
 
 // =====================================================================
-// Animation
+// Draw Player
 // =====================================================================
-
-// ========== Player ==========
 const drawPlayer = (player, ctx) => {
 
    ctx.fillStyle = player.color; // <== Debug Mode
@@ -75,9 +73,9 @@ const drawPlayer = (player, ctx) => {
 // ========== Attack Area ==========
 const drawAttackArea = (player, ctx) => {
 
-   ctx.fillStyle = player.atkColor; // <== Debug Mode
+   ctx.fillStyle = player.attkColor; // <== Debug Mode
    ctx.beginPath();
-   ctx.arc(player.x + player.atkOffset_X, player.y + player.atkOffset_Y, player.atkRadius, player.atkAngle, Math.PI * 2);
+   ctx.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
    ctx.fill();
    ctx.closePath();
 }
@@ -87,26 +85,64 @@ const drawAttackArea = (player, ctx) => {
 const enemyDamageTaken = (player, ctx) => {
    if(player.isGettingDamage) {
       
-      const offsetX = -30;
-      const offsetY = -100;
-      const textSize = 30;
-      const textColor = "yellow";
-      const textValue = `-${player.calcDamage}`;
+      const dmg = {
+         offsetX: -30,
+         offsetY: -100,
+         textSize: 30,
+         textColor: "yellow",
+         textValue: `-${player.calcDamage}`,
+      };
 
-      const newMessage = new FloatingMessage(ctx, player.x, player.y, offsetX, offsetY, textSize, textColor, textValue);
+      const newMessage = new FloatingMessage(ctx, player.x, player.y, dmg.offsetX, dmg.offsetY, dmg.textSize, dmg.textColor, dmg.textValue);
       floatTextArray.push(newMessage);
    }
 }
 
 
-let width = 130;
-let height = 12;
+// =====================================================================
+// Draw Player Game Bars
+// =====================================================================
+const drawBar = (player, ctx) => {
 
-// ========== HealthBar ==========
-const drawHealthBar = (player, ctx) => {
-   let color = "lime";
-   const bar = new GameBar(ctx, player.x, player.y, -width/2, -108, width, height, color, player.baseHealth, player.health);
-   bar.draw();
+   const barWidth = 130;
+   const barHeight = 12;
+
+   const attackBar = {
+      color: "red",
+      maxValue: player.baseAttackCooldown,
+      value: player.attackCooldown,
+   };
+
+   const healthBar = {
+      color: "lime",
+      maxValue: player.baseHealth,
+      value: player.health,
+   };
+
+   const manaBar = {
+      color: "dodgerblue",
+      maxValue: player.baseMana,
+      value: player.mana,
+   };
+
+   const energyBar = {
+      color: "gold",
+      maxValue: player.baseEnergy,
+      value: player.energy,
+   };
+   
+   let gameBarArray = [energyBar, attackBar, manaBar, healthBar];
+   let barGap = 0;
+
+   gameBarArray.forEach(bar => {
+      new GameBar(ctx, player.x, player.y, -barWidth/2, -80 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      barGap -= 14;
+   });
+}
+
+
+// Temporary
+const drawHealthNumber = (player, ctx) => {
 
    ctx.fillStyle = "black";
    ctx.font = "26px Orbitron-Regular";
@@ -114,42 +150,32 @@ const drawHealthBar = (player, ctx) => {
 }
 
 
-// ========== ManaBar ==========
-const drawManaBar = (player, ctx) => {
-   let color = "dodgerblue";
-   if(player.isDead) color = "gray";
-   const bar = new GameBar(ctx, player.x, player.y, -width/2, -94, width, height, color, player.baseMana, player.mana);
-   bar.draw();
-}
+// =====================================================================
+// Player Death
+// =====================================================================
+const deathScreen = document.querySelector(".death-screen");
+const deathMessage = document.querySelector(".death-message");
+const respawnTimer = document.querySelector(".respawn-timer");
 
+const playerDeath = (player) => {
 
-// ========== EnergBar ==========
-const drawEnergyBar = (player, ctx) => {
-   let color = "gold";
-   if(player.isDead) color = "gray";
-   const bar = new GameBar(ctx, player.x, player.y, -width/2, -80, width, height, color, player.baseEnergy, player.energy);
-   bar.draw();
+   if(player.isDead) {
+      socket.emit("death", {
+         id: player.id,
+         timer: player.respawnTimer,
+         deathCounts: player.deathCounts
+      });
+   }
+   
+   if(player.isRespawning) {
+      socket.emit("respawn", player.id);
+   }
 }
 
 
 // =====================================================================
 // Toggle Death Screen
 // =====================================================================
-const deathScreen = document.querySelector(".death-screen");
-const deathMessage = document.querySelector(".death-message");
-const respawnTimer = document.querySelector(".respawn-timer");
-
-const playerDeathScreen = (player) => {
-
-   if(player.isDead) socket.emit("death", {
-      id: player.id,
-      timer: player.respawnTimer,
-      deathCounts: player.deathCounts,
-   });
-
-   if(player.isRespawning) socket.emit("respawn", player.id);
-}
-
 socket.on("showDeathScreen", (player) => {
    
    let textValue = "You died !";
@@ -167,3 +193,19 @@ socket.on("showDeathScreen", (player) => {
 socket.on("hideDeathScreen", () => {
    deathScreen.style = "visibility: hidden";
 });
+
+
+// =====================================================================
+// Player Init (Update)
+// =====================================================================
+const initPlayer = (player, ctx) => {
+
+   drawPlayer(player, ctx);
+   drawAttackArea(player, ctx);
+   enemyDamageTaken(player, ctx);
+
+   drawBar(player, ctx);
+   drawHealthNumber(player, ctx);
+   
+   playerDeath(player);
+}

@@ -9,18 +9,18 @@ const gameWindow = document.querySelector(".game-window");
 const canvas = document.querySelector(".canvas-1");
 const ctx = canvas.getContext("2d");
 
-const gamingSize = {
-   height: 800,
-   width: 1100,
-}
+canvas.height = 800;
+canvas.width = 1100;
+
+// if(window.matchMedia("(max-width: 1500px)").matches) {
+//    canvas.height = 500;
+//    canvas.width = 800;
+// }
 
 gameWindow.style = `
-   height: ${gamingSize.height}px;
-   width: ${gamingSize.width}px
+   height: ${canvas.height}px;
+   width: ${canvas.width}px
 `;
-
-canvas.height = gamingSize.height;
-canvas.width = gamingSize.width;
 
 
 // =====================================================================
@@ -80,18 +80,6 @@ socket.on("newSituation", (playerData) => {
    ctx.clearRect(0, 0, canvas.width, canvas.height);
    
    drawMap();
-
-   playerData.forEach(player => {
-      drawPlayer(player, ctx);
-      drawAttackArea(player, ctx);
-      enemyDamageTaken(player, ctx);
-
-      drawHealthBar(player, ctx);
-      drawManaBar(player, ctx);
-      drawEnergyBar(player, ctx);
-
-      playerDeathScreen(player);
-   });
-   
+   playerData.forEach(player => initPlayer(player, ctx));
    handleFloatingMessages();
 });

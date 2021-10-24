@@ -19,26 +19,33 @@ class GameBar {
       this.value = value;
 
       // Custom
-      this.borderSize = 4;
-      this.width = (this.value / this.maxValue) * this.maxWidth;
+      this.borderSize = 2;
+      this.width = ((this.value / this.maxValue) * this.maxWidth) - this.borderSize;
       this.bordersColor = "black";
       this.backgroundColor = "gray";
    }
 
-   baseFrame(color, barWidth, brd_Size) {
+   baseBar(color, barWidth, brd_Size) {
       this.ctx.fillStyle = color;
+
       this.ctx.fillRect(
          this.x + this.offsetX + brd_Size/2,
          this.y + this.offsetY + brd_Size/2,
-         barWidth - brd_Size,
+         barWidth,
          this.height - brd_Size
       );
    }
 
    draw() {
-      if(this.width <= 0) this.width = this.borderSize;
-      this.baseFrame(this.bordersColor, this.maxWidth, 0);                  // Borders
-      this.baseFrame(this.backgroundColor, this.maxWidth, this.borderSize); // Background
-      this.baseFrame(this.fillColor, this.width, this.borderSize);          // Life Bar
+      if(this.width <= 0) this.width = 0;
+
+      // Borders
+      this.baseBar(this.bordersColor, this.maxWidth, 0);
+
+      // Background
+      this.baseBar(this.backgroundColor, this.maxWidth - this.borderSize, this.borderSize);
+
+      // Value Bar
+      this.baseBar(this.fillColor, this.width, this.borderSize);
    }
 }

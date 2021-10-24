@@ -5,9 +5,14 @@
 // Initiallize client scripts
 // =====================================================================
 const scripts = [
-   "client_GameHandler.js",
+   
+   // Classes
    "classes/FloatingMessage.js",
    "classes/GameBar.js",
+   "classes/Tile.js",
+   
+   // Scripts
+   "client_GameHandler.js",
    "client_PlayerHandler.js",
    "client_Map.js",
 ];

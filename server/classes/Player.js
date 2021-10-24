@@ -5,50 +5,58 @@ class Player {
    constructor(id) {
       this.id = id;
 
+      // Important ==> keep 1.45 for refresh rate of {1000/60}
+      this.timerCoeff = 1.45;
+
       // Player Hitbox
-      this.x = 200;
-      this.y = 200;
+      this.x = 600;
+      this.y = 400;
       this.radius = 50;
       this.angle = 0;
       this.color = "darkviolet";
 
       // Attack Hitbox
-      this.atkOffset = 25;
-      this.atkOffset_X = 0;
-      this.atkOffset_Y = this.atkOffset;
-      this.atkRadius = 40;
-      this.atkAngle = 0;
-      this.atkColor = "orangered";
+      this.attkOffset = 25;
+      this.attkOffset_X = 0;
+      this.attkOffset_Y = this.attkOffset;
+      this.attkRadius = 40;
+      this.attkAngle = 0;
+      this.attkColor = "orangered";
 
       // Health
       this.baseHealth = 300;
-      this.deathCounts = 0;
+      this.health = this.baseHealth;
+
+      // Respawn
       this.baseRespawnTimer = 10; //<== seconds
+      this.respawnTimer = this.baseRespawnTimer;
+      this.deathCounts = 0;
       
       // Energy
-      this.baseEnergy = 90;
+      this.baseEnergy = 150;
+      this.energy = this.baseEnergy;
       this.energyCost = 1.2;
       this.regenEnergy = 0.2;
 
       // Mana
       this.baseMana = 150;
-      this.spellCost = 100;
+      this.mana = this.baseMana;
       this.regenMana = 0.12;
-      this.baseHealing = this.baseHealth * 0.25;
+
+      // Spell - Healing
+      this.spellCost = 100;
+      this.baseHealing = this.baseHealth * 0.25; // <== Healing = 25% MaxHealth
       this.calcHealing;
       
+      // Attack Speed
+      this.attackSpeed = 100/ ( 0.8 ); // <== seconds
+      this.baseAttackCooldown = 60 * 100 / this.timerCoeff;
+      this.attackCooldown = this.baseAttackCooldown;
+
       // Damages
-      this.baseAttackSpeed = 1.2; //<== seconds
       this.baseDamage = 15;
       this.calcDamage;
       
-      // Specs = BaseSpecs
-      this.health = this.baseHealth;
-      this.mana = this.baseMana;
-      this.energy = this.baseEnergy;
-      this.attackSpeed = this.baseAttackSpeed;
-      this.respawnTimer = this.baseRespawnTimer;
-
       // Movements
       this.walkSpeed = 7;
       this.runSpeed = 15;
@@ -76,47 +84,47 @@ class Player {
          // Cross
          if(this.up) {
             this.y -= moveSpeed;
-            this.atkOffset_X = 0;
-            this.atkOffset_Y = -this.atkOffset;
+            this.attkOffset_X = 0;
+            this.attkOffset_Y = -this.attkOffset;
          }
          
          if(this.down) {
             this.y += moveSpeed;
-            this.atkOffset_X = 0;
-            this.atkOffset_Y = this.atkOffset;
+            this.attkOffset_X = 0;
+            this.attkOffset_Y = this.attkOffset;
          }
          
          if(this.left) {
             this.x -= moveSpeed;
-            this.atkOffset_X = -this.atkOffset;
-            this.atkOffset_Y = 0;
+            this.attkOffset_X = -this.attkOffset;
+            this.attkOffset_Y = 0;
          }
          
          if(this.right) {
             this.x += moveSpeed;
-            this.atkOffset_X = this.atkOffset;
-            this.atkOffset_Y = 0;
+            this.attkOffset_X = this.attkOffset;
+            this.attkOffset_Y = 0;
          }
          
          // Diagonale
          if(this.up && this.left) {
-            this.atkOffset_X = -this.atkOffset;
-            this.atkOffset_Y = -this.atkOffset;
+            this.attkOffset_X = -this.attkOffset;
+            this.attkOffset_Y = -this.attkOffset;
          }
 
          if(this.up && this.right) {
-            this.atkOffset_X = this.atkOffset;
-            this.atkOffset_Y = -this.atkOffset;
+            this.attkOffset_X = this.attkOffset;
+            this.attkOffset_Y = -this.attkOffset;
          }
 
          if(this.down && this.left) {
-            this.atkOffset_X = -this.atkOffset;
-            this.atkOffset_Y = this.atkOffset;
+            this.attkOffset_X = -this.attkOffset;
+            this.attkOffset_Y = this.attkOffset;
          }
 
          if(this.down && this.right) {
-            this.atkOffset_X = this.atkOffset;
-            this.atkOffset_Y = this.atkOffset;
+            this.attkOffset_X = this.attkOffset;
+            this.attkOffset_Y = this.attkOffset;
          }
          
          // Diag Speed
@@ -129,17 +137,22 @@ class Player {
       }
    }
 
-   RnG(factor) {
-      return Math.floor(Math.random() * factor);
+   RnG(baseSpec, coeff) {
+      return baseSpec + Math.floor(Math.random() * (baseSpec - baseSpec * coeff));
    }
 
    healRnG() {
-      return this.baseHealing + this.RnG(this.baseHealing - this.baseHealing * 0.15);
+      return this.RnG(this.baseHealing, 0.15);
    }
 
    damageRnG() {
-      return this.baseDamage + this.RnG(this.baseDamage - this.baseDamage * 0.25);
+      return this.RnG(this.baseDamage, 0.25);
    }
+
+   // baseRegen(value, baseValue, regenValue) {
+   //    if(value < baseValue) return value += regenValue;
+   //    if(value > baseValue) return value = baseValue;
+   // }
 
    death() {
       this.health = 0;
@@ -148,17 +161,12 @@ class Player {
       this.color = "blue";
       
       if(this.deathCounts === 10) this.deathCounts = 0;
-      this.respawn();
-   }
-
-   respawn() {
-      const respawnInterval = setInterval(() => {
+      
+      const respawnCooldown = setInterval(() => {
          if(!this.isRespawning) {
-
             this.respawnTimer --;
-   
+            
             if(this.respawnTimer <= 0) {
-               
                this.isDead = false;
                this.isRespawning = true;
                this.health = this.baseHealth;
@@ -169,7 +177,7 @@ class Player {
       }, 1000);
 
       if(this.isRespawning) {
-         clearInterval(respawnInterval);
+         clearInterval(respawnCooldown);
          this.isRespawning = false;
       }
    }
