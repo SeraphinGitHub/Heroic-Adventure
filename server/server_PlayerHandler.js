@@ -33,7 +33,7 @@ exports.onConnect = (socket) => {
    //    let tree = treeList[i];
    //    socket.emit("connected", tree);
    // }
-   
+
    // =================================================================
 
 
@@ -61,7 +61,7 @@ exports.onDisconnect = (socket) => {
 
 // ==========================  Temporary  ==========================
 
-const playerMovements = (player) => {
+const stopMove_onCollide = (player) => {
    
    for(let i in treeList) {
       let tree = treeList[i];
@@ -79,6 +79,74 @@ const playerMovements = (player) => {
 // ==========================  Temporary  ==========================
 
 
+
+
+// =====================================================================
+// Player Movements
+// =====================================================================
+const playerMovements = (player) => {
+
+   if(!player.isDead) {
+
+      let moveSpeed;
+      if(!player.isRunning) moveSpeed = player.walkSpeed;
+      else moveSpeed = player.runSpeed;
+      
+      // Cross
+      if(player.up) {
+         player.y -= moveSpeed;
+         player.attkOffset_X = 0;
+         player.attkOffset_Y = -player.attkOffset;
+      }
+      
+      if(player.down) {
+         player.y += moveSpeed;
+         player.attkOffset_X = 0;
+         player.attkOffset_Y = player.attkOffset;
+      }
+      
+      if(player.left) {
+         player.x -= moveSpeed;
+         player.attkOffset_X = -player.attkOffset;
+         player.attkOffset_Y = 0;
+      }
+      
+      if(player.right) {
+         player.x += moveSpeed;
+         player.attkOffset_X = player.attkOffset;
+         player.attkOffset_Y = 0;
+      }
+      
+      // Diagonale
+      if(player.up && player.left) {
+         player.attkOffset_X = -player.attkOffset;
+         player.attkOffset_Y = -player.attkOffset;
+      }
+
+      if(player.up && player.right) {
+         player.attkOffset_X = player.attkOffset;
+         player.attkOffset_Y = -player.attkOffset;
+      }
+
+      if(player.down && player.left) {
+         player.attkOffset_X = -player.attkOffset;
+         player.attkOffset_Y = player.attkOffset;
+      }
+
+      if(player.down && player.right) {
+         player.attkOffset_X = player.attkOffset;
+         player.attkOffset_Y = player.attkOffset;
+      }
+      
+      // Diag Speed
+      if(player.up && player.left
+      ||player.up && player.right
+      ||player.down && player.left
+      ||player.down && player.right) {
+         moveSpeed = Math.sqrt(moveSpeed);
+      }
+   }
+}
 
 
 // =====================================================================
@@ -120,15 +188,23 @@ const playerHealing = (player) => {
 // =====================================================================
 const playerAttack = (player) => {
 
-   if(player.attackCooldown < player.baseAttackCooldown) player.attackCooldown += player.attackSpeed;
-   if(player.attackCooldown > player.baseAttackCooldown) player.attackCooldown = player.baseAttackCooldown;
-
-   if(player.isAttacking && player.attackCooldown === player.baseAttackCooldown) {  
+   if(player.isAttacking && player.canAttack) {  
 
       player.isAttacking = false;
-      player.attackCooldown = 0;
-      damagingEnemy(player, playerList);
+      player.canAttack = false;
+
+      damagingEnemy(player);
       // damagingEnemy(player, mobList); // <== When Mob class gonna be created
+
+      const attackCooldown = setInterval(() => {
+         player.attackCooldown --;
+
+         if(player.attackCooldown <= 0) {
+            player.canAttack = true;
+            player.attackCooldown = player.attackSpeed;
+            clearInterval(attackCooldown);
+         }
+      }, 1);
    }
 }
 
@@ -136,44 +212,72 @@ const playerAttack = (player) => {
 // =====================================================================
 // Damaging Enemy
 // =====================================================================
-const damagingEnemy = (player, enemyList) => {
+const damagingEnemy = (player) => {
 
-   for(let i in enemyList) {
-      let enemy = enemyList[i];
+   for(let i in playerList) {
+      let otherPlayer = playerList[i];
 
-      if(player !== enemy
+      if(player !== otherPlayer
       && !player.isDead
-      && !enemy.isDead
-      && !enemy.isGettingDamage
-      && collision.circle_toCircle_withOffset(player, player.attkOffset_X, player.attkOffset_Y, player.attkRadius, enemy)) {
+      && !otherPlayer.isDead
+      && !otherPlayer.isGettingDamage
+      && collision.circle_toCircle_withOffset(player, player.attkOffset_X, player.attkOffset_Y, player.attkRadius, otherPlayer)) {
          
-         enemy.isGettingDamage = true;
-         enemy.calcDamage = player.damageRnG();
-         enemy.health -= enemy.calcDamage;
+         otherPlayer.isGettingDamage = true;
+         otherPlayer.calcDamage = player.damageRnG();
+         otherPlayer.health -= otherPlayer.calcDamage;
    
-         setTimeout(() => enemy.isGettingDamage = false, 0);
-         if(enemy.health <= 0) enemy.death();
+         setTimeout(() => otherPlayer.isGettingDamage = false, 0);
+         if(otherPlayer.health <= 0) playerDeath(otherPlayer);
       }
    }
 }
 
 
 // =====================================================================
-// Player update
+// Player Death
 // =====================================================================
-exports.updateSituation = () => {
+const playerDeath = (player) => {
+   
+   player.health = 0;
+   player.isDead = true;
+   player.deathCounts++;
+   player.color = "blue"; // <== Debug Mode
+   
+   if(player.deathCounts === 10) player.deathCounts = 0;
+   
+   const respawnCooldown = setInterval(() => {
+      player.respawnTimer --;
+      
+      if(player.respawnTimer <= 0) {
+
+         player.isDead = false;
+         player.health = player.baseHealth;
+         player.respawnTimer = player.baseRespawnTimer;
+         player.color = "darkviolet"; // <== Debug Mode
+
+         clearInterval(respawnCooldown);
+      }
+   }, 1000);
+}
+
+
+// =====================================================================
+// Player Update (Every frame)
+// =====================================================================
+exports.playerUpdate = () => {
    let playerData = [];
    
    for(let i in playerList) {
       let player = playerList[i];
 
+      playerMovements(player);
       playerRunning(player);
       playerHealing(player);
       playerAttack(player);
 
-      // playerMovements(player);
+      // stopMove_onCollide(player);
 
-      player.update();
       playerData.push(player);
    }
    return playerData;

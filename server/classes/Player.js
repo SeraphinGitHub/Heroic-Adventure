@@ -5,9 +5,6 @@ class Player {
    constructor(id) {
       this.id = id;
 
-      // Important ==> keep 1.45 for refresh rate of {1000/60}
-      this.timerCoeff = 1.45;
-
       // Player Hitbox
       this.x = 600;
       this.y = 400;
@@ -49,12 +46,11 @@ class Player {
       this.calcHealing;
       
       // Attack Speed
-      this.attackSpeed = 100/ ( 0.7 ); // <== seconds
-      this.baseAttackCooldown = 60 * 100 / this.timerCoeff;
-      this.attackCooldown = this.baseAttackCooldown;
+      this.attackSpeed = 100* ( 0.6 ); //<== seconds
+      this.attackCooldown = this.attackSpeed;
 
       // Damages
-      this.baseDamage = 15;
+      this.baseDamage = 25;
       this.calcDamage;
       
       // Movements
@@ -70,72 +66,9 @@ class Player {
       this.isDead = false;
       this.isRunning = false;
       this.isAttacking = false;
+      this.canAttack = true;
       this.isHealing = false;
       this.isGettingDamage = false;
-      this.isRespawning = false;
-   }
-
-   update() {
-      if(!this.isDead) {
-
-         let moveSpeed;
-         if(!this.isRunning) moveSpeed = this.walkSpeed;
-         else moveSpeed = this.runSpeed;
-         
-         // Cross
-         if(this.up) {
-            this.y -= moveSpeed;
-            this.attkOffset_X = 0;
-            this.attkOffset_Y = -this.attkOffset;
-         }
-         
-         if(this.down) {
-            this.y += moveSpeed;
-            this.attkOffset_X = 0;
-            this.attkOffset_Y = this.attkOffset;
-         }
-         
-         if(this.left) {
-            this.x -= moveSpeed;
-            this.attkOffset_X = -this.attkOffset;
-            this.attkOffset_Y = 0;
-         }
-         
-         if(this.right) {
-            this.x += moveSpeed;
-            this.attkOffset_X = this.attkOffset;
-            this.attkOffset_Y = 0;
-         }
-         
-         // Diagonale
-         if(this.up && this.left) {
-            this.attkOffset_X = -this.attkOffset;
-            this.attkOffset_Y = -this.attkOffset;
-         }
-
-         if(this.up && this.right) {
-            this.attkOffset_X = this.attkOffset;
-            this.attkOffset_Y = -this.attkOffset;
-         }
-
-         if(this.down && this.left) {
-            this.attkOffset_X = -this.attkOffset;
-            this.attkOffset_Y = this.attkOffset;
-         }
-
-         if(this.down && this.right) {
-            this.attkOffset_X = this.attkOffset;
-            this.attkOffset_Y = this.attkOffset;
-         }
-         
-         // Diag Speed
-         if(this.up && this.left
-         ||this.up && this.right
-         ||this.down && this.left
-         ||this.down && this.right) {
-            moveSpeed = Math.sqrt(moveSpeed);
-         }
-      }
    }
 
    RnG(baseSpec, coeff) {
@@ -148,34 +81,6 @@ class Player {
 
    damageRnG() {
       return this.RnG(this.baseDamage, 0.25);
-   }
-
-   death() {
-      this.health = 0;
-      this.isDead = true;
-      this.deathCounts++;
-      this.color = "blue";
-      
-      if(this.deathCounts === 10) this.deathCounts = 0;
-      
-      const respawnCooldown = setInterval(() => {
-         if(!this.isRespawning) {
-            this.respawnTimer --;
-            
-            if(this.respawnTimer <= 0) {
-               this.isDead = false;
-               this.isRespawning = true;
-               this.health = this.baseHealth;
-               this.respawnTimer = this.baseRespawnTimer;
-               this.color = "darkviolet";
-            }
-         }
-      }, 1000);
-
-      if(this.isRespawning) {
-         clearInterval(respawnCooldown);
-         this.isRespawning = false;
-      }
    }
 }
 

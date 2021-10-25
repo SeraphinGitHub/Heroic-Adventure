@@ -93,11 +93,19 @@ io.on("connection", (socket) => {
 // Server Sync
 // =====================================================================
 setInterval(() => {
-   let playerData = playerHandler.updateSituation();
-   
+   let playerData = playerHandler.playerUpdate();
+
    for(let i in socketList) {
       let socket = socketList[i];
       socket.emit("newSituation", playerData);
    }
 
+   playerData.forEach(player => {
+      let socket = socketList[player.id];
+      
+      if(player.isDead) socket.emit("playerDeath", {
+         respawnTimer: player.respawnTimer,
+         deathCounts: player.deathCounts
+      });      
+   });
 }, 1000/60);

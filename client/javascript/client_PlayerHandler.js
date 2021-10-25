@@ -117,7 +117,7 @@ const drawBar = (ctxChars, player) => {
 
    const healthBar = setBar("lime", player.baseHealth, player.health);
    const manaBar   = setBar("dodgerblue", player.baseMana, player.mana);
-   const attackBar = setBar("red", player.baseAttackCooldown, player.attackCooldown);
+   const attackBar = setBar("red", player.attackSpeed, player.attackCooldown);
    const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
    let gameBarArray = [
@@ -147,35 +147,16 @@ const drawHealthNumber = (ctxChars, player) => {
 
 
 // =====================================================================
-// Player Death
-// =====================================================================
-const deathScreen = document.querySelector(".death-screen");
-const deathMessage = document.querySelector(".death-message");
-const respawnTimer = document.querySelector(".respawn-timer");
-
-const playerDeath = (player) => {
-
-   if(player.isDead) {
-      socket.emit("death", {
-         id: player.id,
-         timer: player.respawnTimer,
-         deathCounts: player.deathCounts
-      });
-   }
-   
-   if(player.isRespawning) {
-      socket.emit("respawn", player.id);
-   }
-}
-
-
-// =====================================================================
 // Toggle Death Screen
 // =====================================================================
-socket.on("showDeathScreen", (player) => {
+socket.on("playerDeath", (player) => {
+
+   const deathScreen = document.querySelector(".death-screen");
+   const deathMessage = document.querySelector(".death-message");
+   const respawnTimer = document.querySelector(".respawn-timer");
    
    let textValue = "You died !";
-   let timerValue = `Respawn in ${player.timer} sec`;
+   let timerValue = `Respawn in ${player.respawnTimer} sec`;
 
    if(player.deathCounts === 3) textValue = "You died again !";
    if(player.deathCounts === 6) textValue = "Wasted !";
@@ -184,10 +165,8 @@ socket.on("showDeathScreen", (player) => {
    deathScreen.style = "visibility: visible";
    deathMessage.textContent = textValue;
    respawnTimer.textContent = timerValue;
-});
 
-socket.on("hideDeathScreen", () => {
-   deathScreen.style = "visibility: hidden";
+   // setTimeout(() => deathScreen.style = "visibility: hidden", player.respawnTimer);
 });
 
 
@@ -202,6 +181,4 @@ const initPlayer = (ctxChars, player) => {
 
    drawBar(ctxChars, player);
    drawHealthNumber(ctxChars, player);
-   
-   playerDeath(player);
 }
