@@ -11,20 +11,20 @@ class Player {
       // Player Hitbox
       this.x = 600;
       this.y = 400;
-      this.radius = 50;
+      this.radius = 40;
       this.angle = 0;
       this.color = "darkviolet";
 
       // Attack Hitbox
-      this.attkOffset = 25;
+      this.attkOffset = 20;
       this.attkOffset_X = 0;
       this.attkOffset_Y = this.attkOffset;
-      this.attkRadius = 40;
+      this.attkRadius = 30;
       this.attkAngle = 0;
       this.attkColor = "orangered";
 
       // Health
-      this.baseHealth = 300;
+      this.baseHealth = 200;
       this.health = this.baseHealth;
 
       // Respawn
@@ -49,7 +49,7 @@ class Player {
       this.calcHealing;
       
       // Attack Speed
-      this.attackSpeed = 100/ ( 0.8 ); // <== seconds
+      this.attackSpeed = 100/ ( 0.7 ); // <== seconds
       this.baseAttackCooldown = 60 * 100 / this.timerCoeff;
       this.attackCooldown = this.baseAttackCooldown;
 
@@ -59,6 +59,7 @@ class Player {
       
       // Movements
       this.walkSpeed = 7;
+      this.baseWalkSpeed = this.walkSpeed;
       this.runSpeed = 15;
       this.up = false;
       this.down = false;
@@ -148,11 +149,6 @@ class Player {
    damageRnG() {
       return this.RnG(this.baseDamage, 0.25);
    }
-
-   // baseRegen(value, baseValue, regenValue) {
-   //    if(value < baseValue) return value += regenValue;
-   //    if(value > baseValue) return value = baseValue;
-   // }
 
    death() {
       this.health = 0;

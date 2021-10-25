@@ -5,12 +5,19 @@
 // Socket & Canvas
 // =====================================================================
 const socket = io();
-const gameWindow = document.querySelector(".game-window");
-const canvas = document.querySelector(".canvas-1");
-const ctx = canvas.getContext("2d");
 
-canvas.height = 800;
-canvas.width = 1100;
+const gameWindow = document.querySelector(".game-window");
+const canvasMap = document.querySelector(".canvas-map");
+const canvasChars = document.querySelector(".canvas-characters");
+
+const ctxMap = canvasMap.getContext("2d");
+const ctxChars = canvasChars.getContext("2d");
+
+canvasMap.height = 800;
+canvasMap.width = 1100;
+
+canvasChars.height = 800;
+canvasChars.width = 1100;
 
 // if(window.matchMedia("(max-width: 1500px)").matches) {
 //    canvas.height = 500;
@@ -18,8 +25,8 @@ canvas.width = 1100;
 // }
 
 gameWindow.style = `
-   height: ${canvas.height}px;
-   width: ${canvas.width}px
+   height: ${canvasChars.height}px;
+   width: ${canvasChars.width}px
 `;
 
 
@@ -73,13 +80,21 @@ const handleFloatingMessages = () => {
 }
 
 
+// ==========================  Temporary  ==========================
+
+// socket.on("connected", (tree) => initMap(ctxMap, tree));
+
+// ==========================  Temporary  ==========================
+
+
 // =====================================================================
-// Client Sync
+// Client Sync (Every frame)
 // =====================================================================
 socket.on("newSituation", (playerData) => {
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
    
-   drawMap();
-   playerData.forEach(player => initPlayer(player, ctx));
+   initMap(ctxMap); // <== Disactivate on update later
+   
+   playerData.forEach(player => initPlayer(ctxChars, player));
    handleFloatingMessages();
 });

@@ -5,6 +5,7 @@
 // Scrips import
 // =====================================================================
 const Player = require("./classes/Player.js");
+const Tree = require("./classes/Tree.js");
 const collision = require("./collisions.js");
 
 
@@ -12,6 +13,7 @@ const collision = require("./collisions.js");
 // Global Variables
 // =====================================================================
 let playerList = {};
+let treeList = {};
 
 
 // =====================================================================
@@ -20,6 +22,20 @@ let playerList = {};
 exports.onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
+
+
+   // ==========================  Temporary  ==========================
+
+   // const tree = new Tree();
+   // treeList[tree] = tree;
+
+   // for(let i in treeList) {
+   //    let tree = treeList[i];
+   //    socket.emit("connected", tree);
+   // }
+   
+   // =================================================================
+
 
    socket.on("up", data => player.up = data);
    socket.on("down", data => player.down = data);
@@ -40,13 +56,37 @@ exports.onDisconnect = (socket) => {
 }
 
 
+
+
+
+// ==========================  Temporary  ==========================
+
+const playerMovements = (player) => {
+   
+   for(let i in treeList) {
+      let tree = treeList[i];
+
+      if(collision.circle_toCircle_withOffset(tree, tree.offsetX, tree.offsetY, tree.radius, player)) {
+         player.walkSpeed = 1;
+         // player.runSpeed = 0;
+      }
+
+      else player.walkSpeed = player.baseWalkSpeed;
+   }
+
+}
+
+// ==========================  Temporary  ==========================
+
+
+
+
 // =====================================================================
 // Player Running
 // =====================================================================
 const playerRunning = (player) => {
    
    if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
-   if(player.energy > player.baseEnergy) player.energy = player.baseEnergy;
 
    if(player.isRunning) {
       player.energy -= player.energyCost;
@@ -60,10 +100,9 @@ const playerRunning = (player) => {
 // Player Healing
 // =====================================================================
 const playerHealing = (player) => {
-   
+
    if(player.mana < player.baseMana) player.mana += player.regenMana;
-   if(player.mana > player.baseMana) player.mana = player.baseMana;
-   
+
    if(player.isHealing && player.mana >= player.spellCost && player.health < player.baseHealth) {
       player.isHealing = false;
 
@@ -79,40 +118,41 @@ const playerHealing = (player) => {
 // =====================================================================
 // Player Attack
 // =====================================================================
-const playerAttack = (player, damagingOtherPlayer) => {
-   
+const playerAttack = (player) => {
+
    if(player.attackCooldown < player.baseAttackCooldown) player.attackCooldown += player.attackSpeed;
    if(player.attackCooldown > player.baseAttackCooldown) player.attackCooldown = player.baseAttackCooldown;
-   
+
    if(player.isAttacking && player.attackCooldown === player.baseAttackCooldown) {  
 
       player.isAttacking = false;
       player.attackCooldown = 0;
-      damagingOtherPlayer(player)
+      damagingEnemy(player, playerList);
+      // damagingEnemy(player, mobList); // <== When Mob class gonna be created
    }
 }
 
 
 // =====================================================================
-// Damaging Other PLayer
+// Damaging Enemy
 // =====================================================================
-const damagingOtherPlayer = (player) => {
+const damagingEnemy = (player, enemyList) => {
 
-   for(let j in playerList) {
-      let otherPlayer = playerList[j];
+   for(let i in enemyList) {
+      let enemy = enemyList[i];
 
-      if(player !== otherPlayer
+      if(player !== enemy
       && !player.isDead
-      && !otherPlayer.isDead
-      && !otherPlayer.isGettingDamage
-      && collision.circle_toCircle_Collision(player, otherPlayer)) {
+      && !enemy.isDead
+      && !enemy.isGettingDamage
+      && collision.circle_toCircle_withOffset(player, player.attkOffset_X, player.attkOffset_Y, player.attkRadius, enemy)) {
          
-         otherPlayer.isGettingDamage = true;
-         otherPlayer.calcDamage = player.damageRnG();
-         otherPlayer.health -= otherPlayer.calcDamage;
+         enemy.isGettingDamage = true;
+         enemy.calcDamage = player.damageRnG();
+         enemy.health -= enemy.calcDamage;
    
-         setTimeout(() => otherPlayer.isGettingDamage = false, 0);
-         if(otherPlayer.health <= 0) otherPlayer.death();
+         setTimeout(() => enemy.isGettingDamage = false, 0);
+         if(enemy.health <= 0) enemy.death();
       }
    }
 }
@@ -129,7 +169,9 @@ exports.updateSituation = () => {
 
       playerRunning(player);
       playerHealing(player);
-      playerAttack(player, damagingOtherPlayer);
+      playerAttack(player);
+
+      // playerMovements(player);
 
       player.update();
       playerData.push(player);

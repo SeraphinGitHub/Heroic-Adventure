@@ -6,6 +6,8 @@
 body {
    justify-content: space-around !important;
    height: 100vh;
+   
+   background: linear-gradient(to bottom right, dodgerblue, lightgray, orange);
 }
 
 .flexCenter {
@@ -14,6 +16,10 @@ body {
    justify-content: center;
    align-content: center;
    width: 100%;
+}
+
+.absolute {
+   position: absolute;
 }
 
 /* Orbitron Regular */
@@ -165,7 +171,7 @@ body {
 
 .game-window {
    border: 1px solid black;
-   background: yellowgreen;
+   /* background: yellowgreen; */
 }
 
 

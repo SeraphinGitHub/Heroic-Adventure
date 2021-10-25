@@ -5,8 +5,8 @@
 // Variables
 // =====================================================================
 let insideCanvas = false;
-canvas.addEventListener("mouseover", () => insideCanvas = true);
-canvas.addEventListener("mouseleave", () => insideCanvas = false);
+canvasChars.addEventListener("mouseover", () => insideCanvas = true);
+canvasChars.addEventListener("mouseleave", () => insideCanvas = false);
 
 const controls = {
    up: "z",
@@ -60,29 +60,29 @@ window.addEventListener("mouseup", (event) => {
 // =====================================================================
 // Draw Player
 // =====================================================================
-const drawPlayer = (player, ctx) => {
+const drawPlayer = (ctxChars, player) => {
 
-   ctx.fillStyle = player.color; // <== Debug Mode
-   ctx.beginPath();
-   ctx.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
-   ctx.fill();
-   ctx.closePath();
+   ctxChars.fillStyle = player.color; // <== Debug Mode
+   ctxChars.beginPath();
+   ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   ctxChars.fill();
+   ctxChars.closePath();
 }
 
 
 // ========== Attack Area ==========
-const drawAttackArea = (player, ctx) => {
+const drawAttackArea = (ctxChars, player) => {
 
-   ctx.fillStyle = player.attkColor; // <== Debug Mode
-   ctx.beginPath();
-   ctx.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
-   ctx.fill();
-   ctx.closePath();
+   ctxChars.fillStyle = player.attkColor; // <== Debug Mode
+   ctxChars.beginPath();
+   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
+   ctxChars.fill();
+   ctxChars.closePath();
 }
 
 
 // ========== Enemy Damage Taken ==========
-const enemyDamageTaken = (player, ctx) => {
+const enemyDamageTaken = (ctxChars, player) => {
    if(player.isGettingDamage) {
       
       const dmg = {
@@ -93,7 +93,7 @@ const enemyDamageTaken = (player, ctx) => {
          textValue: `-${player.calcDamage}`,
       };
 
-      const newMessage = new FloatingMessage(ctx, player.x, player.y, dmg.offsetX, dmg.offsetY, dmg.textSize, dmg.textColor, dmg.textValue);
+      const newMessage = new FloatingMessage(ctxChars, player.x, player.y, dmg.offsetX, dmg.offsetY, dmg.textSize, dmg.textColor, dmg.textValue);
       floatTextArray.push(newMessage);
    }
 }
@@ -102,51 +102,47 @@ const enemyDamageTaken = (player, ctx) => {
 // =====================================================================
 // Draw Player Game Bars
 // =====================================================================
-const drawBar = (player, ctx) => {
+const setBar = (color, maxValue, value) => {
+   return { 
+      color: color,
+      maxValue: maxValue,
+      value: value
+   }
+}
+
+const drawBar = (ctxChars, player) => {
 
    const barWidth = 130;
    const barHeight = 12;
 
-   const attackBar = {
-      color: "red",
-      maxValue: player.baseAttackCooldown,
-      value: player.attackCooldown,
-   };
-
-   const healthBar = {
-      color: "lime",
-      maxValue: player.baseHealth,
-      value: player.health,
-   };
-
-   const manaBar = {
-      color: "dodgerblue",
-      maxValue: player.baseMana,
-      value: player.mana,
-   };
-
-   const energyBar = {
-      color: "gold",
-      maxValue: player.baseEnergy,
-      value: player.energy,
-   };
+   const healthBar = setBar("lime", player.baseHealth, player.health);
+   const manaBar   = setBar("dodgerblue", player.baseMana, player.mana);
+   const attackBar = setBar("red", player.baseAttackCooldown, player.attackCooldown);
+   const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
-   let gameBarArray = [energyBar, attackBar, manaBar, healthBar];
+   let gameBarArray = [
+      energyBar,
+      attackBar,
+      manaBar,
+      healthBar,
+   ];
+   
    let barGap = 0;
-
+ 
    gameBarArray.forEach(bar => {
-      new GameBar(ctx, player.x, player.y, -barWidth/2, -80 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      if(player.isDead) bar.color = "gray";
+      new GameBar(ctxChars, player.x, player.y, -barWidth/2, -80 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
       barGap -= 14;
    });
 }
 
 
 // Temporary
-const drawHealthNumber = (player, ctx) => {
+const drawHealthNumber = (ctxChars, player) => {
 
-   ctx.fillStyle = "black";
-   ctx.font = "26px Orbitron-Regular";
-   ctx.fillText(Math.floor(player.health), player.x -35, player.y -15);
+   ctxChars.fillStyle = "black";
+   ctxChars.font = "26px Orbitron-Regular";
+   ctxChars.fillText(Math.floor(player.health), player.x -35, player.y -15);
 }
 
 
@@ -196,16 +192,16 @@ socket.on("hideDeathScreen", () => {
 
 
 // =====================================================================
-// Player Init (Update)
+// Player Init (Every frame)
 // =====================================================================
-const initPlayer = (player, ctx) => {
+const initPlayer = (ctxChars, player) => {
 
-   drawPlayer(player, ctx);
-   drawAttackArea(player, ctx);
-   enemyDamageTaken(player, ctx);
+   drawPlayer(ctxChars, player);
+   drawAttackArea(ctxChars, player);
+   enemyDamageTaken(ctxChars, player);
 
-   drawBar(player, ctx);
-   drawHealthNumber(player, ctx);
+   drawBar(ctxChars, player);
+   drawHealthNumber(ctxChars, player);
    
    playerDeath(player);
 }

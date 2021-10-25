@@ -2,9 +2,9 @@
 "use strict"
 
 // =====================================================================
-// Collision for square hitbox
+// Collision Square to Square hitboxes
 // =====================================================================
-exports.square_toSquare_Collision = (first, second) => {
+exports.square_toSquare = (first, second) => {
    if(!(first.x > second.x + second.width
       ||first.x + first.width < second.x
       ||first.y > second.y + second.height
@@ -15,24 +15,26 @@ exports.square_toSquare_Collision = (first, second) => {
 
 
 // =====================================================================
-// Collision for circle hitbox
+// Collision Circle to Circle hitboxes
 // =====================================================================
-exports.circle_toCircle_Collision = (first, second) => {
-   let dx = second.x - (first.x + first.attkOffset_X);
-   let dy = second.y - (first.y + first.attkOffset_Y);
+exports.circle_toCircle = (first, second) => {
+   let dx = second.x - first.x;
+   let dy = second.y - first.y;
    let distance = Math.sqrt(dx * dx + dy * dy);
-   let sumRadius = first.attkRadius + second.radius;
+   let sumRadius = first.radius + second.radius;
 
    if(distance <= sumRadius) return true;
 }
 
 
-// ========== ORIGINALE ==========
-// exports.circle_toCircle_Collision = (first, second) => {
-//    let dx = second.x - first.x;
-//    let dy = second.y - first.y;
-//    let distance = Math.sqrt(dx * dx + dy * dy);
-//    let sumRadius = first.radius + second.radius;
+// =====================================================================
+// Collision Circle to Circle hitboxes with offset
+// =====================================================================
+exports.circle_toCircle_withOffset = (first, firstOffsetX, firstOffsetY, firstRadius , second) => {
+   let dx = second.x - (first.x + firstOffsetX);
+   let dy = second.y - (first.y + firstOffsetY);
+   let distance = Math.sqrt(dx * dx + dy * dy);
+   let sumRadius = firstRadius + second.radius;
 
-//    if(distance <= sumRadius) return true;
-// }
+   if(distance <= sumRadius) return true;
+}
