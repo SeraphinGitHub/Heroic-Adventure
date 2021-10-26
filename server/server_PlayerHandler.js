@@ -26,13 +26,13 @@ exports.onConnect = (socket) => {
 
    // ==========================  Temporary  ==========================
 
-   // const tree = new Tree();
-   // treeList[tree] = tree;
+   // const treeBottom = new Tree(200, 400);
+   // const treeTop = new Tree(800, 200);
 
-   // for(let i in treeList) {
-   //    let tree = treeList[i];
-   //    socket.emit("connected", tree);
-   // }
+   // treeList["treeBottom"] = treeBottom;
+   // treeList["treeTop"] = treeTop;
+
+   // socket.emit("treeList", treeList);
 
    // =================================================================
 
@@ -61,20 +61,23 @@ exports.onDisconnect = (socket) => {
 
 // ==========================  Temporary  ==========================
 
-const stopMove_onCollide = (player) => {
+// const stopMove_onCollide = (player) => {
    
-   for(let i in treeList) {
-      let tree = treeList[i];
+//    for(let i in treeList) {
+//       let tree = treeList[i];
 
-      if(collision.circle_toCircle_withOffset(tree, tree.offsetX, tree.offsetY, tree.radius, player)) {
-         player.walkSpeed = 1;
-         // player.runSpeed = 0;
-      }
+//       if(collision.circle_toCircle_withOffset(tree, tree.offsetX, tree.offsetY, tree.radius, player)) {
+//          player.walkSpeed = 1;
+//          player.runSpeed = 2;
+//       }
 
-      else player.walkSpeed = player.baseWalkSpeed;
-   }
+//       else {
+//          player.walkSpeed = player.baseWalkSpeed;
+//          player.runSpeed = player.baseRunSpeed;
+//       }
+//    }
 
-}
+// }
 
 // ==========================  Temporary  ==========================
 
@@ -93,25 +96,29 @@ const playerMovements = (player) => {
       else moveSpeed = player.runSpeed;
       
       // Cross
-      if(player.up) {
+      if(player.up && player.y > 50) {
+      // if(player.up) {
          player.y -= moveSpeed;
          player.attkOffset_X = 0;
          player.attkOffset_Y = -player.attkOffset;
       }
       
-      if(player.down) {
+      if(player.down && player.y < 750) {
+      // if(player.down) {
          player.y += moveSpeed;
          player.attkOffset_X = 0;
          player.attkOffset_Y = player.attkOffset;
       }
       
-      if(player.left) {
+      if(player.left && player.x > 50) {
+      // if(player.left) {
          player.x -= moveSpeed;
          player.attkOffset_X = -player.attkOffset;
          player.attkOffset_Y = 0;
       }
       
-      if(player.right) {
+      if(player.right && player.x < 1150) {
+      // if(player.right) {
          player.x += moveSpeed;
          player.attkOffset_X = player.attkOffset;
          player.attkOffset_Y = 0;
@@ -249,7 +256,7 @@ const playerDeath = (player) => {
    const respawnCooldown = setInterval(() => {
       player.respawnTimer --;
       
-      if(player.respawnTimer <= 0) {
+      if(player.respawnTimer < 0) {
 
          player.isDead = false;
          player.health = player.baseHealth;

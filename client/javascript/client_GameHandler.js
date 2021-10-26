@@ -14,10 +14,10 @@ const ctxMap = canvasMap.getContext("2d");
 const ctxChars = canvasChars.getContext("2d");
 
 canvasMap.height = 800;
-canvasMap.width = 1100;
+canvasMap.width = 1200;
 
 canvasChars.height = 800;
-canvasChars.width = 1100;
+canvasChars.width = 1200;
 
 // if(window.matchMedia("(max-width: 1500px)").matches) {
 //    canvas.height = 500;
@@ -82,9 +82,10 @@ const handleFloatingMessages = () => {
 
 // ==========================  Temporary  ==========================
 
-// socket.on("connected", (tree) => initMap(ctxMap, tree));
+// socket.on("treeList", (treeList) => initMap(ctxMap, treeList));
 
 // ==========================  Temporary  ==========================
+
 
 
 // =====================================================================

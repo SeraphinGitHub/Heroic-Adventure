@@ -2,11 +2,11 @@
 "use strict"
 
 class Tree {
-   constructor() {
+   constructor(x, y) {
       
       // Hitbox
-      this.x = 200;
-      this.y = 400;
+      this.x = x;
+      this.y = y;
       this.offsetX = 120;
       this.offsetY = 180;
       this.radius = 40;

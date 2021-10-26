@@ -53,10 +53,13 @@ class Player {
       this.baseDamage = 25;
       this.calcDamage;
       
-      // Movements
+      // Movements Speed
       this.walkSpeed = 7;
       this.baseWalkSpeed = this.walkSpeed;
       this.runSpeed = 15;
+      this.baseRunSpeed = this.runSpeed;
+      
+      // Movements Axis
       this.up = false;
       this.down = false;
       this.left = false;

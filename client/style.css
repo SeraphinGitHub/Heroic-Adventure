@@ -76,7 +76,7 @@ body {
 /* ===================================================================== */
 .chat,
 .controls-message {
-   width: 18%;
+   width: 17%;
 }
 
 .chat,
@@ -135,7 +135,7 @@ body {
 .death-screen {
    visibility: hidden;
    position: absolute;
-   top: 35%;
+   top: 28%;
    left: 50%;
    transform: translate(-50%, -50%);
    

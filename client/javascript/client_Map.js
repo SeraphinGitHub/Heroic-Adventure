@@ -13,6 +13,9 @@ desert_6.src = `${mapFolder_Src}land/land_6.png`;
 const tree_1 = new Image();
 tree_1.src = `${mapFolder_Src}trees/tree_1.png`;
 
+const greenery_3 = new Image();
+greenery_3.src = `${mapFolder_Src}/greenery_3.png`;
+
 
 // =====================================================================
 //  Map Creation
@@ -29,39 +32,46 @@ const drawMap = (ctxMap) => {
       }
    }
 
+   // Decor (Temporary)
    ctxMap.drawImage(tree_1, 0, 0, 285, 297, 200, 400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 800, 200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 250, 25, 87, 162);
 }
 
 
 // =====================================================================
 // Draw Tree (Temporary)
 // =====================================================================
-const drawTree = (ctxMap, tree) => {
+// const drawTree = (ctxMap, treeList) => {
 
-   ctxMap.fillStyle = tree.color; // <== Debug Mode
+//    for(let i in treeList) {
+//       let tree = treeList[i];
 
-   ctxMap.fillRect(
-      tree.x + tree.offsetX - 50,
-      tree.y + tree.offsetY - 50,
-      100,
-      100
-   );
-   ctxMap.fill();
-
-
-   // ctxMap.beginPath();
-   // ctxMap.arc(tree.x + tree.offsetX, tree.y + tree.offsetY, tree.radius, tree.angle, Math.PI * 2);
-   // ctxMap.fill();
-   // ctxMap.closePath();
-
-   ctxMap.drawImage(tree_1, 0, 0, 285, 297, tree.x, tree.y, cellSize, cellSize);
-}
+//       ctxMap.fillStyle = tree.color; // <== Debug Mode
+   
+//       ctxMap.fillRect(
+//          tree.x + tree.offsetX - 50,
+//          tree.y + tree.offsetY - 50,
+//          100,
+//          100
+//       );
+//       ctxMap.fill();
+   
+   
+//       // ctxMap.beginPath();
+//       // ctxMap.arc(tree.x + tree.offsetX, tree.y + tree.offsetY, tree.radius, tree.angle, Math.PI * 2);
+//       // ctxMap.fill();
+//       // ctxMap.closePath();
+   
+//       ctxMap.drawImage(tree_1, 0, 0, 285, 297, tree.x, tree.y, cellSize, cellSize);
+//    }
+// }
 
 
 // =====================================================================
 // Map Init (Every frame)
 // =====================================================================
-const initMap = (ctxMap, tree) => {
+const initMap = (ctxMap, treeList) => {
    drawMap(ctxMap);
-   // drawTree(ctxMap, tree);
+   // drawTree(ctxMap, treeList);
 }

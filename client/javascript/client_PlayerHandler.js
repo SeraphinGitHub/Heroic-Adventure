@@ -2,7 +2,7 @@
 "use strict"
 
 // =====================================================================
-// Variables
+// Player Controls
 // =====================================================================
 let insideCanvas = false;
 canvasChars.addEventListener("mouseover", () => insideCanvas = true);
@@ -49,11 +49,11 @@ window.addEventListener("keyup", (event) => {
 // Attack
 // =====================================================================
 window.addEventListener("mousedown", (event) => {
-   if(event && insideCanvas) socket.emit("attack", true);
+   if(event.which === 1 && insideCanvas) socket.emit("attack", true);
 });
 
 window.addEventListener("mouseup", (event) => {
-   if(event && insideCanvas) socket.emit("attack", false);
+   if(event.which === 1 && insideCanvas) socket.emit("attack", false);
 });
 
 
@@ -121,18 +121,18 @@ const drawBar = (ctxChars, player) => {
    const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
    let gameBarArray = [
-      energyBar,
-      attackBar,
-      manaBar,
       healthBar,
+      manaBar,
+      attackBar,
+      energyBar,
    ];
    
    let barGap = 0;
- 
+
    gameBarArray.forEach(bar => {
       if(player.isDead) bar.color = "gray";
-      new GameBar(ctxChars, player.x, player.y, -barWidth/2, -80 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
-      barGap -= 14;
+      new GameBar(ctxChars, player.x, player.y, -barWidth/2, -105 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      barGap += 14;
    });
 }
 
@@ -149,11 +149,11 @@ const drawHealthNumber = (ctxChars, player) => {
 // =====================================================================
 // Toggle Death Screen
 // =====================================================================
-socket.on("playerDeath", (player) => {
+const deathScreen = document.querySelector(".death-screen");
+const deathMessage = document.querySelector(".death-message");
+const respawnTimer = document.querySelector(".respawn-timer");
 
-   const deathScreen = document.querySelector(".death-screen");
-   const deathMessage = document.querySelector(".death-message");
-   const respawnTimer = document.querySelector(".respawn-timer");
+socket.on("playerDeath", (player) => {
    
    let textValue = "You died !";
    let timerValue = `Respawn in ${player.respawnTimer} sec`;
@@ -165,8 +165,10 @@ socket.on("playerDeath", (player) => {
    deathScreen.style = "visibility: visible";
    deathMessage.textContent = textValue;
    respawnTimer.textContent = timerValue;
+});
 
-   // setTimeout(() => deathScreen.style = "visibility: hidden", player.respawnTimer);
+socket.on("playerRespawn", () => {
+   deathScreen.style = "visibility: hidden";
 });
 
 
@@ -174,7 +176,7 @@ socket.on("playerDeath", (player) => {
 // Player Init (Every frame)
 // =====================================================================
 const initPlayer = (ctxChars, player) => {
-
+   
    drawPlayer(ctxChars, player);
    drawAttackArea(ctxChars, player);
    enemyDamageTaken(ctxChars, player);

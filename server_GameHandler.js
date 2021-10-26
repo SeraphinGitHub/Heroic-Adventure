@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
-   playerHandler.onConnect(socket);   
+   playerHandler.onConnect(socket);
    
 
    // ==========  Disconnection  ==========
@@ -74,18 +74,6 @@ io.on("connection", (socket) => {
          socketList[i].emit("addMessage", `${playerName} : ${data}`);
       }
    });
-
-
-   // ==========  Toggle Death Screen  ==========
-   socket.on("death", (respawnSpec) => {
-      let player = socketList[respawnSpec.id];
-      if(player) player.emit("showDeathScreen", respawnSpec);
-   });
-
-   socket.on("respawn", (id) => {
-      let player = socketList[id];
-      if(player) player.emit("hideDeathScreen");
-   });
 });
 
 
@@ -95,17 +83,18 @@ io.on("connection", (socket) => {
 setInterval(() => {
    let playerData = playerHandler.playerUpdate();
 
-   for(let i in socketList) {
-      let socket = socketList[i];
-      socket.emit("newSituation", playerData);
-   }
-
    playerData.forEach(player => {
       let socket = socketList[player.id];
-      
-      if(player.isDead) socket.emit("playerDeath", {
-         respawnTimer: player.respawnTimer,
-         deathCounts: player.deathCounts
-      });      
+      socket.emit("newSituation", playerData);
+
+      // Death Screen Event
+      if(player.isDead) {
+         socket.emit("playerDeath", {
+            respawnTimer: player.respawnTimer,
+            deathCounts: player.deathCounts
+         });
+
+         if(player.respawnTimer === 0) socket.emit("playerRespawn");
+      }
    });
 }, 1000/60);
