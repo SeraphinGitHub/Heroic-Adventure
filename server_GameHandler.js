@@ -97,4 +97,4 @@ setInterval(() => {
          if(player.respawnTimer === 0) socket.emit("playerRespawn");
       }
    });
-}, 1000/60);
+}, 1000/process.env.FRAME_RATE);

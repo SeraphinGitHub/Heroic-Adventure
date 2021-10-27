@@ -36,15 +36,19 @@ exports.onConnect = (socket) => {
 
    // =================================================================
 
+   // Movements
+   socket.on("up", (state) => player.up = state);
+   socket.on("down", (state) => player.down = state);
+   socket.on("left", (state) => player.left = state);
+   socket.on("right", (state) => player.right = state);
 
-   socket.on("up", data => player.up = data);
-   socket.on("down", data => player.down = data);
-   socket.on("left", data => player.left = data);
-   socket.on("right", data => player.right = data);
+   // States
+   socket.on("run", (state) => player.isRunning = state);
+   socket.on("attack", (state) => player.isAttacking = state);
+   socket.on("casting", (state) => player.isCasting = state);
 
-   socket.on("run", data => player.isRunning = data);
-   socket.on("attack", data => player.isAttacking = data);
-   socket.on("heal", data => player.isHealing = data);
+   // Spells cast
+   socket.on("heal", (state) => player.cast_Heal = state);
 }
 
 
@@ -157,13 +161,31 @@ const playerMovements = (player) => {
 
 
 // =====================================================================
+// Player Global Count Down
+// =====================================================================
+const playerGcD = (player) => {
+   if(player.speedGcD < player.baseGcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
+
+   if(player.isCasting && player.speedGcD >= player.baseGcD) {
+
+      player.isCasting = false;
+      player.speedGcD = 0;
+      
+      // ========== Player Spell Casting ==========
+      playerAttack(player);
+      playerHealing(player);
+   }
+}
+
+
+// =====================================================================
 // Player Running
 // =====================================================================
 const playerRunning = (player) => {
-   
    if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
 
    if(player.isRunning) {
+
       player.energy -= player.energyCost;
       if(player.energy < player.energyCost) player.isRunning = false;
       if(player.energy <= 0) player.energy = 0;
@@ -175,15 +197,17 @@ const playerRunning = (player) => {
 // Player Healing
 // =====================================================================
 const playerHealing = (player) => {
-
    if(player.mana < player.baseMana) player.mana += player.regenMana;
 
-   if(player.isHealing && player.mana >= player.spellCost && player.health < player.baseHealth) {
-      player.isHealing = false;
+   if(player.cast_Heal
+   && player.mana >= player.healCost
+   && player.health < player.baseHealth) {
+
+      player.cast_Heal = false;
 
       player.calcHealing = player.healRnG();
       player.health += player.calcHealing;
-      player.mana -= player.spellCost;
+      player.mana -= player.healCost;
 
       if(player.health > player.baseHealth) player.health = player.baseHealth;
    }
@@ -194,24 +218,11 @@ const playerHealing = (player) => {
 // Player Attack
 // =====================================================================
 const playerAttack = (player) => {
-
-   if(player.isAttacking && player.canAttack) {  
+   if(player.isAttacking) {
 
       player.isAttacking = false;
-      player.canAttack = false;
-
       damagingEnemy(player);
       // damagingEnemy(player, mobList); // <== When Mob class gonna be created
-
-      const attackCooldown = setInterval(() => {
-         player.attackCooldown --;
-
-         if(player.attackCooldown <= 0) {
-            player.canAttack = true;
-            player.attackCooldown = player.attackSpeed;
-            clearInterval(attackCooldown);
-         }
-      }, 1);
    }
 }
 
@@ -263,6 +274,11 @@ const playerDeath = (player) => {
          player.respawnTimer = player.baseRespawnTimer;
          player.color = "darkviolet"; // <== Debug Mode
 
+         // ================  Temporary  ================
+         player.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on respawn
+         player.y = Math.floor(Math.random() * 700) + 50;
+         // ================  Temporary  ================
+
          clearInterval(respawnCooldown);
       }
    }, 1000);
@@ -278,10 +294,9 @@ exports.playerUpdate = () => {
    for(let i in playerList) {
       let player = playerList[i];
 
+      playerGcD(player);
       playerMovements(player);
       playerRunning(player);
-      playerHealing(player);
-      playerAttack(player);
 
       // stopMove_onCollide(player);
 

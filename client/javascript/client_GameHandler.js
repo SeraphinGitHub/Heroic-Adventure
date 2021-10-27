@@ -91,11 +91,31 @@ const handleFloatingMessages = () => {
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
-socket.on("newSituation", (playerData) => {
-   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+if(canvasChars && canvasMap) {
    
-   initMap(ctxMap); // <== Disactivate on update later
+   socket.on("newSituation", (playerData) => {
+      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+      
+      initMap(ctxMap); // <== Disactivate on update later
+      
+      playerData.forEach(player => initPlayer(ctxChars, player));
+      handleFloatingMessages();
    
-   playerData.forEach(player => initPlayer(ctxChars, player));
-   handleFloatingMessages();
-});
+      if(showFPS) frameRate++;
+   });
+}
+
+
+// =====================================================================
+// Toggle Frame Rate
+// =====================================================================
+// let showFPS = true; // <== delete this one 
+let showFPS = false;
+let frameRate = 0;
+
+setInterval(() => {
+   if(showFPS) {
+      console.log(frameRate);
+      frameRate = 0;
+   }
+}, 1000);

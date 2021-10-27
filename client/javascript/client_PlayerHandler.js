@@ -17,44 +17,44 @@ const controls = {
    heal: "r",
 }
 
-const playerCommand = (event, state) => {
-   let controlsLength = Object.keys(controls).length;
-
-   for(let i = 0; i < controlsLength; i++) {
-      
-      let ctrlPair = Object.entries(controls)[i];
-      let ctrlKey = ctrlPair[0];
-      let ctrlValue = ctrlPair[1];
-      
-      if(event.key === ctrlValue) socket.emit(ctrlKey, state);
-   }
-}
+// const spells = {
+//    heal: "r",
+// }
 
 
 // =====================================================================
 // Movements
 // =====================================================================
-window.addEventListener("keydown", (event) => {
-   let state = true;
-   if(insideCanvas) playerCommand(event, state);
-});
+const playerCommand = (event, state) => {
+   let controlsLength = Object.keys(controls).length;
+   
+   for(let i = 0; i < controlsLength; i++) {
+      let ctrlPair = Object.entries(controls)[i];
+      let key = ctrlPair[0];
+      let value = ctrlPair[1];
+      
+      if(event.key === value) socket.emit(key, state);
+   }
 
-window.addEventListener("keyup", (event) => {
-   let state = false;
-   playerCommand(event, state);
-});
+   if(event.key === controls.heal) socket.emit("casting", state);
+}
+
+window.addEventListener("keydown", (event) => { if(insideCanvas) playerCommand(event, true) });
+window.addEventListener("keyup", (event) => playerCommand(event, false));
 
 
 // =====================================================================
 // Attack
 // =====================================================================
-window.addEventListener("mousedown", (event) => {
-   if(event.which === 1 && insideCanvas) socket.emit("attack", true);
-});
+const playerAttackCommand = (event, state) => {
+   if(event.which === 1 && insideCanvas) {
+      socket.emit("attack", state);
+      socket.emit("casting", state);
+   }
+}
 
-window.addEventListener("mouseup", (event) => {
-   if(event.which === 1 && insideCanvas) socket.emit("attack", false);
-});
+window.addEventListener("mousedown", (event) => playerAttackCommand(event, true));
+window.addEventListener("mouseup", (event) => playerAttackCommand(event, false));
 
 
 // =====================================================================
@@ -117,7 +117,7 @@ const drawBar = (ctxChars, player) => {
 
    const healthBar = setBar("lime", player.baseHealth, player.health);
    const manaBar   = setBar("dodgerblue", player.baseMana, player.mana);
-   const attackBar = setBar("red", player.attackSpeed, player.attackCooldown);
+   const attackBar = setBar("red", player.baseGcD, player.speedGcD);
    const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
    let gameBarArray = [
@@ -143,6 +143,10 @@ const drawHealthNumber = (ctxChars, player) => {
    ctxChars.fillStyle = "black";
    ctxChars.font = "26px Orbitron-Regular";
    ctxChars.fillText(Math.floor(player.health), player.x -35, player.y -15);
+
+   ctxChars.fillStyle = "black";
+   ctxChars.font = "22px Orbitron-ExtraBold";
+   ctxChars.fillText("id: " + player.id, player.x -30, player.y +70);
 }
 
 
