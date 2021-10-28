@@ -24,6 +24,6 @@ const instantiate = (scriptName) => {
    document.body.appendChild(newScript);
 }
 
-window.onload = () => {
+window.addEventListener("load", () => {
    scripts.forEach(item => instantiate(item));
-}
+});

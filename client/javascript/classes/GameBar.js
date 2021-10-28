@@ -22,7 +22,7 @@ class GameBar {
       this.borderSize = 2;
       this.width = ((this.value / this.maxValue) * this.maxWidth) - this.borderSize;
       this.bordersColor = "black";
-      this.backgroundColor = "gray";
+      this.backgroundColor = "rgb(110, 110, 110)";
    }
 
    baseBar(color, barWidth, brd_Size) {

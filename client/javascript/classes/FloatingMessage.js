@@ -16,7 +16,7 @@ class FloatingMessage {
       this.color = color;
       this.value = value;
       this.opacity = 1;
-      this.displayDuration = 150;
+      this.displayDuration = 150; // More high ==> More long
    }
 
    update() {

@@ -46,6 +46,9 @@ class Player {
       this.mana = this.baseMana;
       this.regenMana = process.env.SYNC_COEFF* 0.12;
 
+      // Spells cast
+      this.cast_Heal = false;
+      
       // Spell - Healing
       this.healCost = 70;
       this.baseHealing = this.baseHealth * 0.25; // <== Healing = 25% MaxHealth
@@ -70,12 +73,10 @@ class Player {
       // States
       this.isDead = false;
       this.isCasting = false;
+      this.isHealing = false;
       this.isRunning = false;
       this.isAttacking = false;
       this.isGettingDamage = false;
-
-      // Spells cast
-      this.cast_Heal = false;
    }
 
    RnG(baseSpec, coeff) {
@@ -83,11 +84,11 @@ class Player {
    }
 
    healRnG() {
-      return this.RnG(this.baseHealing, 0.15);
+      return this.RnG(this.baseHealing, 0.35); // More low => Shorter RnG Range => More heal
    }
 
    damageRnG() {
-      return this.RnG(this.baseDamage, 0.25);
+      return this.RnG(this.baseDamage, 0.20); // More low => Shorter RnG Range => More damage
    }
 }
 

@@ -13,7 +13,7 @@ const collision = require("./collisions.js");
 // Global Variables
 // =====================================================================
 let playerList = {};
-let treeList = {};
+// let treeList = {};
 
 
 // =====================================================================
@@ -23,32 +23,19 @@ exports.onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
 
-
-   // ==========================  Temporary  ==========================
-
-   // const treeBottom = new Tree(200, 400);
-   // const treeTop = new Tree(800, 200);
-
-   // treeList["treeBottom"] = treeBottom;
-   // treeList["treeTop"] = treeTop;
-
-   // socket.emit("treeList", treeList);
-
-   // =================================================================
-
    // Movements
    socket.on("up", (state) => player.up = state);
    socket.on("down", (state) => player.down = state);
    socket.on("left", (state) => player.left = state);
    socket.on("right", (state) => player.right = state);
 
+   // Spells cast
+   socket.on("heal", (state) => player.cast_Heal = state);
+   
    // States
    socket.on("run", (state) => player.isRunning = state);
    socket.on("attack", (state) => player.isAttacking = state);
    socket.on("casting", (state) => player.isCasting = state);
-
-   // Spells cast
-   socket.on("heal", (state) => player.cast_Heal = state);
 }
 
 
@@ -60,32 +47,29 @@ exports.onDisconnect = (socket) => {
 }
 
 
+// =====================================================================
+// Player Global Count Down
+// =====================================================================
+const playerGcD = (player) => {
+   if(player.speedGcD < player.baseGcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
+   if(player.mana < player.baseMana) player.mana += player.regenMana; // Regen Mana
 
+   if(player.speedGcD >= player.baseGcD) {
 
+      if(player.isAttacking) {
 
-// ==========================  Temporary  ==========================
+         player.speedGcD = 0;
+         player.isAttacking = false;
+         playerAttack(player);
+      }
 
-// const stopMove_onCollide = (player) => {
-   
-//    for(let i in treeList) {
-//       let tree = treeList[i];
-
-//       if(collision.circle_toCircle_withOffset(tree, tree.offsetX, tree.offsetY, tree.radius, player)) {
-//          player.walkSpeed = 1;
-//          player.runSpeed = 2;
-//       }
-
-//       else {
-//          player.walkSpeed = player.baseWalkSpeed;
-//          player.runSpeed = player.baseRunSpeed;
-//       }
-//    }
-
-// }
-
-// ==========================  Temporary  ==========================
-
-
+      if(player.isCasting) {
+         
+         player.isCasting = false;
+         playerHealing(player);
+      }
+   }
+}
 
 
 // =====================================================================
@@ -94,10 +78,9 @@ exports.onDisconnect = (socket) => {
 const playerMovements = (player) => {
 
    if(!player.isDead) {
-
-      let moveSpeed;
-      if(!player.isRunning) moveSpeed = player.walkSpeed;
-      else moveSpeed = player.runSpeed;
+      
+      let moveSpeed = player.walkSpeed;
+      if(player.isRunning) moveSpeed = player.runSpeed;
       
       // Cross
       if(player.up && player.y > 50) {
@@ -161,24 +144,6 @@ const playerMovements = (player) => {
 
 
 // =====================================================================
-// Player Global Count Down
-// =====================================================================
-const playerGcD = (player) => {
-   if(player.speedGcD < player.baseGcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
-
-   if(player.isCasting && player.speedGcD >= player.baseGcD) {
-
-      player.isCasting = false;
-      player.speedGcD = 0;
-      
-      // ========== Player Spell Casting ==========
-      playerAttack(player);
-      playerHealing(player);
-   }
-}
-
-
-// =====================================================================
 // Player Running
 // =====================================================================
 const playerRunning = (player) => {
@@ -197,18 +162,20 @@ const playerRunning = (player) => {
 // Player Healing
 // =====================================================================
 const playerHealing = (player) => {
-   if(player.mana < player.baseMana) player.mana += player.regenMana;
 
    if(player.cast_Heal
    && player.mana >= player.healCost
    && player.health < player.baseHealth) {
 
+      player.speedGcD = 0;
+      player.isHealing = true;
       player.cast_Heal = false;
 
       player.calcHealing = player.healRnG();
       player.health += player.calcHealing;
       player.mana -= player.healCost;
 
+      setTimeout(() => player.isHealing = false, 0)
       if(player.health > player.baseHealth) player.health = player.baseHealth;
    }
 }
@@ -218,12 +185,9 @@ const playerHealing = (player) => {
 // Player Attack
 // =====================================================================
 const playerAttack = (player) => {
-   if(player.isAttacking) {
-
-      player.isAttacking = false;
-      damagingEnemy(player);
-      // damagingEnemy(player, mobList); // <== When Mob class gonna be created
-   }
+   
+   damagingEnemy(player);
+   // damagingEnemy(player, mobList); // <== When Mob class gonna be created
 }
 
 
@@ -244,7 +208,7 @@ const damagingEnemy = (player) => {
          otherPlayer.isGettingDamage = true;
          otherPlayer.calcDamage = player.damageRnG();
          otherPlayer.health -= otherPlayer.calcDamage;
-   
+         
          setTimeout(() => otherPlayer.isGettingDamage = false, 0);
          if(otherPlayer.health <= 0) playerDeath(otherPlayer);
       }
@@ -297,8 +261,6 @@ exports.playerUpdate = () => {
       playerGcD(player);
       playerMovements(player);
       playerRunning(player);
-
-      // stopMove_onCollide(player);
 
       playerData.push(player);
    }

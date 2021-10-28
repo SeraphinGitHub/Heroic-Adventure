@@ -26,15 +26,13 @@ app.get("/", (req, res) => {
 app.use("/client", express.static(__dirname + "/client"));
 
 server.listen(process.env.PORT || 3000, () => {
-   // console.log(`Listening on port ${process.env.PORT}`);
-   console.log(`Listening on port ${3000}`);
+   console.log(`Listening on port ${process.env.PORT}`);
 });
 
 
 // =====================================================================
 // Global Variables
 // =====================================================================
-const DEBUG_MODE = process.env.DEBUG_MODE;
 const playerMax = 100;
 let socketList = {};
 
@@ -43,11 +41,11 @@ let socketList = {};
 // Handle sockets connections
 // =====================================================================
 io.on("connection", (socket) => {
-   // console.log("User connected !");  
-   
+   // console.log("User connected !");
+
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
-      if(DEBUG_MODE === "false") return;
+      if(process.env.DEBUG_MODE === "false") return;
       const response = eval(data);
       socket.emit("evalResponse", response);
    });

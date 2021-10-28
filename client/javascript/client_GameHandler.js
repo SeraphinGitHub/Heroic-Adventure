@@ -80,30 +80,19 @@ const handleFloatingMessages = () => {
 }
 
 
-// ==========================  Temporary  ==========================
-
-// socket.on("treeList", (treeList) => initMap(ctxMap, treeList));
-
-// ==========================  Temporary  ==========================
-
-
-
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
-if(canvasChars && canvasMap) {
+socket.on("newSituation", (playerData) => {
+   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
    
-   socket.on("newSituation", (playerData) => {
-      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
-      
-      initMap(ctxMap); // <== Disactivate on update later
-      
-      playerData.forEach(player => initPlayer(ctxChars, player));
-      handleFloatingMessages();
+   initMap(ctxMap); // <== Disactivate on update later
    
-      if(showFPS) frameRate++;
-   });
-}
+   playerData.forEach(player => initPlayer(ctxChars, player));
+   handleFloatingMessages();
+
+   if(showFPS) frameRate++;
+});
 
 
 // =====================================================================

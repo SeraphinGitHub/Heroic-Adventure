@@ -4,43 +4,66 @@
 // =====================================================================
 // Player Controls
 // =====================================================================
+const controls = {
+   movements: {
+      up: "z",
+      down: "s",
+      left: "q",
+      right: "d",
+      run: " ",
+   },
+
+   spells: {
+      heal: "r",
+   }
+}
+
+
+// =====================================================================
+// Inside Canvas Detection
+// =====================================================================
 let insideCanvas = false;
 canvasChars.addEventListener("mouseover", () => insideCanvas = true);
 canvasChars.addEventListener("mouseleave", () => insideCanvas = false);
 
-const controls = {
-   up: "z",
-   down: "s",
-   left: "q",
-   right: "d",
-   run: " ",
-   heal: "r",
-}
-
-// const spells = {
-//    heal: "r",
-// }
-
 
 // =====================================================================
-// Movements
+// Movements & Abilities
 // =====================================================================
-const playerCommand = (event, state) => {
-   let controlsLength = Object.keys(controls).length;
+let isCasting = false;
+
+const playerCommand = (event, ctrlObj, state) => {
+   let pairsArray = Object.entries(ctrlObj);
    
-   for(let i = 0; i < controlsLength; i++) {
-      let ctrlPair = Object.entries(controls)[i];
-      let key = ctrlPair[0];
-      let value = ctrlPair[1];
-      
-      if(event.key === value) socket.emit(key, state);
-   }
+   pairsArray.forEach(pair => {
+      let key = pair[0];
+      let value = pair[1];
 
-   if(event.key === controls.heal) socket.emit("casting", state);
+      if(event.key === value) {
+         socket.emit(key, state);
+
+         if(ctrlObj === controls.spells && isCasting !== state) {
+            isCasting = state;
+            socket.emit("casting", state);
+         }
+      }
+   });
 }
 
-window.addEventListener("keydown", (event) => { if(insideCanvas) playerCommand(event, true) });
-window.addEventListener("keyup", (event) => playerCommand(event, false));
+window.addEventListener("keydown", (event) => {
+   if(insideCanvas) {
+
+      const state = true;
+      playerCommand(event, controls.movements, state);
+      playerCommand(event, controls.spells, state);
+   }
+});
+
+window.addEventListener("keyup", (event) => {
+   const state = false;
+   playerCommand(event, controls.movements, state);
+   playerCommand(event, controls.spells, state);
+});
 
 
 // =====================================================================
@@ -69,7 +92,6 @@ const drawPlayer = (ctxChars, player) => {
    ctxChars.closePath();
 }
 
-
 // ========== Attack Area ==========
 const drawAttackArea = (ctxChars, player) => {
 
@@ -78,24 +100,6 @@ const drawAttackArea = (ctxChars, player) => {
    ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
    ctxChars.fill();
    ctxChars.closePath();
-}
-
-
-// ========== Enemy Damage Taken ==========
-const enemyDamageTaken = (ctxChars, player) => {
-   if(player.isGettingDamage) {
-      
-      const dmg = {
-         offsetX: -30,
-         offsetY: -100,
-         textSize: 30,
-         textColor: "yellow",
-         textValue: `-${player.calcDamage}`,
-      };
-
-      const newMessage = new FloatingMessage(ctxChars, player.x, player.y, dmg.offsetX, dmg.offsetY, dmg.textSize, dmg.textColor, dmg.textValue);
-      floatTextArray.push(newMessage);
-   }
 }
 
 
@@ -112,11 +116,16 @@ const setBar = (color, maxValue, value) => {
 
 const drawBar = (ctxChars, player) => {
 
-   const barWidth = 130;
-   const barHeight = 12;
+   const barWidth = 110;
+   const barHeight = 10;
 
+   // Mana color on low mana
+   let manaColor = "deepskyblue";
+   if(player.mana < player.healCost) manaColor = "blue";
+   
+   // Set up Bar
    const healthBar = setBar("lime", player.baseHealth, player.health);
-   const manaBar   = setBar("dodgerblue", player.baseMana, player.mana);
+   const manaBar   = setBar(manaColor, player.baseMana, player.mana);
    const attackBar = setBar("red", player.baseGcD, player.speedGcD);
    const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
@@ -128,11 +137,12 @@ const drawBar = (ctxChars, player) => {
    ];
    
    let barGap = 0;
+   let topOffset = -95;
 
    gameBarArray.forEach(bar => {
       if(player.isDead) bar.color = "gray";
-      new GameBar(ctxChars, player.x, player.y, -barWidth/2, -105 + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
-      barGap += 14;
+      new GameBar(ctxChars, player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      barGap += 12;
    });
 }
 
@@ -177,14 +187,34 @@ socket.on("playerRespawn", () => {
 
 
 // =====================================================================
+// Player Floating Text
+// =====================================================================
+const playerFloatingText = (ctxChars, player, condition, textColor, textValue) => {
+   if(condition) {
+      
+      const text = {
+         offsetX: -35,
+         offsetY: -100,
+         textSize: 30,
+      };
+
+      const newMessage = new FloatingMessage(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
+      floatTextArray.push(newMessage);
+   }
+}
+
+
+// =====================================================================
 // Player Init (Every frame)
 // =====================================================================
 const initPlayer = (ctxChars, player) => {
    
    drawPlayer(ctxChars, player);
    drawAttackArea(ctxChars, player);
-   enemyDamageTaken(ctxChars, player);
-
    drawBar(ctxChars, player);
+
+   playerFloatingText(ctxChars, player, player.isHealing, "lime", `+${player.calcHealing}`);
+   playerFloatingText(ctxChars, player, player.isGettingDamage, "gold", `-${player.calcDamage}`);
+
    drawHealthNumber(ctxChars, player);
 }
