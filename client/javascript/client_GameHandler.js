@@ -14,27 +14,53 @@ const canvasChars = document.querySelector(".canvas-characters");
 const ctxMap = canvasMap.getContext("2d");
 const ctxChars = canvasChars.getContext("2d");
 
+// Set Canvas Size
+let height = 800;
+let width = 1200;
+
+canvasMap.height = height;
+canvasMap.width = width;
+
+canvasChars.height = height;
+canvasChars.width = width;
+
+gameWindow.style = `
+   height: ${height}px;
+   width: ${width}px
+`;
+
 // Disabled Anti-Aliasing
 ctxChars.imageSmoothingEnabled = false;
 ctxChars.webkitImageSmoothingEnabled = false;
 ctxChars.imageSmoothingEnabled = false;
 
-// Set Canvas Size
-canvasMap.height = 800;
-canvasMap.width = 1200;
+// const reziseCanvas = () => {
 
-canvasChars.height = 800;
-canvasChars.width = 1200;
+//    height = window.innerHeight - 50;
+//    width = window.innerWidth - width * 0.5;
 
-// if(window.matchMedia("(max-width: 1500px)").matches) {
-//    canvas.height = 500;
-//    canvas.width = 800;
+//    canvasMap.height = height;
+//    canvasMap.width = width;
+
+//    canvasChars.height = height;
+//    canvasChars.width = width;
+
+//    gameWindow.style = `
+//       height: ${height}px;
+//       width: ${width}px
+//    `;
+
+//    // Disabled Anti-Aliasing
+//    ctxChars.imageSmoothingEnabled = false;
+//    ctxChars.webkitImageSmoothingEnabled = false;
+//    ctxChars.imageSmoothingEnabled = false;
 // }
 
-gameWindow.style = `
-   height: ${canvasChars.height}px;
-   width: ${canvasChars.width}px
-`;
+// reziseCanvas();
+
+// window.addEventListener("rezise", () => {
+//    reziseCanvas();
+// });
 
 
 // =====================================================================
@@ -52,15 +78,15 @@ const clearChat = () => {
    }
 }
 
-const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="text">${data}</p>`
+const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">${data}</p>`
 
-socket.on("addtext", data => chatResponse(data));
+socket.on("addMessage", data => chatResponse(data));
 socket.on("evalResponse", data => chatResponse(data));
 
 chatEnter.onsubmit = (event) => {
    event.preventDefault();
    if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
-   else if(chatInput.value !== "") socket.emit("sendtext", chatInput.value);
+   else if(chatInput.value !== "") socket.emit("sendMessage", chatInput.value);
    chatInput.value = "";
 }
 
@@ -87,22 +113,29 @@ const handleFloatingText = () => {
 
 
 // =====================================================================
-// Client Sync (Every frame)
+// Time Out before init
 // =====================================================================
 setTimeout(() => {
+   
+   // Client loaded
+   socket.emit("loaded");
+   
 
+   // Init Map
+   initMap(ctxMap);
+   
+
+   // Client Sync (Every frame)
    socket.on("newSituation", (playerData) => {
       ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
-      
-      initMap(ctxMap); // <== Disactivate on update later
-      
+
       playerData.forEach(player => initPlayer(ctxChars, player));
       handleFloatingText();
-   
+
       if(showFPS) frameRate++;
    });
-   
-}, 100)
+
+}, 200);
 
 
 // =====================================================================

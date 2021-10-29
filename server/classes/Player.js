@@ -81,6 +81,10 @@ class Player {
       this.isRunning = false;
       this.isAttacking = false;
       this.isGettingDamage = false;
+
+      // Score
+      this.kills = 0;
+      this.died = 0;
    }
 
    RnG(baseSpec, coeff) {

@@ -42,27 +42,6 @@
         <!-- Player UI -->
         <section class="flexCenter player-UI">
 
-            <!-- Player Controls -->
-            <div class="flexCenter UI-frame player-controls">
-                <div class="UI-content">
-                    <p>==== Welcome to ====</p>
-                    <p>Multi Player Arena</p>
-                    <br>
-                    <p>[Attack: left click]</p>
-                    <p>[Heal: r]</p>
-                    <p>[Up: z]</p>
-                    <p>[Down: s]</p>
-                    <p>[Left: q]</p>
-                    <p>[Right: d]</p>
-                    <p>[Run: space bar]</p>
-                    <br>
-                    <p>If you want to try, open</p>
-                    <p>another tab</p>
-                    <br>
-                    <p>Enjoy =)</p>
-                </div>
-            </div>
-
             <!-- Player Infos -->
             <div class="flexCenter UI-frame player-infos">
                 <div class="flexCenter UI-content">
@@ -73,21 +52,39 @@
                     </div>
 
                     <div class="flexCenter player-stats">
-                        <p class="health">Health: 200</p>
-                        <p class="mana">Mana: 150</p>
-                        <p class="mana-regen">Regen mana: 0.5</p>
-                        <p class="energy">Energy: 50</p>
-                        <p class="energy-regen">Regen energy: 0.2</p>
-                        <p class="GcD">GcD: 30</p>
+                        <p class="health"></p>
+                        <p class="mana"></p>
+                        <p class="mana-regen"></p>
+                        <p class="energy"></p>
+                        <p class="energy-regen"></p>
+                        <p class="GcD"></p>
                     </div>
 
                     <div class="flexCenter player-score">
-                        <p class="kills">Kills: 12</p>
-                        <p class="died">Died: 5</p>
+                        <p class="kills"></p>
+                        <p class="died"></p>
                     </div>
 
                 </div>
             </div>
+
+            <!-- Player Controls -->
+            <div class="flexCenter UI-frame player-controls">
+                <div class="UI-content">
+                    <p>=== Multi Player Arena ===</p>
+                    <p>Attack: left click</p>
+                    <p>Heal: r</p>
+                    <p>Up: z</p>
+                    <p>Down: s</p>
+                    <p>Left: q</p>
+                    <p>Right: d</p>
+                    <p>Run: space bar</p>
+                    <br>
+                    <p>Open another tab to try</p>
+                    <p>Enjoy =)</p>
+                </div>
+            </div>
+
         </section>
         
         <script src="/socket.io/socket.io.js"></script>

@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
 // Server Sync
 // =====================================================================
 setInterval(() => {
-   let playerData = playerHandler.playerUpdate();
+   let playerData = playerHandler.playerUpdate(socketList);
 
    playerData.forEach(player => {
       let socket = socketList[player.id];
@@ -87,7 +87,8 @@ setInterval(() => {
 
       // Death Screen Event
       if(player.isDead && !player.isRespawning) {
-         
+         socket.emit("playerStats", player);
+
          socket.emit("playerDeath", {
             respawnTimer: player.respawnTimer,
             deathCounts: player.deathCounts

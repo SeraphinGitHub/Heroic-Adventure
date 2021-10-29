@@ -4,11 +4,11 @@
 // =====================================================================
 // DOM Player Stats
 // =====================================================================
-const playerStats = () => {
+const playerStats = (player) => {
    const playerName = document.querySelector(".player-name");
-   const playerStats = document.querySelector(".player-stats");
-
+   
    // Player infos
+   const playerStats = document.querySelector(".player-stats");
    const health = playerStats.querySelector(".health");
    const mana = playerStats.querySelector(".mana");
    const regenMana = playerStats.querySelector(".mana-regen");
@@ -17,11 +17,26 @@ const playerStats = () => {
    const GcD = playerStats.querySelector(".GcD");
 
    // Player score
-   const kills = playerStats.querySelector(".kills");
-   const died = playerStats.querySelector(".died");
+   const playerScore = document.querySelector(".player-score");
+   const kills = playerScore.querySelector(".kills");
+   const died = playerScore.querySelector(".died");
 
-   
+   // Set DOM text content
+   health.textContent = `Health: ${player.baseHealth}`;
+   mana.textContent = `Mana: ${player.baseMana}`;
+   regenMana.textContent = `Regen mana: ${player.baseRegenMana}`;
+   energy.textContent = `Energy: ${player.baseEnergy}`;
+   regenEnergy.textContent = `Regen energy: ${player.baseRegenEnergy}`;
+   GcD.textContent = `GcD: ${player.baseGcD}`;
+
+   kills.textContent = `Kills: ${player.kills}`;
+   died.textContent = `Died: ${player.died}`;
 }
+
+// Init Player DOM UI
+socket.on("playerStats", (player) => {
+   playerStats(player);
+});
 
 
 // =====================================================================
@@ -163,7 +178,7 @@ const drawBar = (ctxChars, player) => {
    let topOffset = -95;
 
    gameBarArray.forEach(bar => {
-      if(player.isDead) bar.color = "gray";
+      if(player.isDead) bar.value = 0;
       new GameBar(ctxChars, player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
       barGap += 12;
    });
@@ -231,8 +246,6 @@ const playerFloatingText = (ctxChars, player, condition, textColor, textValue) =
 // Player Init (Every frame)
 // =====================================================================
 const initPlayer = (ctxChars, player) => {
-   
-   playerStats(player);
 
    drawPlayer(ctxChars, player);
    drawAttackArea(ctxChars, player);
