@@ -86,13 +86,17 @@ setInterval(() => {
       socket.emit("newSituation", playerData);
 
       // Death Screen Event
-      if(player.isDead) {
+      if(player.isDead && !player.isRespawning) {
+         
          socket.emit("playerDeath", {
             respawnTimer: player.respawnTimer,
             deathCounts: player.deathCounts
          });
+      }
 
-         if(player.respawnTimer === 0) socket.emit("playerRespawn");
+      else if(!player.isDead && player.isRespawning) {
+         player.isRespawning = false;
+         socket.emit("playerRespawn");
       }
    });
 }, 1000/process.env.FRAME_RATE);

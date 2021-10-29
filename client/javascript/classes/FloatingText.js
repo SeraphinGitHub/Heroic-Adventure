@@ -1,7 +1,7 @@
 
 "use strict"
 
-class FloatingMessage {
+class FloatingText {
    constructor(ctx, x, y, offsetX, offsetY, size, color, value) {
 
       // Position
@@ -16,16 +16,14 @@ class FloatingMessage {
       this.color = color;
       this.value = value;
       this.opacity = 1;
-      this.displayDuration = 150; // More high ==> More long
-   }
-
-   update() {
-      this.y -= 0.8;
-      this.displayDuration--;
-      if(this.opacity > 0.01) this.opacity -= 0.01;
+      this.displayDuration = 150; // More high ==> More show long time
    }
    
-   draw() {
+   drawText() {
+      this.y -= 0.8;
+      this.displayDuration--;
+      if(this.opacity > 0.008) this.opacity -= 0.008;
+
       this.ctx.globalAlpha = this.opacity;
       this.ctx.fillStyle = this.color;
       this.ctx.font = `${this.size}px Orbitron-ExtraBold`;

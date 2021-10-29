@@ -2,6 +2,29 @@
 "use strict"
 
 // =====================================================================
+// DOM Player Stats
+// =====================================================================
+const playerStats = () => {
+   const playerName = document.querySelector(".player-name");
+   const playerStats = document.querySelector(".player-stats");
+
+   // Player infos
+   const health = playerStats.querySelector(".health");
+   const mana = playerStats.querySelector(".mana");
+   const regenMana = playerStats.querySelector(".mana-regen");
+   const energy = playerStats.querySelector(".energy");
+   const regenEnergy = playerStats.querySelector(".energy-regen");
+   const GcD = playerStats.querySelector(".GcD");
+
+   // Player score
+   const kills = playerStats.querySelector(".kills");
+   const died = playerStats.querySelector(".died");
+
+   
+}
+
+
+// =====================================================================
 // Player Controls
 // =====================================================================
 const controls = {
@@ -126,7 +149,7 @@ const drawBar = (ctxChars, player) => {
    // Set up Bar
    const healthBar = setBar("lime", player.baseHealth, player.health);
    const manaBar   = setBar(manaColor, player.baseMana, player.mana);
-   const attackBar = setBar("red", player.baseGcD, player.speedGcD);
+   const attackBar = setBar("red", player.GcD, player.speedGcD);
    const energyBar = setBar("gold", player.baseEnergy, player.energy);
    
    let gameBarArray = [
@@ -198,8 +221,8 @@ const playerFloatingText = (ctxChars, player, condition, textColor, textValue) =
          textSize: 30,
       };
 
-      const newMessage = new FloatingMessage(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
-      floatTextArray.push(newMessage);
+      const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
+      floatTextArray.push(newText);
    }
 }
 
@@ -209,12 +232,14 @@ const playerFloatingText = (ctxChars, player, condition, textColor, textValue) =
 // =====================================================================
 const initPlayer = (ctxChars, player) => {
    
+   playerStats(player);
+
    drawPlayer(ctxChars, player);
    drawAttackArea(ctxChars, player);
    drawBar(ctxChars, player);
 
    playerFloatingText(ctxChars, player, player.isHealing, "lime", `+${player.calcHealing}`);
-   playerFloatingText(ctxChars, player, player.isGettingDamage, "gold", `-${player.calcDamage}`);
+   playerFloatingText(ctxChars, player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
 
    drawHealthNumber(ctxChars, player);
 }

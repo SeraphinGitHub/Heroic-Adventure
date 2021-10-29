@@ -10,9 +10,16 @@ const gameWindow = document.querySelector(".game-window");
 const canvasMap = document.querySelector(".canvas-map");
 const canvasChars = document.querySelector(".canvas-characters");
 
+// Set Contexts
 const ctxMap = canvasMap.getContext("2d");
 const ctxChars = canvasChars.getContext("2d");
 
+// Disabled Anti-Aliasing
+ctxChars.imageSmoothingEnabled = false;
+ctxChars.webkitImageSmoothingEnabled = false;
+ctxChars.imageSmoothingEnabled = false;
+
+// Set Canvas Size
 canvasMap.height = 800;
 canvasMap.width = 1200;
 
@@ -45,15 +52,15 @@ const clearChat = () => {
    }
 }
 
-const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">${data}</p>`
+const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="text">${data}</p>`
 
-socket.on("addMessage", data => chatResponse(data));
+socket.on("addtext", data => chatResponse(data));
 socket.on("evalResponse", data => chatResponse(data));
 
 chatEnter.onsubmit = (event) => {
    event.preventDefault();
    if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
-   else if(chatInput.value !== "") socket.emit("sendMessage", chatInput.value);
+   else if(chatInput.value !== "") socket.emit("sendtext", chatInput.value);
    chatInput.value = "";
 }
 
@@ -61,38 +68,41 @@ clearChatBtn.addEventListener("click", () => clearChat());
 
 
 // =====================================================================
-// Floating Messages
+// Floating Text
 // =====================================================================
 let floatTextArray = [];
 
-const handleFloatingMessages = () => {
-   for(let i = 0; i < floatTextArray.length; i++) {
+const handleFloatingText = () => {
+
+   floatTextArray.forEach(text => {
+      text.drawText();
       
-      let message = floatTextArray[i];
-      message.update();
-      message.draw();
-      
-      if(message.displayDuration <= 0) {
-         floatTextArray.splice(i, 1);
-         i--;
+      if(text.displayDuration <= 0) {
+         let textIndex = floatTextArray.indexOf(text);
+         floatTextArray.splice(textIndex, 1);
+         textIndex--;
       }
-   }
+   });
 }
 
 
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
-socket.on("newSituation", (playerData) => {
-   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
-   
-   initMap(ctxMap); // <== Disactivate on update later
-   
-   playerData.forEach(player => initPlayer(ctxChars, player));
-   handleFloatingMessages();
+setTimeout(() => {
 
-   if(showFPS) frameRate++;
-});
+   socket.on("newSituation", (playerData) => {
+      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+      
+      initMap(ctxMap); // <== Disactivate on update later
+      
+      playerData.forEach(player => initPlayer(ctxChars, player));
+      handleFloatingText();
+   
+      if(showFPS) frameRate++;
+   });
+   
+}, 100)
 
 
 // =====================================================================

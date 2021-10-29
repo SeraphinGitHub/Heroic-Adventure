@@ -51,10 +51,10 @@ exports.onDisconnect = (socket) => {
 // Player Global Count Down
 // =====================================================================
 const playerGcD = (player) => {
-   if(player.speedGcD < player.baseGcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
+   if(player.speedGcD < player.GcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
    if(player.mana < player.baseMana) player.mana += player.regenMana; // Regen Mana
 
-   if(player.speedGcD >= player.baseGcD) {
+   if(player.speedGcD >= player.GcD) {
 
       if(player.isAttacking) {
 
@@ -231,9 +231,11 @@ const playerDeath = (player) => {
    const respawnCooldown = setInterval(() => {
       player.respawnTimer --;
       
-      if(player.respawnTimer < 0) {
+      if(player.respawnTimer <= 0) {
 
          player.isDead = false;
+         player.isRespawning = true;
+
          player.health = player.baseHealth;
          player.respawnTimer = player.baseRespawnTimer;
          player.color = "darkviolet"; // <== Debug Mode

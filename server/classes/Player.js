@@ -32,19 +32,22 @@ class Player {
       this.deathCounts = 0;
       
       // Global Count Down
-      this.baseGcD = process.env.SYNC_COEFF* 30; // More high ==> more slow
-      this.speedGcD = this.baseGcD;
+      this.baseGcD = 30;
+      this.GcD = process.env.SYNC_COEFF* this.baseGcD; // More high ==> more slow
+      this.speedGcD = this.GcD;
 
       // Energy
       this.baseEnergy = 150;
       this.energy = this.baseEnergy;
       this.energyCost = 1.2;
-      this.regenEnergy = process.env.SYNC_COEFF* 0.2;
+      this.baseRegenEnergy = 0.2;
+      this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
       // Mana
       this.baseMana = 150;
       this.mana = this.baseMana;
-      this.regenMana = process.env.SYNC_COEFF* 0.12;
+      this.baseRegenMana = 0.12;
+      this.regenMana = process.env.SYNC_COEFF* this.baseRegenMana;
 
       // Spells cast
       this.cast_Heal = false;
@@ -72,6 +75,7 @@ class Player {
 
       // States
       this.isDead = false;
+      this.isRespawning = false;
       this.isCasting = false;
       this.isHealing = false;
       this.isRunning = false;

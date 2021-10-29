@@ -7,7 +7,7 @@
 const scripts = [
    
    // Classes
-   "classes/FloatingMessage.js",
+   "classes/FloatingText.js",
    "classes/GameBar.js",
    "classes/Tile.js",
    
@@ -24,6 +24,6 @@ const instantiate = (scriptName) => {
    document.body.appendChild(newScript);
 }
 
-window.addEventListener("load", () => {
+window.onload = () => {
    scripts.forEach(item => instantiate(item));
-});
+}
