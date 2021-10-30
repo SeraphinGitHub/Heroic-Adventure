@@ -138,11 +138,45 @@ window.addEventListener("mouseup", (event) => playerAttackCommand(event, false))
 // =====================================================================
 const drawPlayer = (player) => {
 
-   ctxChars.fillStyle = player.color; // <== Debug Mode
-   ctxChars.beginPath();
-   ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
-   ctxChars.fill();
-   ctxChars.closePath();
+   // ctxChars.fillStyle = player.color; // <== Debug Mode
+   // ctxChars.beginPath();
+   // ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   // ctxChars.fill();
+   // ctxChars.closePath();
+
+   const walkDown = new Image();
+   walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
+
+   // const walkLeft = new Image();
+   // walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
+
+   // const walkRight = new Image();
+   // walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
+   
+   // let animSheets = [
+   //    walkDown,
+   //    walkLeft,
+   //    walkRight
+   // ];
+
+   // animSheets.forEach(animation => {
+      ctxChars.drawImage(
+         // animation,
+         walkDown,
+         player.frameX * player.spriteWidth,
+         0,
+         player.spriteWidth,
+         player.spriteHeight,
+         player.x - player.spriteWidth * 0.5,
+         player.y - player.spriteHeight * 0.5,
+         152,
+         152
+      );
+   // });
+
+
+   // ctxChars.strokeStyle = "black";
+   // ctxChars.strokeRect(player.x - player.spriteWidth * 0.5, player.y - player.spriteHeight * 0.5, 150, 150);
 }
 
 // ========== Attack Area ==========
@@ -263,13 +297,13 @@ const playerFloatingText = (player, condition, textColor, textValue) => {
 const initPlayer = (player) => {
 
    drawPlayer(player);
-   drawAttackArea(player);
+   // drawAttackArea(player);
    drawBar(player);
 
    playerFloatingText(player, player.isHealing, "lime", `+${player.calcHealing}`);
    playerFloatingText(player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
 
-   drawHealthNumber(player);
+   // drawHealthNumber(player);
 }
 
 

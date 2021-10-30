@@ -39,7 +39,7 @@ class Player {
       // Energy
       this.baseEnergy = 150;
       this.energy = this.baseEnergy;
-      this.energyCost = 1.2;
+      this.energyCost = 0.8;
       this.baseRegenEnergy = 0.2;
       this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
@@ -62,9 +62,9 @@ class Player {
       this.calcDamage;
       
       // Movements Speed
-      this.walkSpeed = process.env.SYNC_COEFF* 7;
+      this.walkSpeed = process.env.SYNC_COEFF* 3; // <== WalkSpeed
       this.baseWalkSpeed = this.walkSpeed;
-      this.runSpeed = process.env.SYNC_COEFF* 15;
+      this.runSpeed = process.env.SYNC_COEFF* 7; // <== RunSpeed
       this.baseRunSpeed = this.runSpeed;
       
       // Movements Axis
@@ -85,6 +85,14 @@ class Player {
       // Score
       this.kills = 0;
       this.died = 0;
+
+      // Animation
+      this.frameX = 0;
+      this.frameY = 0;
+      this.minFrame = 0;
+      this.maxFrame = 29;
+      this.spriteWidth = 152;
+      this.spriteHeight = 152;
    }
 
    RnG(baseSpec, coeff) {

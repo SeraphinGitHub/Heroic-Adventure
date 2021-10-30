@@ -88,7 +88,7 @@ const playerGcD = (player, socketList) => {
    }
 }
 
-
+let frame = 0;
 // =====================================================================
 // Player Movements
 // =====================================================================
@@ -96,35 +96,48 @@ const playerMovements = (player) => {
       
    let moveSpeed = player.walkSpeed;
    if(player.isRunning) moveSpeed = player.runSpeed;
-   
-   // Cross
-   if(player.up && player.y > 50) {
-   // if(player.up) {
+
+   // Map Border Reached
+   if(player.up && player.y < 50
+   || player.down && player.y > 750
+   || player.left && player.x < 50
+   || player.right && player.x > 1150) {
+      moveSpeed = 0;
+   }
+
+
+   // Cross Directions
+   if(player.up) {
       player.y -= moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = -player.attkOffset;
+      player.attkOffset_Y = -player.attkOffset;      
    }
    
-   if(player.down && player.y < 750) {
-   // if(player.down) {
+   if(player.down) {
       player.y += moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = player.attkOffset;
+      player.attkOffset_Y = player.attkOffset;     
+      
+      // ================ Walk Down Animation ================
+      if(frame % 1 === 0) {
+         if(player.frameX < player.maxFrame) player.frameX++;
+         else player.frameX = player.minFrame;
+      }
+      // ================ Walk Down Animation ================
    }
    
-   if(player.left && player.x > 50) {
-   // if(player.left) {
+   if(player.left) {
       player.x -= moveSpeed;
       player.attkOffset_X = -player.attkOffset;
       player.attkOffset_Y = 0;
    }
    
-   if(player.right && player.x < 1150) {
-   // if(player.right) {
+   if(player.right) {
       player.x += moveSpeed;
       player.attkOffset_X = player.attkOffset;
       player.attkOffset_Y = 0;
    }
+
    
    // Diagonale
    if(player.up && player.left) {
@@ -146,6 +159,7 @@ const playerMovements = (player) => {
       player.attkOffset_X = player.attkOffset;
       player.attkOffset_Y = player.attkOffset;
    }
+
    
    // Diag Speed
    if(player.up && player.left
@@ -298,5 +312,7 @@ exports.playerUpdate = (socketList) => {
 
       playerData.push(player);
    }
+
+   frame++;
    return playerData;
 }
