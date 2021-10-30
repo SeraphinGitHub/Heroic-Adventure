@@ -87,7 +87,11 @@ setInterval(() => {
 
       // Death Screen Event
       if(player.isDead && !player.isRespawning) {
-         socket.emit("playerStats", player);
+         
+         socket.emit("playerScore", {
+            kills: player.kills,
+            died: player.died,
+         });
 
          socket.emit("playerDeath", {
             respawnTimer: player.respawnTimer,

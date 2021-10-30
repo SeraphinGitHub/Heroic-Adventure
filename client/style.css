@@ -273,7 +273,7 @@ p {
 @media screen and (max-width: 1600px) {
    .chat,
    .player-UI {
-      width: 12%;
+      width: 11%;
    }
 
    .player-infos {

@@ -23,9 +23,21 @@ exports.onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
 
-   // Init Player DOM UI
-   socket.on("loaded", () => {
-      socket.emit("playerStats", player);
+   // Init Player Stats
+   socket.emit("playerStats", {
+      playerName: player.id,
+      health: player.baseHealth,
+      mana: player.baseMana,
+      regenMana: player.baseRegenMana,
+      energy: player.baseEnergy,
+      regenEnergy: player.baseRegenEnergy,
+      GcD: player.baseGcD,
+   });
+
+   // Init Player Score
+   socket.emit("playerScore", {
+      kills: player.kills,
+      died: player.died,
    });
 
    // Movements
@@ -217,7 +229,10 @@ const damagingEnemy = (player, socketList) => {
             player.kills++;
 
             let socket = socketList[player.id];
-            socket.emit("playerStats", player);
+            socket.emit("playerScore", {
+               kills: player.kills,
+               died: player.died,
+            });
          }
       }
    }

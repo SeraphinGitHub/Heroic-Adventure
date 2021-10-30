@@ -20,7 +20,7 @@ greenery_3.src = `${mapFolder_Src}/greenery_3.png`;
 // =====================================================================
 //  Map Creation
 // =====================================================================
-const drawMap = (ctxMap) => {
+const drawMap = () => {
 
    // Desert Floor
    for(let x = 0; x < canvasMap.width; x += cellSize) {
@@ -40,38 +40,14 @@ const drawMap = (ctxMap) => {
 
 
 // =====================================================================
-// Draw Tree (Temporary)
+// Map Init
 // =====================================================================
-// const drawTree = (ctxMap, treeList) => {
+let mapLoaded = false;
+socket.on("newSituation", () => {
 
-//    for(let i in treeList) {
-//       let tree = treeList[i];
+   if(!mapLoaded) {
+      setTimeout(() => mapLoaded = true, 1000)
 
-//       ctxMap.fillStyle = tree.color; // <== Debug Mode
-   
-//       ctxMap.fillRect(
-//          tree.x + tree.offsetX - 50,
-//          tree.y + tree.offsetY - 50,
-//          100,
-//          100
-//       );
-//       ctxMap.fill();
-   
-   
-//       // ctxMap.beginPath();
-//       // ctxMap.arc(tree.x + tree.offsetX, tree.y + tree.offsetY, tree.radius, tree.angle, Math.PI * 2);
-//       // ctxMap.fill();
-//       // ctxMap.closePath();
-   
-//       ctxMap.drawImage(tree_1, 0, 0, 285, 297, tree.x, tree.y, cellSize, cellSize);
-//    }
-// }
-
-
-// =====================================================================
-// Map Init (Every frame)
-// =====================================================================
-const initMap = (ctxMap, treeList) => {
-   drawMap(ctxMap);
-   // drawTree(ctxMap, treeList);
-}
+      drawMap();
+   }
+});

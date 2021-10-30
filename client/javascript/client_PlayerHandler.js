@@ -2,13 +2,17 @@
 "use strict"
 
 // =====================================================================
-// DOM Player Stats
+// DOM Player UI
 // =====================================================================
-const playerStats = (player) => {
+
+// ========== Player Stats ==========
+const playerStats = (data) => {
    const playerName = document.querySelector(".player-name");
-   
-   // Player infos
    const playerStats = document.querySelector(".player-stats");
+   
+   playerName.textContent = `Player ID: ${data.playerName}`;
+
+   // Player infos
    const health = playerStats.querySelector(".health");
    const mana = playerStats.querySelector(".mana");
    const regenMana = playerStats.querySelector(".mana-regen");
@@ -16,26 +20,37 @@ const playerStats = (player) => {
    const regenEnergy = playerStats.querySelector(".energy-regen");
    const GcD = playerStats.querySelector(".GcD");
 
-   // Player score
+   // Set DOM text content
+   health.textContent = `Health: ${data.health}`;
+   mana.textContent = `Mana: ${data.mana}`;
+   regenMana.textContent = `Regen mana: ${data.regenMana}`;
+   energy.textContent = `Energy: ${data.energy}`;
+   regenEnergy.textContent = `Regen energy: ${data.regenEnergy}`;
+   GcD.textContent = `GcD: ${data.GcD}`;
+}
+
+// Init Player UI
+socket.on("playerStats", (data) => {
+   playerStats(data);
+});
+
+
+// ========== Player Score ==========
+const playerScore = (data) => {
    const playerScore = document.querySelector(".player-score");
+
+   // Player score
    const kills = playerScore.querySelector(".kills");
    const died = playerScore.querySelector(".died");
 
    // Set DOM text content
-   health.textContent = `Health: ${player.baseHealth}`;
-   mana.textContent = `Mana: ${player.baseMana}`;
-   regenMana.textContent = `Regen mana: ${player.baseRegenMana}`;
-   energy.textContent = `Energy: ${player.baseEnergy}`;
-   regenEnergy.textContent = `Regen energy: ${player.baseRegenEnergy}`;
-   GcD.textContent = `GcD: ${player.baseGcD}`;
-
-   kills.textContent = `Kills: ${player.kills}`;
-   died.textContent = `Died: ${player.died}`;
+   kills.textContent = `Kills: ${data.kills}`;
+   died.textContent = `Died: ${data.died}`;
 }
 
-// Init Player DOM UI
-socket.on("playerStats", (player) => {
-   playerStats(player);
+// Init Player Score
+socket.on("playerScore", (data) => {
+   playerScore(data);
 });
 
 
@@ -121,7 +136,7 @@ window.addEventListener("mouseup", (event) => playerAttackCommand(event, false))
 // =====================================================================
 // Draw Player
 // =====================================================================
-const drawPlayer = (ctxChars, player) => {
+const drawPlayer = (player) => {
 
    ctxChars.fillStyle = player.color; // <== Debug Mode
    ctxChars.beginPath();
@@ -131,7 +146,7 @@ const drawPlayer = (ctxChars, player) => {
 }
 
 // ========== Attack Area ==========
-const drawAttackArea = (ctxChars, player) => {
+const drawAttackArea = (player) => {
 
    ctxChars.fillStyle = player.attkColor; // <== Debug Mode
    ctxChars.beginPath();
@@ -152,7 +167,7 @@ const setBar = (color, maxValue, value) => {
    }
 }
 
-const drawBar = (ctxChars, player) => {
+const drawBar = (player) => {
 
    const barWidth = 110;
    const barHeight = 10;
@@ -186,7 +201,7 @@ const drawBar = (ctxChars, player) => {
 
 
 // Temporary
-const drawHealthNumber = (ctxChars, player) => {
+const drawHealthNumber = (player) => {
 
    ctxChars.fillStyle = "black";
    ctxChars.font = "26px Orbitron-Regular";
@@ -227,7 +242,7 @@ socket.on("playerRespawn", () => {
 // =====================================================================
 // Player Floating Text
 // =====================================================================
-const playerFloatingText = (ctxChars, player, condition, textColor, textValue) => {
+const playerFloatingText = (player, condition, textColor, textValue) => {
    if(condition) {
       
       const text = {
@@ -245,14 +260,22 @@ const playerFloatingText = (ctxChars, player, condition, textColor, textValue) =
 // =====================================================================
 // Player Init (Every frame)
 // =====================================================================
-const initPlayer = (ctxChars, player) => {
+const initPlayer = (player) => {
 
-   drawPlayer(ctxChars, player);
-   drawAttackArea(ctxChars, player);
-   drawBar(ctxChars, player);
+   drawPlayer(player);
+   drawAttackArea(player);
+   drawBar(player);
 
-   playerFloatingText(ctxChars, player, player.isHealing, "lime", `+${player.calcHealing}`);
-   playerFloatingText(ctxChars, player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
+   playerFloatingText(player, player.isHealing, "lime", `+${player.calcHealing}`);
+   playerFloatingText(player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
 
-   drawHealthNumber(ctxChars, player);
+   drawHealthNumber(player);
 }
+
+
+// =====================================================================
+// Player Sync (Every frame)
+// =====================================================================
+socket.on("newSituation", (playerData) => {
+   playerData.forEach(player => initPlayer(player));
+});

@@ -34,34 +34,6 @@ ctxChars.imageSmoothingEnabled = false;
 ctxChars.webkitImageSmoothingEnabled = false;
 ctxChars.imageSmoothingEnabled = false;
 
-// const reziseCanvas = () => {
-
-//    height = window.innerHeight - 50;
-//    width = window.innerWidth - width * 0.5;
-
-//    canvasMap.height = height;
-//    canvasMap.width = width;
-
-//    canvasChars.height = height;
-//    canvasChars.width = width;
-
-//    gameWindow.style = `
-//       height: ${height}px;
-//       width: ${width}px
-//    `;
-
-//    // Disabled Anti-Aliasing
-//    ctxChars.imageSmoothingEnabled = false;
-//    ctxChars.webkitImageSmoothingEnabled = false;
-//    ctxChars.imageSmoothingEnabled = false;
-// }
-
-// reziseCanvas();
-
-// window.addEventListener("rezise", () => {
-//    reziseCanvas();
-// });
-
 
 // =====================================================================
 // Chatting
@@ -113,29 +85,15 @@ const handleFloatingText = () => {
 
 
 // =====================================================================
-// Time Out before init
+// Client Sync (Every frame)
 // =====================================================================
-setTimeout(() => {
+socket.on("newSituation", () => {
+   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
    
-   // Client loaded
-   socket.emit("loaded");
-   
+   handleFloatingText();
 
-   // Init Map
-   initMap(ctxMap);
-   
-
-   // Client Sync (Every frame)
-   socket.on("newSituation", (playerData) => {
-      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
-
-      playerData.forEach(player => initPlayer(ctxChars, player));
-      handleFloatingText();
-
-      if(showFPS) frameRate++;
-   });
-
-}, 200);
+   if(showFPS) frameRate++;
+});
 
 
 // =====================================================================
