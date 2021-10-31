@@ -42,12 +42,7 @@ const drawMap = () => {
 // =====================================================================
 // Map Init
 // =====================================================================
-let mapLoaded = false;
-socket.on("newSituation", () => {
-
-   if(!mapLoaded) {
-      setTimeout(() => mapLoaded = true, 1000)
-
-      drawMap();
-   }
-});
+const initMap = () => {
+   
+   drawMap();
+}

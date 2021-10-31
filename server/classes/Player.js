@@ -4,13 +4,12 @@
 class Player {
    constructor(id) {
       this.id = id;
+      this.name = "Séraphin";
 
       // Player Hitbox
       this.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on load
       this.y = Math.floor(Math.random() * 700) + 50;
-      // this.x = 600;
-      // this.y = 400;
-      this.radius = 40;
+      this.radius = 45;
       this.angle = 0;
       this.color = "darkviolet";
 
@@ -87,12 +86,11 @@ class Player {
       this.died = 0;
 
       // Animation
+      this.state;
       this.frameX = 0;
-      this.frameY = 0;
-      this.minFrame = 0;
-      this.maxFrame = 29;
-      this.spriteWidth = 152;
-      this.spriteHeight = 152;
+      this.frameY = 1;
+      this.spriteWidth = 200;
+      this.spriteHeight = 200;
    }
 
    RnG(baseSpec, coeff) {
@@ -105,6 +103,13 @@ class Player {
 
    damageRnG() {
       return this.RnG(this.baseDamage, 0.20); // More low => Shorter RnG Range => More damage
+   }
+
+   animation(frame, index, spritesNumber) {
+      if(frame % index === 0) {
+         if(this.frameX < spritesNumber) this.frameX++;
+         else this.frameX = 0;
+      }
    }
 }
 

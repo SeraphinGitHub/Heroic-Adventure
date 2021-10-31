@@ -228,9 +228,15 @@ p {
    height: 93%;
 }
 
-.player-title h2,
-.player-title h3 {
+.player-title h2 {
    width: 100%;
+}
+
+.player-name {
+   text-decoration: unset;
+   color: black;
+   -webkit-text-stroke: 0.8px lime;
+   text-shadow: lime 2px 2px 2px;
 }
 
 .player-stats,

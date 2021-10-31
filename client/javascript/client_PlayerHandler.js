@@ -10,7 +10,7 @@ const playerStats = (data) => {
    const playerName = document.querySelector(".player-name");
    const playerStats = document.querySelector(".player-stats");
    
-   playerName.textContent = `Player ID: ${data.playerName}`;
+   playerName.textContent = data.playerName;
 
    // Player infos
    const health = playerStats.querySelector(".health");
@@ -134,63 +134,6 @@ window.addEventListener("mouseup", (event) => playerAttackCommand(event, false))
 
 
 // =====================================================================
-// Draw Player
-// =====================================================================
-const drawPlayer = (player) => {
-
-   // ctxChars.fillStyle = player.color; // <== Debug Mode
-   // ctxChars.beginPath();
-   // ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
-   // ctxChars.fill();
-   // ctxChars.closePath();
-
-   const walkDown = new Image();
-   walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
-
-   // const walkLeft = new Image();
-   // walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
-
-   // const walkRight = new Image();
-   // walkDown.src = "client/images/playerAnimation/walkDownAnim.png";
-   
-   // let animSheets = [
-   //    walkDown,
-   //    walkLeft,
-   //    walkRight
-   // ];
-
-   // animSheets.forEach(animation => {
-      ctxChars.drawImage(
-         // animation,
-         walkDown,
-         player.frameX * player.spriteWidth,
-         0,
-         player.spriteWidth,
-         player.spriteHeight,
-         player.x - player.spriteWidth * 0.5,
-         player.y - player.spriteHeight * 0.5,
-         152,
-         152
-      );
-   // });
-
-
-   // ctxChars.strokeStyle = "black";
-   // ctxChars.strokeRect(player.x - player.spriteWidth * 0.5, player.y - player.spriteHeight * 0.5, 150, 150);
-}
-
-// ========== Attack Area ==========
-const drawAttackArea = (player) => {
-
-   ctxChars.fillStyle = player.attkColor; // <== Debug Mode
-   ctxChars.beginPath();
-   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
-   ctxChars.fill();
-   ctxChars.closePath();
-}
-
-
-// =====================================================================
 // Draw Player Game Bars
 // =====================================================================
 const setBar = (color, maxValue, value) => {
@@ -204,7 +147,7 @@ const setBar = (color, maxValue, value) => {
 const drawBar = (player) => {
 
    const barWidth = 110;
-   const barHeight = 10;
+   const barHeight = 9;
 
    // Mana color on low mana
    let manaColor = "deepskyblue";
@@ -224,26 +167,116 @@ const drawBar = (player) => {
    ];
    
    let barGap = 0;
-   let topOffset = -95;
+   let topOffset = -110;
 
    gameBarArray.forEach(bar => {
       if(player.isDead) bar.value = 0;
       new GameBar(ctxChars, player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
-      barGap += 12;
+      barGap += 11;
    });
 }
 
+const drawPlayerName = (player) => {
 
-// Temporary
-const drawHealthNumber = (player) => {
+   const namePos = {
+      x: player.x - (player.name.length * 6),
+      y: player.y + 75,
+   };
+
+   ctxChars.fillStyle = "lime";
+   ctxChars.shadowColor = "black";
+   ctxChars.shadowBlur = 6;
+
+   ctxChars.font = "22px Orbitron-ExtraBold";
+   ctxChars.strokeText(player.name, namePos.x, namePos.y);
+   ctxChars.fillText(player.name, namePos.x, namePos.y);
+}
+
+
+// =====================================================================
+// Player Animation State
+// =====================================================================
+const playerAnimState = (player) => {
+   
+   // Idle Anim
+   const idle = new Image();
+   idle.src = "client/images/playerAnimation/idle_4x.png";
+
+   // Walk Anim
+   const walk = new Image();
+   walk.src = "client/images/playerAnimation/walk_4x.png";
+
+   // Attack Anim
+   const attack = new Image();
+   attack.src = "client/images/playerAnimation/attack2_4x.png";
+   
+   switch(player.state) {
+      case "walk":
+         drawPlayer(player, walk);
+      break;
+
+      case "attack":
+         drawPlayer(player, attack);
+      break;
+
+      default:
+         drawPlayer(player, idle);
+      break;
+   }
+}
+
+
+// =====================================================================
+// Draw Player
+// =====================================================================
+const drawPlayer = (player, animImg) => {
+
+   const animSize = {
+      height: 200,
+      width: 200,
+      offsetY: 5,
+   }
+
+   ctxChars.drawImage(
+      animImg,
+      player.frameX * player.spriteWidth,
+      player.frameY * player.spriteHeight,
+      player.spriteWidth,
+      player.spriteHeight,
+      player.x - animSize.height * 0.5,
+      player.y - animSize.width * 0.5 - animSize.offsetY,
+      animSize.height,
+      animSize.width,
+   );
+}
+
+
+// =====================================================================
+// ==>  Debug Mode  <==
+// =====================================================================
+const drawPlayer_DebugMode = (player) => {
+
+   ctxChars.fillStyle = player.color;
+   ctxChars.beginPath();
+   ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   ctxChars.fill();
+   ctxChars.closePath();
+}
+
+const drawAttackArea_DebugMode = (player) => {
+
+   ctxChars.fillStyle = player.attkColor;
+   ctxChars.beginPath();
+   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
+   ctxChars.fill();
+   ctxChars.closePath();
+}
+
+const drawHealthNumber_DebugMode = (player) => {
 
    ctxChars.fillStyle = "black";
    ctxChars.font = "26px Orbitron-Regular";
    ctxChars.fillText(Math.floor(player.health), player.x -35, player.y -15);
-
-   ctxChars.fillStyle = "black";
-   ctxChars.font = "22px Orbitron-ExtraBold";
-   ctxChars.fillText("id: " + player.id, player.x -30, player.y +70);
 }
 
 
@@ -281,7 +314,7 @@ const playerFloatingText = (player, condition, textColor, textValue) => {
       
       const text = {
          offsetX: -35,
-         offsetY: -100,
+         offsetY: -117,
          textSize: 30,
       };
 
@@ -296,14 +329,15 @@ const playerFloatingText = (player, condition, textColor, textValue) => {
 // =====================================================================
 const initPlayer = (player) => {
 
-   drawPlayer(player);
-   // drawAttackArea(player);
    drawBar(player);
+   drawPlayerName(player);
+   // drawPlayer_DebugMode(player);
+   playerAnimState(player)
+   // drawAttackArea_DebugMode(player);
+   // drawHealthNumber_DebugMode(player);
 
    playerFloatingText(player, player.isHealing, "lime", `+${player.calcHealing}`);
    playerFloatingText(player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
-
-   // drawHealthNumber(player);
 }
 
 

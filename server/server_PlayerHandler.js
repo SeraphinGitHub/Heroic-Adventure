@@ -25,7 +25,7 @@ exports.onConnect = (socket) => {
 
    // Init Player Stats
    socket.emit("playerStats", {
-      playerName: player.id,
+      playerName: player.name,
       health: player.baseHealth,
       mana: player.baseMana,
       regenMana: player.baseRegenMana,
@@ -75,9 +75,13 @@ const playerGcD = (player, socketList) => {
 
       if(player.isAttacking) {
 
+         player.animation(frame, 1, 14);
+         player.state = "attack";
          player.speedGcD = 0;
          player.isAttacking = false;
-         playerAttack(player, socketList);
+
+         damagingEnemy(player, socketList);
+         // damagingEnemy(player, mobList); // <== When Mob class gonna be created
       }
 
       if(player.isCasting) {
@@ -88,7 +92,7 @@ const playerGcD = (player, socketList) => {
    }
 }
 
-let frame = 0;
+
 // =====================================================================
 // Player Movements
 // =====================================================================
@@ -96,72 +100,100 @@ const playerMovements = (player) => {
       
    let moveSpeed = player.walkSpeed;
    if(player.isRunning) moveSpeed = player.runSpeed;
+   
+   // Walk Animation
+   if(player.up
+   || player.down
+   || player.left
+   || player.right) {
+      
+      player.state = "walk";
+      player.animation(frame, 1, 29); // <== Walk Img 
+   }
 
-   // Map Border Reached
-   if(player.up && player.y < 50
-   || player.down && player.y > 750
+   // Idle Animation
+   else {
+      player.animation(frame, 2, 29); // <== Idle Img
+      player.state = "idle";
+   }
+
+
+   // Map Border Reached ==> Temporary (Await Scrolling Cam)
+   if(player.up && player.y < 65
+   || player.down && player.y > 740
    || player.left && player.x < 50
    || player.right && player.x > 1150) {
       moveSpeed = 0;
    }
 
 
-   // Cross Directions
+   // =============== Cross Move ===============
+
+   // Up
    if(player.up) {
+      player.frameY = 0;
       player.y -= moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = -player.attkOffset;      
+      player.attkOffset_Y = -player.attkOffset;    
    }
    
+   // Down
    if(player.down) {
+      player.frameY = 1;
       player.y += moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = player.attkOffset;     
-      
-      // ================ Walk Down Animation ================
-      if(frame % 1 === 0) {
-         if(player.frameX < player.maxFrame) player.frameX++;
-         else player.frameX = player.minFrame;
-      }
-      // ================ Walk Down Animation ================
+      player.attkOffset_Y = player.attkOffset;
    }
    
+   // Left
    if(player.left) {
+      player.frameY = 2;
       player.x -= moveSpeed;
       player.attkOffset_X = -player.attkOffset;
       player.attkOffset_Y = 0;
    }
    
-   if(player.right) {
+   // Right
+   if(player.right) {      
+      player.frameY = 3;
       player.x += moveSpeed;
       player.attkOffset_X = player.attkOffset;
       player.attkOffset_Y = 0;
    }
 
    
-   // Diagonale
+   // =============== Diag Move ===============
+
+   // Up & Left
    if(player.up && player.left) {
+      player.frameY = 0;
       player.attkOffset_X = -player.attkOffset;
       player.attkOffset_Y = -player.attkOffset;
    }
 
+   // Up & Right
    if(player.up && player.right) {
+      player.frameY = 0;
       player.attkOffset_X = player.attkOffset;
       player.attkOffset_Y = -player.attkOffset;
    }
 
+   // Down & Left
    if(player.down && player.left) {
+      player.frameY = 1;
       player.attkOffset_X = -player.attkOffset;
       player.attkOffset_Y = player.attkOffset;
    }
 
+   // Down & Right
    if(player.down && player.right) {
+      player.frameY = 1;
       player.attkOffset_X = player.attkOffset;
       player.attkOffset_Y = player.attkOffset;
    }
 
    
-   // Diag Speed
+   // =============== Diag Speed ===============
    if(player.up && player.left
    ||player.up && player.right
    ||player.down && player.left
@@ -206,16 +238,6 @@ const playerHealing = (player) => {
       setTimeout(() => player.isHealing = false, 0)
       if(player.health > player.baseHealth) player.health = player.baseHealth;
    }
-}
-
-
-// =====================================================================
-// Player Attack
-// =====================================================================
-const playerAttack = (player, socketList) => {
-   
-   damagingEnemy(player, socketList);
-   // damagingEnemy(player, mobList); // <== When Mob class gonna be created
 }
 
 
@@ -298,6 +320,8 @@ const playerDeath = (player) => {
 // =====================================================================
 // Player Update (Every frame)
 // =====================================================================
+let frame = 0;
+
 exports.playerUpdate = (socketList) => {
    let playerData = [];
    

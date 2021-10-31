@@ -87,9 +87,15 @@ const handleFloatingText = () => {
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
+let mapLoaded = false;
+
 socket.on("newSituation", () => {
-   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+   if(!mapLoaded) {
+      setTimeout(() => mapLoaded = true, 1000)
+      initMap();
+   }
    
+   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
    handleFloatingText();
 
    if(showFPS) frameRate++;
