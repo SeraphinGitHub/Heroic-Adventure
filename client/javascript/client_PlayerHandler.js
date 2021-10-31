@@ -123,9 +123,9 @@ window.addEventListener("keyup", (event) => {
 // Attack
 // =====================================================================
 const playerAttackCommand = (event, state) => {
+
    if(event.which === 1 && insideCanvas) {
       socket.emit("attack", state);
-      socket.emit("casting", state);
    }
 }
 

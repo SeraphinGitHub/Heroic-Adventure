@@ -77,8 +77,10 @@ class Player {
       this.isRespawning = false;
       this.isCasting = false;
       this.isHealing = false;
+      this.isMoving = false;
       this.isRunning = false;
       this.isAttacking = false;
+      this.attackAnim = false;
       this.isGettingDamage = false;
 
       // Score

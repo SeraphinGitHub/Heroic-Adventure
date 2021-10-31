@@ -41,10 +41,10 @@ exports.onConnect = (socket) => {
    });
 
    // Movements
-   socket.on("up", (state) => player.up = state);
-   socket.on("down", (state) => player.down = state);
-   socket.on("left", (state) => player.left = state);
-   socket.on("right", (state) => player.right = state);
+   socket.on("up", (state) => { player.up = state; player.isMoving = state });
+   socket.on("down", (state) => { player.down = state; player.isMoving = state });
+   socket.on("left", (state) => { player.left = state; player.isMoving = state });
+   socket.on("right", (state) => { player.right = state; player.isMoving = state });
 
    // Spells cast
    socket.on("heal", (state) => player.cast_Heal = state);
@@ -68,18 +68,22 @@ exports.onDisconnect = (socket) => {
 // Player Global Count Down
 // =====================================================================
 const playerGcD = (player, socketList) => {
-   if(player.speedGcD < player.GcD) player.speedGcD += process.env.SYNC_COEFF* 1 ;
    if(player.mana < player.baseMana) player.mana += player.regenMana; // Regen Mana
+   
+   if(player.speedGcD < player.GcD) {
+      player.speedGcD += process.env.SYNC_COEFF* 1 ;
+      if(player.isAttacking) player.isAttacking = false;
+   }
 
    if(player.speedGcD >= player.GcD) {
-
+      player.attackAnim = false;
+      
       if(player.isAttacking) {
-
-         player.animation(frame, 1, 14);
-         player.state = "attack";
+         
          player.speedGcD = 0;
+         player.attackAnim = true;
          player.isAttacking = false;
-
+         
          damagingEnemy(player, socketList);
          // damagingEnemy(player, mobList); // <== When Mob class gonna be created
       }
@@ -102,21 +106,14 @@ const playerMovements = (player) => {
    if(player.isRunning) moveSpeed = player.runSpeed;
    
    // Walk Animation
-   if(player.up
-   || player.down
-   || player.left
-   || player.right) {
+   if(player.isMoving) {
       
-      player.state = "walk";
-      player.animation(frame, 1, 29); // <== Walk Img 
+      if(player.attackAnim) player.state = "attack";
+      else {
+         player.state = "walk";
+         player.animation(frame, 1, 29); // <== Walk Img
+      }
    }
-
-   // Idle Animation
-   else {
-      player.animation(frame, 2, 29); // <== Idle Img
-      player.state = "idle";
-   }
-
 
    // Map Border Reached ==> Temporary (Await Scrolling Cam)
    if(player.up && player.y < 65
@@ -210,7 +207,7 @@ const playerRunning = (player) => {
    if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
 
    if(player.isRunning) {
-
+      
       player.energy -= player.energyCost;
       if(player.energy < player.energyCost) player.isRunning = false;
       if(player.energy <= 0) player.energy = 0;
@@ -328,7 +325,19 @@ exports.playerUpdate = (socketList) => {
    for(let i in playerList) {
       let player = playerList[i];
 
+      
       if(!player.isDead) {
+
+         if(player.attackAnim) {
+            player.state = "attack";
+            player.animation(frame, 1, 14); // <== Attack Img
+         }
+
+         else if(!player.isMoving) {
+            player.state = "idle";
+            player.animation(frame, 2, 29); // <== Idle Img
+         }
+
          playerGcD(player, socketList);
          playerMovements(player);
          playerRunning(player);
