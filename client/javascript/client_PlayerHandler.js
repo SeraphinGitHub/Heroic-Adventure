@@ -134,6 +134,24 @@ window.addEventListener("mouseup", (event) => playerAttackCommand(event, false))
 
 
 // =====================================================================
+// Player Floating Text
+// =====================================================================
+const playerFloatingText = (player, condition, textColor, textValue) => {
+   if(condition) {
+      
+      const text = {
+         offsetX: -35,
+         offsetY: -117,
+         textSize: 30,
+      };
+
+      const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
+      floatTextArray.push(newText);
+   }
+}
+
+
+// =====================================================================
 // Draw Player Game Bars
 // =====================================================================
 const setBar = (color, maxValue, value) => {
@@ -176,43 +194,31 @@ const drawBar = (player) => {
    });
 }
 
-const drawPlayerName = (player) => {
-
-   const namePos = {
-      x: player.x - (player.name.length * 6),
-      y: player.y + 75,
-   };
-
-   ctxChars.fillStyle = "lime";
-   ctxChars.shadowColor = "black";
-   ctxChars.shadowBlur = 6;
-
-   ctxChars.font = "22px Orbitron-ExtraBold";
-   ctxChars.strokeText(player.name, namePos.x, namePos.y);
-   ctxChars.fillText(player.name, namePos.x, namePos.y);
-}
-
 
 // =====================================================================
 // Player Animation State
 // =====================================================================
+const idle = new Image();
+idle.src = "client/images/playerAnimation/idle_4x.png"; // <== Idle Anim
+
+const walk = new Image();
+walk.src = "client/images/playerAnimation/walk_4x.png"; // <== Walk Anim
+
+const run = new Image();
+run.src = "client/images/playerAnimation/run_4x.png"; // <== Run Anim
+
+const attack = new Image();
+attack.src = "client/images/playerAnimation/attack2_4x.png"; // <== Attack Anim
+
 const playerAnimState = (player) => {
-   
-   // Idle Anim
-   const idle = new Image();
-   idle.src = "client/images/playerAnimation/idle_4x.png";
 
-   // Walk Anim
-   const walk = new Image();
-   walk.src = "client/images/playerAnimation/walk_4x.png";
-
-   // Attack Anim
-   const attack = new Image();
-   attack.src = "client/images/playerAnimation/attack2_4x.png";
-   
    switch(player.state) {
       case "walk":
          drawPlayer(player, walk);
+      break;
+
+      case "run":
+         drawPlayer(player, run);
       break;
 
       case "attack":
@@ -231,23 +237,45 @@ const playerAnimState = (player) => {
 // =====================================================================
 const drawPlayer = (player, animImg) => {
 
-   const animSize = {
+   const sprites = {
       height: 200,
       width: 200,
       offsetY: 5,
+      radius: 45,
    }
 
+   // Player Shadow
+   ctxChars.fillStyle = "rgba(30, 30, 30, 0.6)";
+   ctxChars.beginPath();
+   ctxChars.ellipse(player.x, player.y + sprites.radius, sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2);
+   ctxChars.fill();
+   ctxChars.closePath();
+
+   // Player
    ctxChars.drawImage(
       animImg,
       player.frameX * player.spriteWidth,
       player.frameY * player.spriteHeight,
       player.spriteWidth,
       player.spriteHeight,
-      player.x - animSize.height * 0.5,
-      player.y - animSize.width * 0.5 - animSize.offsetY,
-      animSize.height,
-      animSize.width,
-   );
+      player.x - sprites.height * 0.5,
+      player.y - sprites.width * 0.5 - sprites.offsetY,
+      sprites.height,
+      sprites.width,
+   );   
+}
+
+const drawPlayerName = (player) => {
+
+   const namePos = {
+      x: player.x - (player.name.length * 6),
+      y: player.y + 85,
+   };
+   
+   ctxChars.fillStyle = "lime";
+   ctxChars.font = "22px Orbitron-ExtraBold";
+   ctxChars.strokeText(player.name, namePos.x, namePos.y);
+   ctxChars.fillText(player.name, namePos.x, namePos.y);
 }
 
 
@@ -307,34 +335,21 @@ socket.on("playerRespawn", () => {
 
 
 // =====================================================================
-// Player Floating Text
-// =====================================================================
-const playerFloatingText = (player, condition, textColor, textValue) => {
-   if(condition) {
-      
-      const text = {
-         offsetX: -35,
-         offsetY: -117,
-         textSize: 30,
-      };
-
-      const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
-      floatTextArray.push(newText);
-   }
-}
-
-
-// =====================================================================
 // Player Init (Every frame)
 // =====================================================================
 const initPlayer = (player) => {
 
+   // ctxChars.shadowColor = "black";
+   // ctxChars.shadowBlur = 6;
+
    drawBar(player);
    drawPlayerName(player);
+
    // drawPlayer_DebugMode(player);
-   playerAnimState(player)
    // drawAttackArea_DebugMode(player);
    // drawHealthNumber_DebugMode(player);
+
+   playerAnimState(player);
 
    playerFloatingText(player, player.isHealing, "lime", `+${player.calcHealing}`);
    playerFloatingText(player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);

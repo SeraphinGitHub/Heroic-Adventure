@@ -41,10 +41,10 @@ exports.onConnect = (socket) => {
    });
 
    // Movements
-   socket.on("up", (state) => { player.up = state; player.isMoving = state });
-   socket.on("down", (state) => { player.down = state; player.isMoving = state });
-   socket.on("left", (state) => { player.left = state; player.isMoving = state });
-   socket.on("right", (state) => { player.right = state; player.isMoving = state });
+   socket.on("up", (state) => player.up = state);
+   socket.on("down", (state) => player.down = state);
+   socket.on("left", (state) => player.left = state);
+   socket.on("right", (state) => player.right = state);
 
    // Spells cast
    socket.on("heal", (state) => player.cast_Heal = state);
@@ -65,7 +65,7 @@ exports.onDisconnect = (socket) => {
 
 
 // =====================================================================
-// Player Global Count Down
+// Player Global Count Down   (Attack & Spell Cast)
 // =====================================================================
 const playerGcD = (player, socketList) => {
    if(player.mana < player.baseMana) player.mana += player.regenMana; // Regen Mana
@@ -78,6 +78,7 @@ const playerGcD = (player, socketList) => {
    if(player.speedGcD >= player.GcD) {
       player.attackAnim = false;
       
+      // Player Attack
       if(player.isAttacking) {
          
          player.speedGcD = 0;
@@ -88,6 +89,7 @@ const playerGcD = (player, socketList) => {
          // damagingEnemy(player, mobList); // <== When Mob class gonna be created
       }
 
+      // Player Spell Cast
       if(player.isCasting) {
          
          player.isCasting = false;
@@ -103,17 +105,7 @@ const playerGcD = (player, socketList) => {
 const playerMovements = (player) => {
       
    let moveSpeed = player.walkSpeed;
-   if(player.isRunning) moveSpeed = player.runSpeed;
-   
-   // Walk Animation
-   if(player.isMoving) {
-      
-      if(player.attackAnim) player.state = "attack";
-      else {
-         player.state = "walk";
-         player.animation(frame, 1, 29); // <== Walk Img
-      }
-   }
+   if(player.isRunning && player.isRunnable) moveSpeed = player.runSpeed;
 
    // Map Border Reached ==> Temporary (Await Scrolling Cam)
    if(player.up && player.y < 65
@@ -122,16 +114,19 @@ const playerMovements = (player) => {
    || player.right && player.x > 1150) {
       moveSpeed = 0;
    }
+   
+   crossMove(player, moveSpeed);
+   diagMove(player, moveSpeed);
+}
 
-
-   // =============== Cross Move ===============
+const crossMove = (player, moveSpeed) => {
 
    // Up
    if(player.up) {
       player.frameY = 0;
       player.y -= moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = -player.attkOffset;    
+      player.attkOffset_Y = -47;
    }
    
    // Down
@@ -139,54 +134,56 @@ const playerMovements = (player) => {
       player.frameY = 1;
       player.y += moveSpeed;
       player.attkOffset_X = 0;
-      player.attkOffset_Y = player.attkOffset;
+      player.attkOffset_Y = 57;
    }
    
    // Left
    if(player.left) {
       player.frameY = 2;
       player.x -= moveSpeed;
-      player.attkOffset_X = -player.attkOffset;
-      player.attkOffset_Y = 0;
+      player.attkOffset_X = -35;
+      player.attkOffset_Y = 15;
    }
    
    // Right
    if(player.right) {      
       player.frameY = 3;
       player.x += moveSpeed;
-      player.attkOffset_X = player.attkOffset;
-      player.attkOffset_Y = 0;
+      player.attkOffset_X = 18;
+      player.attkOffset_Y = 10;
    }
+}
 
-   
-   // =============== Diag Move ===============
+const diagMove = (player, moveSpeed) => {
+   const topOffset = 30;
+   const bottomOffset = 37;
 
    // Up & Left
    if(player.up && player.left) {
       player.frameY = 0;
-      player.attkOffset_X = -player.attkOffset;
-      player.attkOffset_Y = -player.attkOffset;
+      player.attkOffset_X = -topOffset;
+      player.attkOffset_Y = -topOffset; 
    }
 
    // Up & Right
    if(player.up && player.right) {
       player.frameY = 0;
-      player.attkOffset_X = player.attkOffset;
-      player.attkOffset_Y = -player.attkOffset;
+      player.attkOffset_X = topOffset;
+      player.attkOffset_Y = -topOffset;
    }
 
    // Down & Left
    if(player.down && player.left) {
       player.frameY = 1;
-      player.attkOffset_X = -player.attkOffset;
-      player.attkOffset_Y = player.attkOffset;
+      player.attkOffset_X = -bottomOffset;
+      player.attkOffset_Y = bottomOffset;
    }
 
    // Down & Right
    if(player.down && player.right) {
       player.frameY = 1;
-      player.attkOffset_X = player.attkOffset;
-      player.attkOffset_Y = player.attkOffset;
+      player.attkOffset_X = bottomOffset;
+      player.attkOffset_Y = bottomOffset;
    }
 
    
@@ -206,12 +203,14 @@ const playerMovements = (player) => {
 const playerRunning = (player) => {
    if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
 
-   if(player.isRunning) {
+   if(player.isRunning && player.isRunnable) {
       
       player.energy -= player.energyCost;
-      if(player.energy < player.energyCost) player.isRunning = false;
       if(player.energy <= 0) player.energy = 0;
+      if(player.energy < player.energyCost) player.isRunnable = false;
    }
+
+   if(!player.isRunning) player.isRunnable = true;
 }
 
 
@@ -254,14 +253,15 @@ const damagingEnemy = (player, socketList) => {
          otherPlayer.isGettingDamage = true;
          otherPlayer.calcDamage = player.damageRnG();
          otherPlayer.health -= otherPlayer.calcDamage;
-         
+
          setTimeout(() => otherPlayer.isGettingDamage = false, 0);
          
          if(otherPlayer.health <= 0) {
+
             playerDeath(otherPlayer);
             player.kills++;
-
             let socket = socketList[player.id];
+
             socket.emit("playerScore", {
                kills: player.kills,
                died: player.died,
@@ -315,6 +315,45 @@ const playerDeath = (player) => {
 
 
 // =====================================================================
+// Player Switch State
+// =====================================================================
+const playerSwitchState = (player) => {
+   let isMoving = false;
+
+   // Walk State
+   if(player.up || player.down || player.left || player.right) {
+      isMoving = true;
+      
+      if(!player.attackAnim) {
+
+         if(player.isRunning && !player.isRunnable || !player.isRunning) {
+            player.state = "walk";
+            player.animation(frame, 1, 29); // <== Walk Img
+         }
+      }
+   }
+
+   // Run State
+   if(isMoving && player.isRunning && player.isRunnable && !player.attackAnim) {
+      player.state = "run";
+      player.animation(frame, 1, 14); // <== Run Img
+   }
+
+   // Attack State
+   if(player.attackAnim) {
+      player.state = "attack";
+      player.animation(frame, 1, 14); // <== Attack Img
+   }
+
+   // Idle State
+   else if(!isMoving) {
+      player.state = "idle";
+      player.animation(frame, 2, 29); // <== Idle Img
+   }
+}
+
+
+// =====================================================================
 // Player Update (Every frame)
 // =====================================================================
 let frame = 0;
@@ -324,20 +363,10 @@ exports.playerUpdate = (socketList) => {
    
    for(let i in playerList) {
       let player = playerList[i];
-
       
       if(!player.isDead) {
-
-         if(player.attackAnim) {
-            player.state = "attack";
-            player.animation(frame, 1, 14); // <== Attack Img
-         }
-
-         else if(!player.isMoving) {
-            player.state = "idle";
-            player.animation(frame, 2, 29); // <== Idle Img
-         }
-
+         
+         playerSwitchState(player);
          playerGcD(player, socketList);
          playerMovements(player);
          playerRunning(player);

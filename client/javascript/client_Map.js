@@ -14,23 +14,36 @@ const tree_1 = new Image();
 tree_1.src = `${mapFolder_Src}trees/tree_1.png`;
 
 const greenery_3 = new Image();
-greenery_3.src = `${mapFolder_Src}/greenery_3.png`;
+greenery_3.src = `${mapFolder_Src}greenery_3.png`;
 
 
 // =====================================================================
-//  Map Creation
+//  Init Grid
 // =====================================================================
-const drawMap = () => {
+let cellArray = [];
+
+const initGrid = () => {
 
    // Desert Floor
    for(let x = 0; x < canvasMap.width; x += cellSize) {
       for(let y = 0; y < canvasMap.height; y += cellSize) {
 
-         ctxMap.strokeStyle = "black";
-         ctxMap.strokeRect(x, y, cellSize, cellSize);
-         new Tile(ctxMap, x, y, desert_6, 256, 256, cellSize).draw();
+         cellArray.push(new Tile(ctxMap, x, y, desert_6, 256, 256, cellSize));
       }
    }
+}
+
+
+// =====================================================================
+//  Draw Map
+// =====================================================================
+const drawMap = () => {
+
+   cellArray.forEach(cell => {
+      ctxMap.strokeStyle = "black";
+      ctxMap.strokeRect(cell.x, cell.y, cellSize, cellSize);
+      cell.draw()
+   });
 
    // Decor (Temporary)
    ctxMap.drawImage(tree_1, 0, 0, 285, 297, 200, 400, cellSize, cellSize);
@@ -44,5 +57,6 @@ const drawMap = () => {
 // =====================================================================
 const initMap = () => {
    
+   initGrid();
    drawMap();
 }

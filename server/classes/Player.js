@@ -9,23 +9,18 @@ class Player {
       // Player Hitbox
       this.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on load
       this.y = Math.floor(Math.random() * 700) + 50;
-      this.radius = 45;
+      this.radius = 42;
       this.angle = 0;
       this.color = "darkviolet";
 
       // Attack Hitbox
-      this.attkOffset = 20;
       this.attkOffset_X = 0;
-      this.attkOffset_Y = this.attkOffset;
-      this.attkRadius = 30;
+      this.attkOffset_Y = 57;
+      this.attkRadius = 32;
       this.attkAngle = 0;
       this.attkColor = "orangered";
 
-      // Health
-      this.baseHealth = 200;
-      this.health = this.baseHealth;
-
-      // Respawn
+      // Respawn Time
       this.baseRespawnTimer = 10; //<== seconds
       this.respawnTimer = this.baseRespawnTimer;
       this.deathCounts = 0;
@@ -35,14 +30,18 @@ class Player {
       this.GcD = process.env.SYNC_COEFF* this.baseGcD; // More high ==> more slow
       this.speedGcD = this.GcD;
 
-      // Energy
+      // Player Health
+      this.baseHealth = 250;
+      this.health = this.baseHealth;
+
+      // Player Energy
       this.baseEnergy = 150;
       this.energy = this.baseEnergy;
       this.energyCost = 0.8;
       this.baseRegenEnergy = 0.2;
       this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
-      // Mana
+      // Player Mana
       this.baseMana = 150;
       this.mana = this.baseMana;
       this.baseRegenMana = 0.12;
@@ -53,7 +52,7 @@ class Player {
       
       // Spell - Healing
       this.healCost = 70;
-      this.baseHealing = this.baseHealth * 0.25; // <== Healing = 25% MaxHealth
+      this.baseHealing = this.baseHealth * 0.25; // <== Healing = 25% from MaxHealth
       this.calcHealing;
 
       // Damages
@@ -77,8 +76,8 @@ class Player {
       this.isRespawning = false;
       this.isCasting = false;
       this.isHealing = false;
-      this.isMoving = false;
       this.isRunning = false;
+      this.isRunnable = false;
       this.isAttacking = false;
       this.attackAnim = false;
       this.isGettingDamage = false;
@@ -96,15 +95,15 @@ class Player {
    }
 
    RnG(baseSpec, coeff) {
-      return baseSpec + Math.floor(Math.random() * (baseSpec - baseSpec * coeff));
+      return baseSpec + Math.floor(Math.random() * (baseSpec * coeff));
    }
 
    healRnG() {
-      return this.RnG(this.baseHealing, 0.35); // More low => Shorter RnG Range => More heal
+      return this.RnG(this.baseHealing, 0.57); // More high => Higher RnG Range => More heal
    }
 
    damageRnG() {
-      return this.RnG(this.baseDamage, 0.20); // More low => Shorter RnG Range => More damage
+      return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
    }
 
    animation(frame, index, spritesNumber) {
