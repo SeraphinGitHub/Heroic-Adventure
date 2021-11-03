@@ -76,8 +76,9 @@ const playerGcD = (player, socketList) => {
    }
 
    if(player.speedGcD >= player.GcD) {
-      player.attackAnim = false;
+      // player.attackAnim = false;
       
+
       // Player Attack
       if(player.isAttacking) {
          
@@ -96,8 +97,19 @@ const playerGcD = (player, socketList) => {
          playerHealing(player);
       }
    }
+
+   
+   if(player.attackAnim) {
+      aze++;
+      
+      if(aze >= 15) {
+         aze = 0;
+         player.attackAnim = false;
+      }
+   }
 }
 
+let aze = 0;
 
 // =====================================================================
 // Player Movements
@@ -328,7 +340,7 @@ const playerSwitchState = (player) => {
 
          if(player.isRunning && !player.isRunnable || !player.isRunning) {
             player.state = "walk";
-            player.animation(frame, 1, 29); // <== Walk Img
+            player.animation(frame, 1, 29);
          }
       }
    }
@@ -336,19 +348,41 @@ const playerSwitchState = (player) => {
    // Run State
    if(isMoving && player.isRunning && player.isRunnable && !player.attackAnim) {
       player.state = "run";
-      player.animation(frame, 1, 14); // <== Run Img
+      player.animation(frame, 1, 14);
    }
 
    // Attack State
    if(player.attackAnim) {
       player.state = "attack";
-      player.animation(frame, 1, 14); // <== Attack Img
+      player.animation(frame, 1, 14);
    }
 
+
+   // ==================================================================
+   
+   // Heal State
+   if(player.isHealing) {
+      player.state = "heal";
+      player.animation(frame, 1, 14);
+      console.log("aze");
+   }
+   
+   // Died State
+   if(player.isDead) {
+      player.state = "died";
+      player.animation(frame, 1, 29);
+   }
+   
+   // ==================================================================
+
+
    // Idle State
-   else if(!isMoving) {
+   else if(!isMoving && !player.attackAnim
+   || player.up && player.down && !player.left && !player.right
+   || player.left && player.right && !player.up && !player.down) {
+      
       player.state = "idle";
-      player.animation(frame, 2, 29); // <== Idle Img
+      player.animation(frame, 2, 29);
    }
 }
 

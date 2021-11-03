@@ -4,8 +4,6 @@
 // =====================================================================
 // DOM Player UI
 // =====================================================================
-
-// ========== Player Stats ==========
 const playerStats = (data) => {
    const playerName = document.querySelector(".player-name");
    const playerStats = document.querySelector(".player-stats");
@@ -29,13 +27,6 @@ const playerStats = (data) => {
    GcD.textContent = `GcD: ${data.GcD}`;
 }
 
-// Init Player UI
-socket.on("playerStats", (data) => {
-   playerStats(data);
-});
-
-
-// ========== Player Score ==========
 const playerScore = (data) => {
    const playerScore = document.querySelector(".player-score");
 
@@ -47,6 +38,11 @@ const playerScore = (data) => {
    kills.textContent = `Kills: ${data.kills}`;
    died.textContent = `Died: ${data.died}`;
 }
+
+// Init Player Stats
+socket.on("playerStats", (data) => {
+   playerStats(data);
+});
 
 // Init Player Score
 socket.on("playerScore", (data) => {
@@ -196,43 +192,6 @@ const drawBar = (player) => {
 
 
 // =====================================================================
-// Player Animation State
-// =====================================================================
-const idle = new Image();
-idle.src = "client/images/playerAnimation/idle_4x.png"; // <== Idle Anim
-
-const walk = new Image();
-walk.src = "client/images/playerAnimation/walk_4x.png"; // <== Walk Anim
-
-const run = new Image();
-run.src = "client/images/playerAnimation/run_4x.png"; // <== Run Anim
-
-const attack = new Image();
-attack.src = "client/images/playerAnimation/attack2_4x.png"; // <== Attack Anim
-
-const playerAnimState = (player) => {
-
-   switch(player.state) {
-      case "walk":
-         drawPlayer(player, walk);
-      break;
-
-      case "run":
-         drawPlayer(player, run);
-      break;
-
-      case "attack":
-         drawPlayer(player, attack);
-      break;
-
-      default:
-         drawPlayer(player, idle);
-      break;
-   }
-}
-
-
-// =====================================================================
 // Draw Player
 // =====================================================================
 const drawPlayer = (player, animImg) => {
@@ -262,7 +221,7 @@ const drawPlayer = (player, animImg) => {
       player.y - sprites.width * 0.5 - sprites.offsetY,
       sprites.height,
       sprites.width,
-   );   
+   );
 }
 
 const drawPlayerName = (player) => {
@@ -276,6 +235,58 @@ const drawPlayerName = (player) => {
    ctxChars.font = "22px Orbitron-ExtraBold";
    ctxChars.strokeText(player.name, namePos.x, namePos.y);
    ctxChars.fillText(player.name, namePos.x, namePos.y);
+}
+
+
+// =====================================================================
+// Player Animation State
+// =====================================================================
+const playerAnimPath = "client/images/playerAnimation/";
+
+const animSrc = {
+   idle: playerAnimPath + "idle_4x.png",
+   walk: playerAnimPath + "walk_4x.png",
+   run: playerAnimPath + "run_4x.png",
+   attack: playerAnimPath + "attack2_4x.png",
+   heal: playerAnimPath + "hurt_4x.png",
+   died: playerAnimPath + "died_4x.png",
+}
+
+let animArray = [];
+for(let state in animSrc) {
+
+   const animation = new Image();
+   animation.src = animSrc[state];
+   animArray.push(animation);
+}
+
+const playerAnimState = (player) => {
+
+   switch(player.state) {
+      case "walk":
+         drawPlayer(player, animArray[1]);
+      break;
+
+      case "run":
+         drawPlayer(player, animArray[2]);
+      break;
+
+      case "attack":
+         drawPlayer(player, animArray[3]);
+      break;
+
+      case "heal":
+         drawPlayer(player, animArray[4]);
+      break;
+
+      case "died":
+         drawPlayer(player, animArray[5]);
+      break;
+
+      default:
+         drawPlayer(player, animArray[0]);
+      break;
+   }
 }
 
 

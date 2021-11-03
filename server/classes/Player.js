@@ -95,7 +95,7 @@ class Player {
    }
 
    RnG(baseSpec, coeff) {
-      return baseSpec + Math.floor(Math.random() * (baseSpec * coeff));
+      return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));
    }
 
    healRnG() {
