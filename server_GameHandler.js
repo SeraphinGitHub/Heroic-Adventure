@@ -80,8 +80,9 @@ io.on("connection", (socket) => {
 // =====================================================================
 setInterval(() => {
    let playerData = playerHandler.playerUpdate(socketList);
-
+   
    playerData.forEach(player => {
+
       let socket = socketList[player.id];
       socket.emit("newSituation", playerData);
 

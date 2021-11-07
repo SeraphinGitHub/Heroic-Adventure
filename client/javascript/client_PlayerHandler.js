@@ -72,8 +72,8 @@ const controls = {
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-canvasChars.addEventListener("mouseover", () => insideCanvas = true);
-canvasChars.addEventListener("mouseleave", () => insideCanvas = false);
+canvasUI.addEventListener("mouseover", () => insideCanvas = true);
+canvasUI.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
@@ -132,19 +132,29 @@ window.addEventListener("mouseup", (event) => playerAttackCommand(event, false))
 // =====================================================================
 // Player Floating Text
 // =====================================================================
-const playerFloatingText = (player, condition, textColor, textValue) => {
-   if(condition) {
-      
-      const text = {
-         offsetX: -35,
-         offsetY: -117,
-         textSize: 30,
-      };
+const playerFloatingText = (player, textColor, textValue) => {
 
-      const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
-      floatTextArray.push(newText);
-   }
+   const text = {
+      offsetX: -35,
+      offsetY: -117,
+      textSize: 30,
+   };
+
+   const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
+   floatTextArray.push(newText);
 }
+
+socket.on("getHeal", (player) => {
+   playerFloatingText(player, "lime", `+${player.calcHealing}`);
+});
+
+socket.on("giveDamage", (player) => {
+   playerFloatingText(player, "yellow", `-${player.calcDamage}`);
+});
+
+socket.on("getDamage", (player) => {
+   playerFloatingText(player, "red", `-${player.calcDamage}`);
+});
 
 
 // =====================================================================
@@ -213,10 +223,10 @@ const drawPlayer = (player, animImg) => {
    // Player
    ctxChars.drawImage(
       animImg,
-      player.frameX * player.spriteWidth,
-      player.frameY * player.spriteHeight,
-      player.spriteWidth,
-      player.spriteHeight,
+      player.frameX * sprites.width,
+      player.frameY * sprites.height,
+      sprites.width,
+      sprites.height,
       player.x - sprites.height * 0.5,
       player.y - sprites.width * 0.5 - sprites.offsetY,
       sprites.height,
@@ -233,8 +243,8 @@ const drawPlayerName = (player) => {
    
    ctxChars.fillStyle = "lime";
    ctxChars.font = "22px Orbitron-ExtraBold";
-   ctxChars.strokeText(player.name, namePos.x, namePos.y);
    ctxChars.fillText(player.name, namePos.x, namePos.y);
+   ctxChars.strokeText(player.name, namePos.x, namePos.y);
 }
 
 
@@ -295,18 +305,18 @@ const playerAnimState = (player) => {
 // =====================================================================
 const drawPlayer_DebugMode = (player) => {
 
-   ctxChars.fillStyle = player.color;
+   ctxChars.fillStyle = "darkviolet";
    ctxChars.beginPath();
-   ctxChars.arc(player.x, player.y, player.radius, player.angle, Math.PI * 2);
+   ctxChars.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
    ctxChars.fill();
    ctxChars.closePath();
 }
 
 const drawAttackArea_DebugMode = (player) => {
 
-   ctxChars.fillStyle = player.attkColor;
+   ctxChars.fillStyle = "orangered";
    ctxChars.beginPath();
-   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, player.attkAngle, Math.PI * 2);
+   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, 0, Math.PI * 2);
    ctxChars.fill();
    ctxChars.closePath();
 }
@@ -350,9 +360,6 @@ socket.on("playerRespawn", () => {
 // =====================================================================
 const initPlayer = (player) => {
 
-   // ctxChars.shadowColor = "black";
-   // ctxChars.shadowBlur = 6;
-
    drawBar(player);
    drawPlayerName(player);
 
@@ -361,9 +368,6 @@ const initPlayer = (player) => {
    // drawHealthNumber_DebugMode(player);
 
    playerAnimState(player);
-
-   playerFloatingText(player, player.isHealing, "lime", `+${player.calcHealing}`);
-   playerFloatingText(player, player.isGettingDamage, "yellow", `-${player.calcDamage}`);
 }
 
 

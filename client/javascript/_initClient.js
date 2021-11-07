@@ -15,6 +15,7 @@ const scripts = [
    "client_GameHandler.js",
    "client_PlayerHandler.js",
    "client_Map.js",
+   "client_UI.js",
 ];
 
 const instantiate = (scriptName) => {

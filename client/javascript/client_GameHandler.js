@@ -2,6 +2,21 @@
 "use strict"
 
 // =====================================================================
+// Login Button
+// =====================================================================
+// let socket;
+const logPlayer = document.querySelector(".log-player");
+const logBtn = document.querySelector(".log-btn");
+
+logBtn.addEventListener("click", () => {
+   logPlayer.style = "top: -700px;"
+   // socket = io();
+   
+   // ==> Trigger init client <==
+});
+
+
+// =====================================================================
 // Socket & Canvas
 // =====================================================================
 const socket = io();
@@ -9,10 +24,12 @@ const socket = io();
 const gameWindow = document.querySelector(".game-window");
 const canvasMap = document.querySelector(".canvas-map");
 const canvasChars = document.querySelector(".canvas-characters");
+const canvasUI = document.querySelector(".canvas-UI");
 
 // Set Contexts
 const ctxMap = canvasMap.getContext("2d");
 const ctxChars = canvasChars.getContext("2d");
+const ctxUI = canvasUI.getContext("2d");
 
 // Set Canvas Size
 let height = 800;
@@ -23,6 +40,9 @@ canvasMap.width = width;
 
 canvasChars.height = height;
 canvasChars.width = width;
+
+canvasUI.height = height;
+canvasUI.width = width;
 
 gameWindow.style = `
    height: ${height}px;
@@ -105,7 +125,6 @@ socket.on("newSituation", () => {
 // =====================================================================
 // Toggle Frame Rate
 // =====================================================================
-// let showFPS = true; // <== delete this one 
 let showFPS = false;
 let frameRate = 0;
 

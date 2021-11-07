@@ -8,17 +8,13 @@ class Player {
 
       // Player Hitbox
       this.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on load
-      this.y = Math.floor(Math.random() * 700) + 50;
+      this.y = Math.floor(Math.random() * 700) + 50; // depend of canvas size (1000 x 700)
       this.radius = 42;
-      this.angle = 0;
-      this.color = "darkviolet";
 
       // Attack Hitbox
       this.attkOffset_X = 0;
-      this.attkOffset_Y = 57;
+      this.attkOffset_Y = 45;
       this.attkRadius = 32;
-      this.attkAngle = 0;
-      this.attkColor = "orangered";
 
       // Respawn Time
       this.baseRespawnTimer = 10; //<== seconds
@@ -75,12 +71,13 @@ class Player {
       this.isDead = false;
       this.isRespawning = false;
       this.isCasting = false;
-      this.isHealing = false;
       this.isRunning = false;
       this.isRunnable = false;
       this.isAttacking = false;
-      this.attackAnim = false;
-      this.isGettingDamage = false;
+
+      // Anim States
+      this.attack_isAnimable = false;
+      this.heal_isAnimable = false;
 
       // Score
       this.kills = 0;
@@ -90,8 +87,6 @@ class Player {
       this.state;
       this.frameX = 0;
       this.frameY = 1;
-      this.spriteWidth = 200;
-      this.spriteHeight = 200;
    }
 
    RnG(baseSpec, coeff) {
@@ -107,7 +102,7 @@ class Player {
    }
 
    animation(frame, index, spritesNumber) {
-      if(frame % index === 0) {
+      if(frame % index === 0) {       
          if(this.frameX < spritesNumber) this.frameX++;
          else this.frameX = 0;
       }

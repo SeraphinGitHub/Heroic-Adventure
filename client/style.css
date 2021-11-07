@@ -93,6 +93,60 @@ p {
 
 
 /* ===================================================================== */
+/* Log Player
+/* ===================================================================== */
+.log-player {
+   z-index: 100;
+   align-content: flex-end;
+
+   top: -100px;
+   height: 600px;
+   width: 350px;
+
+   border: solid black 1px;
+   border-radius: 0px 0px 40px 40px;
+   background: linear-gradient(to bottom right, rgb(20, 20, 20),gray, white, gray);
+   box-shadow: black 0px 0px 50px;
+   
+   animation: logPopUp 0.5s linear 1;
+   transition-duration: 0.5s;
+}
+
+@keyframes logPopUp {
+   0% { top: -600px }
+   100% { top: -100px }
+}
+
+.log-form {
+   height: 50px;
+   width: 80%;
+}
+
+.log-form input {
+   height: 100%;
+   width: 100%;
+   padding-left: 20px;
+
+   font-size: 20px;
+   font-family: Verdana;
+
+   border: double darkviolet 6px;
+   border-radius: 15px;
+   background: linear-gradient(to bottom left, violet,white, lightblue, white);
+}
+
+.log-btn {
+   height: 70px;
+   width: 60%;
+}
+
+.log-form,
+.log-btn {
+   margin-bottom: 50px;
+}
+
+
+/* ===================================================================== */
 /* UI Frames & Content
 /* ===================================================================== */
 .UI-frame {
@@ -276,10 +330,16 @@ p {
 /* ===================================================================== */
 /* Responsive 17" Screen
 /* ===================================================================== */
-@media screen and (max-width: 1600px) {
+@media screen and (min-width: 1550px) and (max-width: 1850px) {
+
+   h2, h3, p {
+      font-size: 16px;
+      line-height: 90%;
+   }
+
    .chat,
    .player-UI {
-      width: 11%;
+      width: 10%;
    }
 
    .player-infos {

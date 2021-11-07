@@ -13,6 +13,15 @@
     
     <body class="flexCenter">
 
+        <!-- Log Player -->
+        <section class="flexCenter absolute log-player">
+            <form class="flexCenter log-form">
+                <input type="text" placeholder="Player name">
+            </form>
+
+            <button class="btn green-btn log-btn">Enter Game</button>
+        </section>
+
         <!-- Chat -->
         <section class="flexCenter UI-frame chat">
             <div class="UI-content chat-display-mess">
@@ -31,6 +40,7 @@
         <section class="flexCenter game-window">
             <canvas class="absolute canvas-map"></canvas>
             <canvas class="absolute canvas-characters"></canvas>
+            <canvas class="absolute canvas-UI"></canvas>
 
             <div class="death-screen">
                 <p class="death-message"></p>
