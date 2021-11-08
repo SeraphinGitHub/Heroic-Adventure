@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
       socket.emit("evalResponse", response);
    });
 
-
+   
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
       playerHandler.onDisconnect(socket);
    });
 
-
+   
    // ==========  Chatting  ==========
    socket.on("sendMessage", (data) => {
       const playerName = socket.id;

@@ -22,6 +22,12 @@ body {
    position: absolute;
 }
 
+.visible {
+   visibility: visible !important;
+   opacity: 100% !important;
+}
+
+
 /* Orbitron Regular */
 @font-face {
    font-family: "Orbitron-Regular";
@@ -93,31 +99,36 @@ p {
 
 
 /* ===================================================================== */
-/* Log Player
+/* Log Screen
 /* ===================================================================== */
-.log-player {
+.log-screen {
    z-index: 100;
    align-content: flex-end;
 
-   top: -100px;
-   height: 600px;
+   top: 0px;
+   height: 500px;
    width: 350px;
-
-   border: solid black 1px;
+   
    border-radius: 0px 0px 40px 40px;
    background: linear-gradient(to bottom right, rgb(20, 20, 20),gray, white, gray);
    box-shadow: black 0px 0px 50px;
    
-   animation: logPopUp 0.5s linear 1;
-   transition-duration: 0.5s;
+   animation: show_LogScreen 0.8s linear 1;
+   transition-duration: 0.8s;
 }
 
-@keyframes logPopUp {
+@keyframes show_LogScreen {
    0% { top: -600px }
-   100% { top: -100px }
+   100% { top: 0px }
+}
+
+.hide_LogScreen {
+   top: -600px;
+   visibility: hidden;   
 }
 
 .log-form {
+   position: relative;
    height: 50px;
    width: 80%;
 }
@@ -143,6 +154,24 @@ p {
 .log-form,
 .log-btn {
    margin-bottom: 50px;
+}
+
+.empty-alert,
+.min-chars-alert,
+.max-chars-alert {
+   visibility: hidden;
+   opacity: 0;
+   text-align: center;
+
+   top: 40px;
+   height: 35px;
+   width: 80%;
+
+   border-radius: 8px;
+   border: solid 1px red;
+   background: pink;
+
+   transition-duration: 1s;
 }
 
 
@@ -258,7 +287,6 @@ p {
 
 .game-window {
    border: 1px solid black;
-   /* background: yellowgreen; */
 }
 
 

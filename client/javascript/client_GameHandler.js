@@ -2,26 +2,21 @@
 "use strict"
 
 // =====================================================================
-// Login Button
-// =====================================================================
-// let socket;
-const logPlayer = document.querySelector(".log-player");
-const logBtn = document.querySelector(".log-btn");
-
-logBtn.addEventListener("click", () => {
-   logPlayer.style = "top: -700px;"
-   // socket = io();
-   
-   // ==> Trigger init client <==
-});
-
-
-// =====================================================================
-// Socket & Canvas
+// Socket
 // =====================================================================
 const socket = io();
 
-const gameWindow = document.querySelector(".game-window");
+
+// =====================================================================
+// Player Login
+// =====================================================================
+socket.emit("playerName", logFormInput.value);
+logFormInput.value = "";
+
+
+// =====================================================================
+// Canvas
+// =====================================================================
 const canvasMap = document.querySelector(".canvas-map");
 const canvasChars = document.querySelector(".canvas-characters");
 const canvasUI = document.querySelector(".canvas-UI");
@@ -31,10 +26,6 @@ const ctxMap = canvasMap.getContext("2d");
 const ctxChars = canvasChars.getContext("2d");
 const ctxUI = canvasUI.getContext("2d");
 
-// Set Canvas Size
-let height = 800;
-let width = 1200;
-
 canvasMap.height = height;
 canvasMap.width = width;
 
@@ -43,11 +34,6 @@ canvasChars.width = width;
 
 canvasUI.height = height;
 canvasUI.width = width;
-
-gameWindow.style = `
-   height: ${height}px;
-   width: ${width}px
-`;
 
 // Disabled Anti-Aliasing
 ctxChars.imageSmoothingEnabled = false;

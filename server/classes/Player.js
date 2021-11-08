@@ -4,7 +4,7 @@
 class Player {
    constructor(id) {
       this.id = id;
-      this.name = "Séraphin";
+      this.name = "";
 
       // Player Hitbox
       this.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on load

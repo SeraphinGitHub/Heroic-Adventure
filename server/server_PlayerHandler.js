@@ -20,22 +20,26 @@ let playerList = {};
 exports.onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
+   
+   socket.on("playerName", (data) => {
+      player.name = data
 
-   // Init Player Stats
-   socket.emit("playerStats", {
-      playerName: player.name,
-      health: player.baseHealth,
-      mana: player.baseMana,
-      regenMana: player.baseRegenMana,
-      energy: player.baseEnergy,
-      regenEnergy: player.baseRegenEnergy,
-      GcD: player.baseGcD,
-   });
-
-   // Init Player Score
-   socket.emit("playerScore", {
-      kills: player.kills,
-      died: player.died,
+      // Init Player Stats
+      socket.emit("playerStats", {
+         playerName: player.name,
+         health: player.baseHealth,
+         mana: player.baseMana,
+         regenMana: player.baseRegenMana,
+         energy: player.baseEnergy,
+         regenEnergy: player.baseRegenEnergy,
+         GcD: player.baseGcD,
+      });
+   
+      // Init Player Score
+      socket.emit("playerScore", {
+         kills: player.kills,
+         died: player.died,
+      });
    });
 
    // Movements
