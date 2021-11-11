@@ -68,14 +68,6 @@ const controls = {
 }
 
 
-// =====================================================================
-// Inside Canvas Detection
-// =====================================================================
-let insideCanvas = false;
-// addEventListener("mouseover")
-canvasUI.addEventListener("mouseover", () => insideCanvas = true);
-canvasUI.addEventListener("mouseleave", () => insideCanvas = false);
-
 
 // =====================================================================
 // Movements & Abilities
@@ -101,7 +93,7 @@ const playerCommand = (event, ctrlObj, state) => {
 }
 
 window.addEventListener("keydown", (event) => {
-   if(insideCanvas) {
+   if(insideCanvas && !isChatting) {
 
       const state = true;
       playerCommand(event, controls.movements, state);
@@ -120,8 +112,7 @@ window.addEventListener("keyup", (event) => {
 // Attack
 // =====================================================================
 const playerAttackCommand = (event, state) => {
-
-   if(event.which === 1 && insideCanvas) {
+   if(event.which === 1 && insideCanvas && !isChatting) {
       socket.emit("attack", state);
    }
 }

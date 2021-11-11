@@ -17,10 +17,19 @@ let playerList = {};
 // =====================================================================
 // Player connection
 // =====================================================================
-exports.onConnect = (socket) => {
+exports.onConnect = (socket, socketList) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
-   
+      
+   // General Chat
+   socket.on("sendMessage", (data) => {
+      const playerName = player.name;
+      for(let i in socketList) {
+         socketList[i].emit("addMessage", `${playerName} : ${data}`);
+      }
+   });
+
+   // Init player
    socket.on("playerName", (data) => {
       player.name = data
 

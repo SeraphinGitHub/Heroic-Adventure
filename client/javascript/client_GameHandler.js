@@ -2,14 +2,9 @@
 "use strict"
 
 // =====================================================================
-// Socket
+// Player Enter Game
 // =====================================================================
 const socket = io();
-
-
-// =====================================================================
-// Player Login
-// =====================================================================
 socket.emit("playerName", logFormInput.value);
 logFormInput.value = "";
 
@@ -49,17 +44,7 @@ const chatEnter = document.querySelector(".chat-enter");
 const chatInput = document.querySelector(".chat-enter input");
 const clearChatBtn = document.querySelector(".clear-chat-btn");
 
-const clearChat = () => {
-   for (let i = 0; i < chatDisplayMess.children.length; i++) {
-      chatDisplayMess.children[i].remove();
-      i--;
-   }
-}
-
-const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">${data}</p>`
-
-socket.on("addMessage", data => chatResponse(data));
-socket.on("evalResponse", data => chatResponse(data));
+// chat ID instead of name !
 
 chatEnter.addEventListener("submit", (event) => {
    event.preventDefault();
@@ -68,7 +53,28 @@ chatEnter.addEventListener("submit", (event) => {
    chatInput.value = "";
 });
 
-clearChatBtn.addEventListener("click", () => clearChat());
+clearChatBtn.addEventListener("click", () => {
+   for (let i = 0; i < chatDisplayMess.children.length; i++) {
+      chatDisplayMess.children[i].remove();
+      i--;
+   }
+});
+
+const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">${data}</p>`
+socket.on("addMessage", data => chatResponse(data));
+socket.on("evalResponse", data => chatResponse(data));
+
+
+// =====================================================================
+// Inside Canvas & Chatting Detection
+// =====================================================================
+let insideCanvas = false;
+canvasUI.addEventListener("mouseover", () => insideCanvas = true);
+canvasUI.addEventListener("mouseleave", () => insideCanvas = false);
+
+let isChatting = false;
+chatInput.addEventListener("focusin", () => isChatting = true);
+chatInput.addEventListener("focusout", () => isChatting = false);
 
 
 // =====================================================================
@@ -95,7 +101,7 @@ const handleFloatingText = () => {
 // =====================================================================
 let mapLoaded = false;
 
-socket.on("clientLoaded", () => {
+socket.on("clientConnected", () => {
    socket.on("newSituation", (playerData) => {
       
       if(!mapLoaded) {

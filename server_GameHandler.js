@@ -33,7 +33,7 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 // Global Variables
 // =====================================================================
-const playerMax = 100;
+const playerMax = 300;
 let socketList = {};
 
 
@@ -43,9 +43,10 @@ let socketList = {};
 io.on("connection", (socket) => {
    // console.log("User connected !");
    
-   // ==========  Client Loaded  ==========
-   socket.emit("clientLoaded");
+   // ==========  Client Connected  ==========
+   socket.emit("clientConnected");
 
+   
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
       if(process.env.DEBUG_MODE === "false") return;
@@ -53,10 +54,11 @@ io.on("connection", (socket) => {
       socket.emit("evalResponse", response);
    });
 
+
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
-   playerHandler.onConnect(socket);
+   playerHandler.onConnect(socket, socketList);
    
 
    // ==========  Disconnection  ==========
@@ -64,15 +66,6 @@ io.on("connection", (socket) => {
       // console.log("User disconnected !");
       delete socketList[socket.id];
       playerHandler.onDisconnect(socket);
-   });
-
-   
-   // ==========  Chatting  ==========
-   socket.on("sendMessage", (data) => {
-      const playerName = socket.id;
-      for(let i in socketList) {
-         socketList[i].emit("addMessage", `${playerName} : ${data}`);
-      }
    });
 });
 

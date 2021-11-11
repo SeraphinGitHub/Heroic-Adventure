@@ -104,3 +104,9 @@ const formValidation = () => {
       scripts.forEach(item => instantiate(item));
    }
 }
+
+
+// =====  Temporary ==> for development =====
+// logScreen.classList.add("hide_LogScreen");
+// scripts.forEach(item => instantiate(item));
+// =====  Temporary ==> for development =====
