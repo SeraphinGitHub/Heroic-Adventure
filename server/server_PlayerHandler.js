@@ -390,7 +390,7 @@ const handlePlayerState = (player) => {
    }
    
    // Walk State
-   if(isMoving && !player.attack_isAnimable) {
+   if(isMoving && !player.attack_isAnimable && !player.heal_isAnimable) {
       if(player.isRunning && !player.isRunnable || !player.isRunning) {
          player.animation(frame, anim.walk.index, anim.walk.spritesNumber);
          return player.state = "walk";

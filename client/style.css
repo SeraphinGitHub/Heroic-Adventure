@@ -99,6 +99,26 @@ p {
 
 
 /* ===================================================================== */
+/* Alert Pop Up
+/* ===================================================================== */
+.alert {
+   visibility: hidden;
+   opacity: 0;
+   text-align: center;
+
+   top: 40px;
+   height: 35px;
+   width: 80%;
+
+   border-radius: 8px;
+   border: solid 1px red;
+   background: pink;
+
+   transition-duration: 1s;
+}
+
+
+/* ===================================================================== */
 /* Log Screen
 /* ===================================================================== */
 .log-screen {
@@ -154,24 +174,6 @@ p {
 .log-form,
 .log-btn {
    margin-bottom: 50px;
-}
-
-.empty-alert,
-.min-chars-alert,
-.max-chars-alert {
-   visibility: hidden;
-   opacity: 0;
-   text-align: center;
-
-   top: 40px;
-   height: 35px;
-   width: 80%;
-
-   border-radius: 8px;
-   border: solid 1px red;
-   background: pink;
-
-   transition-duration: 1s;
 }
 
 

@@ -38,11 +38,11 @@ const initGrid = () => {
 //  Draw Map
 // =====================================================================
 const drawMap = () => {
-
+   
    cellArray.forEach(cell => {
       ctxMap.strokeStyle = "black";
       ctxMap.strokeRect(cell.x, cell.y, cellSize, cellSize);
-      cell.draw()
+      cell.draw();
    });
 
    // Decor (Temporary)

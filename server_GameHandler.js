@@ -42,6 +42,9 @@ let socketList = {};
 // =====================================================================
 io.on("connection", (socket) => {
    // console.log("User connected !");
+   
+   // ==========  Client Loaded  ==========
+   socket.emit("clientLoaded");
 
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
@@ -50,7 +53,6 @@ io.on("connection", (socket) => {
       socket.emit("evalResponse", response);
    });
 
-   
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;

@@ -16,11 +16,12 @@
         <!-- Log Player -->
         <section class="flexCenter absolute log-screen">
             <form class="flexCenter log-form">
-                <input type="text" placeholder="Player name">
+                <input type="text" placeholder="Player name" autofocus>
 
-                <p class="flexCenter absolute empty-alert">Empty field</p>
-                <p class="flexCenter absolute min-chars-alert">Min 4 letters</p>
-                <p class="flexCenter absolute max-chars-alert">Max 10 letters</p>
+                <p class="flexCenter absolute empty-field alert">Empty field</p>
+                <p class="flexCenter absolute invalid-chars alert">Invalid name</p>
+                <p class="flexCenter absolute min-chars alert">Min 4 characters</p>
+                <p class="flexCenter absolute max-chars alert">Max 10 characters</p>
             </form>
 
             <button class="btn green-btn log-btn">Enter Game</button>

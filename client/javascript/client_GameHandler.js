@@ -61,12 +61,12 @@ const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">
 socket.on("addMessage", data => chatResponse(data));
 socket.on("evalResponse", data => chatResponse(data));
 
-chatEnter.onsubmit = (event) => {
+chatEnter.addEventListener("submit", (event) => {
    event.preventDefault();
    if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
    else if(chatInput.value !== "") socket.emit("sendMessage", chatInput.value);
    chatInput.value = "";
-}
+});
 
 clearChatBtn.addEventListener("click", () => clearChat());
 
@@ -95,17 +95,22 @@ const handleFloatingText = () => {
 // =====================================================================
 let mapLoaded = false;
 
-socket.on("newSituation", () => {
-   if(!mapLoaded) {
-      setTimeout(() => mapLoaded = true, 1000)
-      initMap();
-   }
+socket.on("clientLoaded", () => {
+   socket.on("newSituation", (playerData) => {
+      
+      if(!mapLoaded) {
+         initMap();
+         setTimeout(() => mapLoaded = true, 1000);
+      }
+      
+      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+      playerData.forEach(player => initPlayer(player));
+      handleFloatingText();
    
-   ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
-   handleFloatingText();
-
-   if(showFPS) frameRate++;
+      if(showFPS) frameRate++;
+   });
 });
+
 
 
 // =====================================================================

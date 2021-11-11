@@ -72,6 +72,7 @@ const controls = {
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
+// addEventListener("mouseover")
 canvasUI.addEventListener("mouseover", () => insideCanvas = true);
 canvasUI.addEventListener("mouseleave", () => insideCanvas = false);
 
@@ -369,11 +370,3 @@ const initPlayer = (player) => {
 
    playerAnimState(player);
 }
-
-
-// =====================================================================
-// Player Sync (Every frame)
-// =====================================================================
-socket.on("newSituation", (playerData) => {
-   playerData.forEach(player => initPlayer(player));
-});
