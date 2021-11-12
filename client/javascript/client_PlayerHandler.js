@@ -39,15 +39,8 @@ const playerScore = (data) => {
    died.textContent = `Died: ${data.died}`;
 }
 
-// Init Player Stats
-socket.on("playerStats", (data) => {
-   playerStats(data);
-});
-
-// Init Player Score
-socket.on("playerScore", (data) => {
-   playerScore(data);
-});
+socket.on("playerStats", (data) => playerStats(data));
+socket.on("playerScore", (data) => playerScore(data));
 
 
 // =====================================================================
@@ -136,17 +129,9 @@ const playerFloatingText = (player, textColor, textValue) => {
    floatTextArray.push(newText);
 }
 
-socket.on("getHeal", (player) => {
-   playerFloatingText(player, "lime", `+${player.calcHealing}`);
-});
-
-socket.on("giveDamage", (player) => {
-   playerFloatingText(player, "yellow", `-${player.calcDamage}`);
-});
-
-socket.on("getDamage", (player) => {
-   playerFloatingText(player, "red", `-${player.calcDamage}`);
-});
+socket.on("getHeal", (player) => playerFloatingText(player, "lime", `+${player.calcHealing}`));
+socket.on("giveDamage", (player) => playerFloatingText(player, "yellow", `-${player.calcDamage}`));
+socket.on("getDamage", (player) => playerFloatingText(player, "red", `-${player.calcDamage}`));
 
 
 // =====================================================================

@@ -199,20 +199,91 @@ p {
 /* Chat
 /* ===================================================================== */
 .chat {
+   position: relative;
+   justify-content: space-between;
+   align-content: flex-start;
    height: 600px; /* <== Chat Height Size */
+}
+
+/* Chrome scroll bar */
+::-webkit-scrollbar {
+   width: 8px;
+   background: transparent;
+}
+::-webkit-scrollbar-thumb {
+   background: white;
+}
+
+.general-chat-btn,
+.private-chat-btn {
+   height: 50px;
+   width: 49%;
+   border-radius: 10px 10px 0px 0px;
+}
+
+.general-chat,
+.private-chat {
+   overflow-y: scroll;
+   scrollbar-width: thin;
+   scrollbar-color: white transparent;
+
+   height: 400px;
+   padding: 10px;
+}
+
+
+/* ========== General Chat ========== */
+.general-chat-btn {
+   background: rgb(206, 83, 255);
+}
+
+.general-chat {
+   z-index: 10;
+   width: 100%;
+
+   border-radius: 0px 10px 10px 10px;
+   border: solid 4px rgb(206, 83, 255);
+   background: linear-gradient(to bottom, rgb(206, 83, 255), lightgray);
+}
+
+
+/* ========== Private Chat ========== */
+.private-chat-btn {
+   background: orange;
+}
+
+.private-chat {
+   z-index: 0;
+   top: 54px;
+   width: 298px;
+
+   border-radius: 10px 0px 10px 10px;
+   border: solid 4px orange;
+   background: linear-gradient(to bottom, orange, lightgray);
+}
+
+
+/* ========== Btn Hover/Active ========== */
+.general-chat-btn:hover,
+.private-chat-btn:hover,
+.clear-chat-btn:hover {
+   box-shadow: none;
+}
+
+.general-chat-btn:active,
+.private-chat-btn:active {
+   border: none;
+}
+
+
+.general-chat,
+.chat-enter {
+   margin-bottom: 5px;
 }
 
 .chat,
 .player-UI {
    width: 17%;
-}
-
-.chat-display-mess {
-   overflow-y: scroll;
-   height: 76%;
-   width: 100%;
-   padding: 10px;
-   background: rgb(206, 227, 255);
 }
 
 .message,
@@ -228,13 +299,12 @@ p {
    background: rgb(105, 197, 255);
 }
 
-.chat-display-mess,
 .chat-enter input,
 .clear-chat-btn  {
    border-radius: 10px;
 }
 
-.chat-display-mess,
+.general-chat,
 .chat-enter input,
 .controls-message div p {
    font-size: 18px;
@@ -244,6 +314,13 @@ p {
 .chat-enter,
 .clear-chat-btn {
    height: 55px;
+}
+
+
+/* ========== Message Hover ========== */
+.message:hover {
+   cursor: pointer;
+   color: white;
 }
 
 

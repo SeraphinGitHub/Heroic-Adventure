@@ -39,12 +39,25 @@ ctxChars.imageSmoothingEnabled = false;
 // =====================================================================
 // Chatting
 // =====================================================================
-const chatDisplayMess = document.querySelector(".chat-display-mess");
+const generalBtn = document.querySelector(".general-chat-btn");
+const generalChat = document.querySelector(".general-chat");
+
+const privateBtn = document.querySelector(".private-chat-btn");
+const privateChat = document.querySelector(".private-chat");
+
 const chatEnter = document.querySelector(".chat-enter");
 const chatInput = document.querySelector(".chat-enter input");
 const clearChatBtn = document.querySelector(".clear-chat-btn");
 
-// chat ID instead of name !
+generalBtn.addEventListener("click", () => {
+   generalChat.style = "z-index: 10";
+   privateChat.style = "z-index: 0";
+});
+
+privateBtn.addEventListener("click", () => {
+   generalChat.style = "z-index: 0";
+   privateChat.style = "z-index: 10";
+});
 
 chatEnter.addEventListener("submit", (event) => {
    event.preventDefault();
@@ -54,15 +67,33 @@ chatEnter.addEventListener("submit", (event) => {
 });
 
 clearChatBtn.addEventListener("click", () => {
-   for (let i = 0; i < chatDisplayMess.children.length; i++) {
-      chatDisplayMess.children[i].remove();
+   for (let i = 0; i < generalChat.children.length; i++) {
+      generalChat.children[i].remove();
       i--;
    }
 });
 
-const chatResponse = (data) => chatDisplayMess.innerHTML += `<p class="message">${data}</p>`
-socket.on("addMessage", data => chatResponse(data));
-socket.on("evalResponse", data => chatResponse(data));
+const chatResponse = (data) => generalChat.innerHTML += `<p class="message">${data}</p>`;
+const message = document.getElementsByClassName("message");
+
+
+// ========== Temporary ==> Dev ==========
+socket.emit("sendMessage", logFormInput.value + "Hello wolrd !");
+// ========== Temporary ==> Dev ==========
+
+
+socket.on("addMessage", (data) => {
+   chatResponse(data);
+
+   for(let i = 0; i < message.length; i++) {
+      message[i].addEventListener("mousedown", (event) => {
+
+         if(event.which === 1) console.log( message[i].textContent.split(" : ")[0] ); // <== Return player's name
+      });
+   }
+});
+
+socket.on("evalResponse", (data) => chatResponse(data));
 
 
 // =====================================================================

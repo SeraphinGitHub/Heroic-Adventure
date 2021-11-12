@@ -16,7 +16,11 @@
         <!-- Log Player -->
         <section class="flexCenter absolute log-screen">
             <form class="flexCenter log-form">
-                <input type="text" placeholder="Player name" autofocus>
+                <!-- <input type="text" placeholder="Player name" autofocus> -->
+                
+                <!-- Temporary ==> Dev -->
+                <input type="text" value="Séraphin" autofocus autocomplete="off">
+                <!-- Temporary ==> Dev -->
 
                 <p class="flexCenter absolute empty-field alert">Empty field</p>
                 <p class="flexCenter absolute invalid-chars alert">Invalid name</p>
@@ -29,12 +33,19 @@
 
         <!-- Chat -->
         <section class="flexCenter UI-frame chat">
-            <div class="UI-content chat-display-mess">
+            <button class="btn general-chat-btn">General</button>
+            <button class="btn private-chat-btn">Private</button>
+
+            <div class="UI-content general-chat">
+                <!-- <p></p> -->
+            </div>
+
+            <div class="UI-content absolute private-chat">
                 <!-- <p></p> -->
             </div>
 
             <form class="flexCenter chat-enter">
-                <input type="text">
+                <input type="text" placeholder="Send message">
             </form>
 
             <button class="btn orange-btn clear-chat-btn">Clear Chat</button>
