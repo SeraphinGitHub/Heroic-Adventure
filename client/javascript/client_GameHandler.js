@@ -55,34 +55,58 @@ const message = document.getElementsByClassName("message");
 
 let isGeneralChat = true;
 let isPrivateChat = false;
+let worldContent = "Everyone";
+let receiverContent = "";
+
+
+// ========== Functions Declarations ==========
+const displayReceiverName = (receiverStr) => receiver.textContent = receiverStr;
+displayReceiverName(worldContent);
 
 const showGeneralChat = () => {
+
    generalChat.style = "z-index: 10";
    privateChat.style = "z-index: 0";
    isGeneralChat = true;
    isPrivateChat = false;
+
+   displayReceiverName(worldContent);
 }
 
 const showPrivateChat = () => {
+
    generalChat.style = "z-index: 0";
    privateChat.style = "z-index: 10";
    isGeneralChat = false;
    isPrivateChat = true;
+
+   displayReceiverName(receiverContent);
 }
 
-const getPlayerNameFromChat = (chatChannel, data) =>{
-   chatChannel.innerHTML += `<p class="message">${data}</p>`;
+const getPlayerNameFromChat = (chatChannel, textMessage) => {
+   chatChannel.innerHTML += `<p class="message">${textMessage}</p>`;
 
    for(let i = 0; i < message.length; i++) {
-      message[i].addEventListener("mousedown", (event) => {
+      let messageIndexed = message[i];
 
+      messageIndexed.addEventListener("mousedown", (event) => {
          if(event.which === 1) {
-            const playerName = message[i].textContent.split(": ")[0];
+            
+            const prefix = "To >";
+            const offlineStr = "< Has gone offline !";
+            const messageText = messageIndexed.textContent;
+            
+            let receiverName;
+            let splitedName = messageText.split(": ")[0];
+            
+            if(splitedName.includes(prefix)) receiverName = splitedName.split(prefix)[1];
+            else receiverName = splitedName;
 
-            if(!playerName.includes(logged_PlayerName)) {
-
-               socket.emit("chatPlayerName", playerName);
-               receiver.textContent = `Send to : ${playerName}`;
+            if(messageText.includes(offlineStr)) return;
+            else if(receiverName !== logged_PlayerName && receiverName !== "") {
+               
+               socket.emit("chatReceiverName", receiverName);
+               receiverContent = `Send to : ${receiverName}`;
                chatInput.value = "";
                showPrivateChat();
             }
@@ -98,6 +122,8 @@ const clearChat = (chatChannel) => {
    }
 }
 
+
+// ========== Buttons ==========
 generalBtn.addEventListener("click", () => showGeneralChat());
 privateBtn.addEventListener("click", () => showPrivateChat());
 
@@ -124,18 +150,20 @@ clearChatBtn.addEventListener("click", () => {
    if(isPrivateChat) clearChat(privateChat);
 });
 
-socket.on("addMessage_General", (data) => getPlayerNameFromChat(generalChat, data));
 
-socket.on("addMessage_Private", (data) => {
-   getPlayerNameFromChat(privateChat, data);
-
-   // if( "receiver" ) {
-      privateBtn.style = "background: red";
-      setTimeout(() => privateBtn.style = "background: orange", 200);
-   // }
+// ========== Sockets Event ==========
+socket.on("addMessage_General", (textMessage) => {
+   getPlayerNameFromChat(generalChat, textMessage);
 });
 
-socket.on("evalResponse", (data) => generalChatResponse(data));
+socket.on("addMessage_Private", (textMessage) => {
+   getPlayerNameFromChat(privateChat, textMessage);
+
+   if(!isPrivateChat) privateBtn.classList.add("private-message-received");
+   setTimeout(() => privateBtn.classList.remove("private-message-received"), 200);
+});
+
+socket.on("evalResponse", (textMessage) => generalChatResponse(textMessage));
 
 
 // =====================================================================
@@ -174,7 +202,7 @@ const handleFloatingText = () => {
 // =====================================================================
 let mapLoaded = false;
 
-socket.on("newSituation", (playerData) => {
+socket.on("newSituation", () => {
    
    if(!mapLoaded) {
       initMap();

@@ -46,25 +46,31 @@ exports.onConnect = (socket, socketList) => {
       });
 
       // General Chat
-      socket.on("generalMessage", (data) => {
+      socket.on("generalMessage", (textMessage) => {
          for(let i in socketList) {
-            socketList[i].emit("addMessage_General", `${player.name}: ${data}`);
+            socketList[i].emit("addMessage_General", `${player.name}: ${textMessage}`);
          }
       });
       
       // Private Chat
-      socket.on("privateMessage", (data) => {
-         socketList[receiverID].emit("addMessage_Private", `${player.name}: ${data}`);
-         socketList[player.id].emit("addMessage_Private", `To ${receiverName}: ${data}`);
+      socket.on("privateMessage", (textMessage) => {
+         const prefix = "To >";
+         let receiver = socketList[receiverID];
+         
+         if(receiver) {
+            receiver.emit("addMessage_Private", `${player.name}: ${textMessage}`);
+            socket.emit("addMessage_Private", `${prefix}${receiverName}: ${textMessage}`);
+         }
+         else socket.emit("addMessage_Private", `>${receiverName}< Has gone offline !`);
       });
 
       // Get reveiver ID for private chat 
-      socket.on("chatPlayerName", (data) => {
-         receiverName = data;
-
+      socket.on("chatReceiverName", (name) => {
+         receiverName = name;
+         
          for(let i in playerList) {
             let receiver = playerList[i];
-            if(receiver.name === receiverName) receiverID = receiver.id;
+            if(receiver.name === name) receiverID = receiver.id;
          }
       });
    });  

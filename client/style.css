@@ -134,8 +134,8 @@ p {
    background: linear-gradient(to bottom right, rgb(20, 20, 20),gray, white, gray);
    box-shadow: black 0px 0px 50px;
    
-   animation: show_LogScreen 0.8s linear 1;
-   transition-duration: 0.8s;
+   animation: show_LogScreen 0.7s linear 1;
+   transition-duration: 0.7s;
 }
 
 @keyframes show_LogScreen {
@@ -261,12 +261,38 @@ p {
 }
 
 .private-chat {
-   /* z-index: 18; */
    z-index: 0;
 
    border-radius: 10px 0px 10px 10px;
    border: solid 4px orange;
    background: linear-gradient(to bottom, orange, lightgray);
+}
+
+.message-receiver {
+   z-index: 20;
+   position: absolute;
+
+   left: 50%;
+   bottom: 125px;
+   height: 35px;
+   width: 90%;
+   
+   font-size: 20px;
+   text-align: center;
+   transform: translate(-50%);
+   
+   border-radius: 30px;
+   border: solid 2px rgb(206, 83, 255);
+   background: linear-gradient(to bottom left, violet, white, lightblue, white);
+}
+
+.private-message-received {
+   animation: privateReceived linear 0.2s;
+}
+
+@keyframes privateReceived {
+   0% { background: red }
+   100% { background: orange }
 }
 
 
@@ -328,24 +354,6 @@ p {
 .message:hover {
    cursor: pointer;
    color: white;
-}
-
-.message-receiver {
-   z-index: 20;
-   position: absolute;
-
-   left: 50%;
-   bottom: 125px;
-   height: 35px;
-   width: 90%;
-   
-   font-size: 20px;
-   text-align: center;
-   transform: translate(-50%);
-   
-   border-radius: 30px;
-   border: solid 2px rgb(206, 83, 255);
-   background: linear-gradient(to bottom left, violet,white, lightblue, white);
 }
 
 
