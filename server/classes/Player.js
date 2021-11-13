@@ -56,9 +56,9 @@ class Player {
       this.calcDamage;
       
       // Movements Speed
-      this.walkSpeed = process.env.SYNC_COEFF* 3; // <== WalkSpeed
+      this.walkSpeed = Math.floor(process.env.SYNC_COEFF* 3); // <== WalkSpeed
       this.baseWalkSpeed = this.walkSpeed;
-      this.runSpeed = process.env.SYNC_COEFF* 7; // <== RunSpeed
+      this.runSpeed = Math.floor(process.env.SYNC_COEFF* 7); // <== RunSpeed
       this.baseRunSpeed = this.runSpeed;
       
       // Movements Axis

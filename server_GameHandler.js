@@ -43,24 +43,20 @@ let socketList = {};
 io.on("connection", (socket) => {
    // console.log("User connected !");
    
-   // ==========  Client Connected  ==========
-   socket.emit("clientConnected");
+   // ==========  Generate ID  ==========
+   socket.id = Math.floor(playerMax * Math.random());
+   socketList[socket.id] = socket;
+   playerHandler.onConnect(socket, socketList);
 
-   
+
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
       if(process.env.DEBUG_MODE === "false") return;
       const response = eval(data);
       socket.emit("evalResponse", response);
-   });
+   });   
 
-
-   // ==========  Generate ID  ==========
-   socket.id = Math.floor(playerMax * Math.random());
-   socketList[socket.id] = socket;
-   playerHandler.onConnect(socket, socketList);
    
-
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
       // console.log("User disconnected !");

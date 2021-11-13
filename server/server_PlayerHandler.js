@@ -20,18 +20,13 @@ let playerList = {};
 exports.onConnect = (socket, socketList) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
-      
-   // General Chat
-   socket.on("sendMessage", (data) => {
-      const playerName = player.name;
-      for(let i in socketList) {
-         socketList[i].emit("addMessage", `${playerName} : ${data}`);
-      }
-   });
-
+   
    // Init player
    socket.on("playerName", (data) => {
-      player.name = data
+      player.name = data;
+      
+      let receiverID;
+      let receiverName;
 
       // Init Player Stats
       socket.emit("playerStats", {
@@ -49,8 +44,31 @@ exports.onConnect = (socket, socketList) => {
          kills: player.kills,
          died: player.died,
       });
-   });
 
+      // General Chat
+      socket.on("generalMessage", (data) => {
+         for(let i in socketList) {
+            socketList[i].emit("addMessage_General", `${player.name}: ${data}`);
+         }
+      });
+      
+      // Private Chat
+      socket.on("privateMessage", (data) => {
+         socketList[receiverID].emit("addMessage_Private", `${player.name}: ${data}`);
+         socketList[player.id].emit("addMessage_Private", `To ${receiverName}: ${data}`);
+      });
+
+      // Get reveiver ID for private chat 
+      socket.on("chatPlayerName", (data) => {
+         receiverName = data;
+
+         for(let i in playerList) {
+            let receiver = playerList[i];
+            if(receiver.name === receiverName) receiverID = receiver.id;
+         }
+      });
+   });  
+   
    // Movements
    socket.on("up", (state) => player.up = state);
    socket.on("down", (state) => player.down = state);
@@ -225,6 +243,7 @@ const diagMove = (player, moveSpeed, axisOffset) => {
 // =====================================================================
 const playerRunning = (player) => {
    if(player.energy < player.baseEnergy) player.energy += player.regenEnergy;
+   if(player.energy >= player.baseEnergy) player.energy = player.baseEnergy;
 
    if(player.isRunning && player.isRunnable) {
       

@@ -346,3 +346,11 @@ const initPlayer = (player) => {
 
    playerAnimState(player);
 }
+
+
+// =====================================================================
+// Player Sync (Every frame)
+// =====================================================================
+socket.on("newSituation", (playerData) => {
+   playerData.forEach(player => initPlayer(player));
+});

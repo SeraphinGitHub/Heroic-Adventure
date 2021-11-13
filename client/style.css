@@ -103,6 +103,7 @@ p {
 /* ===================================================================== */
 .alert {
    visibility: hidden;
+   position: absolute;
    opacity: 0;
    text-align: center;
 
@@ -201,8 +202,8 @@ p {
 .chat {
    position: relative;
    justify-content: space-between;
-   align-content: flex-start;
-   height: 600px; /* <== Chat Height Size */
+   align-content: flex-end;
+   height: 710px;
 }
 
 /* Chrome scroll bar */
@@ -216,8 +217,9 @@ p {
 
 .general-chat-btn,
 .private-chat-btn {
+   top: 4px;
    height: 50px;
-   width: 49%;
+   width: 48%;
    border-radius: 10px 10px 0px 0px;
 }
 
@@ -227,19 +229,24 @@ p {
    scrollbar-width: thin;
    scrollbar-color: white transparent;
 
-   height: 400px;
+   top: 54px;
+   left: 50%;
+   height: 465px;
+   width: 89%;
+   
    padding: 10px;
+   transform: translate(-50%);
 }
 
 
 /* ========== General Chat ========== */
 .general-chat-btn {
+   left: 4px;
    background: rgb(206, 83, 255);
 }
 
 .general-chat {
    z-index: 10;
-   width: 100%;
 
    border-radius: 0px 10px 10px 10px;
    border: solid 4px rgb(206, 83, 255);
@@ -249,13 +256,13 @@ p {
 
 /* ========== Private Chat ========== */
 .private-chat-btn {
+   right: 4px;
    background: orange;
 }
 
 .private-chat {
+   /* z-index: 18; */
    z-index: 0;
-   top: 54px;
-   width: 298px;
 
    border-radius: 10px 0px 10px 10px;
    border: solid 4px orange;
@@ -321,6 +328,24 @@ p {
 .message:hover {
    cursor: pointer;
    color: white;
+}
+
+.message-receiver {
+   z-index: 20;
+   position: absolute;
+
+   left: 50%;
+   bottom: 125px;
+   height: 35px;
+   width: 90%;
+   
+   font-size: 20px;
+   text-align: center;
+   transform: translate(-50%);
+   
+   border-radius: 30px;
+   border: solid 2px rgb(206, 83, 255);
+   background: linear-gradient(to bottom left, violet,white, lightblue, white);
 }
 
 
@@ -473,5 +498,10 @@ p {
    .player-controls div {
       height: 95%;
       padding-left: 10px;
+   }
+
+   .general-chat,
+   .private-chat {
+      width: 81%;
    }
 }

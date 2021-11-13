@@ -62,45 +62,42 @@ logBtn.addEventListener("click", () => formValidation());
 // =====================================================================
 const emptyFieldAlert = document.querySelector(".empty-field");
 const invalidAlert = document.querySelector(".invalid-chars");
+const whiteSpaceAlert = document.querySelector(".white-space");
 const minCharsAlert = document.querySelector(".min-chars");
 const maxCharsAlert = document.querySelector(".max-chars");
 
-// LETTER || letter || accent letters && No white space && minimum 4 characters 
+// if include: LETTER || letter || accent letters && No white space && minimum 4 characters 
 const playerNameRegEx = new RegExp(/^[A-Za-zÜ-ü]+$/);
 
-// Any special Characters || Numbers
-const specialCharsRegEx = new RegExp(/^[!@#$%^&*\s-'_=0-9]+$/);
+// if include: White Space
+const includeSpaceRegEx = new RegExp(" ");
 
 const formValidation = () => {
-   const duration = 3000;
 
    // if Empty Field
-   if(logFormInput.value === "") {
-      emptyFieldAlert.classList.add("visible");
-      setTimeout(() => emptyFieldAlert.classList.remove("visible"), duration);
-   }
+   if(logFormInput.value === "") alertMessage(emptyFieldAlert);
 
    // if player name is less than 4 characters
-   else if(logFormInput.value.length < 4) {
-      minCharsAlert.classList.add("visible");
-      setTimeout(() => minCharsAlert.classList.remove("visible"), duration);
-   }
+   else if(logFormInput.value.length < 4) alertMessage(minCharsAlert);
 
    // if player name is more than 10 characters
-   else if(logFormInput.value.length > 10) {
-      maxCharsAlert.classList.add("visible");
-      setTimeout(() => maxCharsAlert.classList.remove("visible"), duration);
-   }
+   else if(logFormInput.value.length > 10) alertMessage(maxCharsAlert);
 
-   // if pass player name RegEx (No special chars or space)
-   else if(!playerNameRegEx.test(logFormInput.value)) {
-      invalidAlert.classList.add("visible");
-      setTimeout(() => invalidAlert.classList.remove("visible"), duration);
-   }
+   // if include white space
+   else if(includeSpaceRegEx.test(logFormInput.value)) alertMessage(whiteSpaceAlert);
+
+   // if include any special characters or number
+   else if(!playerNameRegEx.test(logFormInput.value)) alertMessage(invalidAlert);
 
    // if everything's fine ==> Connect Player
    else {
       logScreen.classList.add("hide_LogScreen");
       scripts.forEach(item => instantiate(item));
    }
+}
+
+const alertMessage = (messageClass) => {
+   const duration = 2500;
+   messageClass.classList.add("visible");
+   setTimeout(() => messageClass.classList.remove("visible"), duration);
 }
