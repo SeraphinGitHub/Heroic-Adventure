@@ -39,8 +39,11 @@ const playerScore = (data) => {
    died.textContent = `Died: ${data.died}`;
 }
 
-socket.on("playerStats", (data) => playerStats(data));
-socket.on("playerScore", (data) => playerScore(data));
+const initPlayerUI = (socket) => {
+
+   socket.on("playerStats", (data) => playerStats(data));
+   socket.on("playerScore", (data) => playerScore(data));
+}
 
 
 // =====================================================================
@@ -67,7 +70,7 @@ const controls = {
 // =====================================================================
 let isCasting = false;
 
-const playerCommand = (event, ctrlObj, state) => {
+const playerCommand = (socket, event, ctrlObj, state) => {
    let pairsArray = Object.entries(ctrlObj);
    
    pairsArray.forEach(pair => {
@@ -85,33 +88,39 @@ const playerCommand = (event, ctrlObj, state) => {
    });
 }
 
-window.addEventListener("keydown", (event) => {
-   if(insideCanvas && !isChatting) {
+const onKeyboardInput = (socket) => {
 
-      const state = true;
-      playerCommand(event, controls.movements, state);
-      playerCommand(event, controls.spells, state);
-   }
-});
-
-window.addEventListener("keyup", (event) => {
-   const state = false;
-   playerCommand(event, controls.movements, state);
-   playerCommand(event, controls.spells, state);
-});
+   window.addEventListener("keydown", (event) => {
+      if(insideCanvas && !isChatting) {
+   
+         const state = true;
+         playerCommand(socket, event, controls.movements, state);
+         playerCommand(socket, event, controls.spells, state);
+      }
+   });
+   
+   window.addEventListener("keyup", (event) => {
+      const state = false;
+      playerCommand(socket, event, controls.movements, state);
+      playerCommand(socket,event, controls.spells, state);
+   });
+}
 
 
 // =====================================================================
 // Attack
 // =====================================================================
-const playerAttackCommand = (event, state) => {
+const playerAttackCommand = (socket, event, state) => {
    if(event.which === 1 && insideCanvas && !isChatting) {
       socket.emit("attack", state);
    }
 }
 
-window.addEventListener("mousedown", (event) => playerAttackCommand(event, true));
-window.addEventListener("mouseup", (event) => playerAttackCommand(event, false));
+const onMouseInput = (socket) => {
+
+   window.addEventListener("mousedown", (event) => playerAttackCommand(socket, event, true));
+   window.addEventListener("mouseup", (event) => playerAttackCommand(socket, event, false));
+}
 
 
 // =====================================================================
@@ -129,9 +138,12 @@ const playerFloatingText = (player, textColor, textValue) => {
    floatTextArray.push(newText);
 }
 
-socket.on("getHeal", (player) => playerFloatingText(player, "lime", `+${player.calcHealing}`));
-socket.on("giveDamage", (player) => playerFloatingText(player, "yellow", `-${player.calcDamage}`));
-socket.on("getDamage", (player) => playerFloatingText(player, "red", `-${player.calcDamage}`));
+const toggleFloatingText = (socket) => {
+
+   socket.on("getHeal", (player) => playerFloatingText(player, "lime", `+${player.calcHealing}`));
+   socket.on("giveDamage", (player) => playerFloatingText(player, "yellow", `-${player.calcDamage}`));
+   socket.on("getDamage", (player) => playerFloatingText(player, "red", `-${player.calcDamage}`));
+}
 
 
 // =====================================================================
@@ -309,33 +321,36 @@ const drawHealthNumber_DebugMode = (player) => {
 // =====================================================================
 // Toggle Death Screen
 // =====================================================================
-const deathScreen = document.querySelector(".death-screen");
-const deathMessage = document.querySelector(".death-message");
-const respawnTimer = document.querySelector(".respawn-timer");
+const toggleDeathScreen = (socket) => {
 
-socket.on("playerDeath", (player) => {
+   const deathScreen = document.querySelector(".death-screen");
+   const deathMessage = document.querySelector(".death-message");
+   const respawnTimer = document.querySelector(".respawn-timer");
    
-   let textValue = "You died !";
-   let timerValue = `Respawn in ${player.respawnTimer} sec`;
-
-   if(player.deathCounts === 3) textValue = "You died again !";
-   if(player.deathCounts === 6) textValue = "Wasted !";
-   if(player.deathCounts === 9) textValue = "You died like a bitch !";
-
-   deathScreen.style = "visibility: visible";
-   deathMessage.textContent = textValue;
-   respawnTimer.textContent = timerValue;
-});
-
-socket.on("playerRespawn", () => {
-   deathScreen.style = "visibility: hidden";
-});
+   socket.on("playerDeath", (player) => {
+      
+      let textValue = "You died !";
+      let timerValue = `Respawn in ${player.respawnTimer} sec`;
+   
+      if(player.deathCounts === 3) textValue = "You died again !";
+      if(player.deathCounts === 6) textValue = "Wasted !";
+      if(player.deathCounts === 9) textValue = "You died like a bitch !";
+   
+      deathScreen.style = "visibility: visible";
+      deathMessage.textContent = textValue;
+      respawnTimer.textContent = timerValue;
+   });
+   
+   socket.on("playerRespawn", () => {
+      deathScreen.style = "visibility: hidden";
+   });
+}
 
 
 // =====================================================================
-// Player Init (Every frame)
+// Player Sync (Every frame)
 // =====================================================================
-const initPlayer = (player) => {
+const playerSync = (player) => {
 
    drawBar(player);
    drawPlayerName(player);
@@ -349,8 +364,27 @@ const initPlayer = (player) => {
 
 
 // =====================================================================
-// Player Sync (Every frame)
+// Event Listeners
 // =====================================================================
-socket.on("newSituation", (playerData) => {
-   playerData.forEach(player => initPlayer(player));
-});
+const playerEventListeners = (socket) => {
+   
+   onKeyboardInput(socket);
+   onMouseInput(socket);
+}
+
+
+// =====================================================================
+// Init Player
+// =====================================================================
+const initPlayer = (socket) => {
+   
+   initPlayerUI(socket);
+   toggleFloatingText(socket)
+   toggleDeathScreen(socket);
+
+   playerEventListeners(socket);
+}
+
+
+
+

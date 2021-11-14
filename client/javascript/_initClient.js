@@ -27,10 +27,15 @@ const scripts = [
    "classes/Tile.js",
    
    // Scripts
-   "client_GameHandler.js",
-   "client_PlayerHandler.js",
    "client_Map.js",
+   "client_Chat.js",
    "client_UI.js",
+
+   // Player Handler
+   "client_PlayerHandler.js",
+
+   // Game Handler
+   "client_GameHandler.js",
 ];
 
 const instantiate = (scriptName) => {
@@ -39,6 +44,8 @@ const instantiate = (scriptName) => {
    newScript.src = `/client/javascript/${scriptName}`;
    document.body.appendChild(newScript);
 }
+
+scripts.forEach(item => instantiate(item));
 
 
 // =====================================================================
@@ -58,6 +65,29 @@ logBtn.addEventListener("click", () => formValidation());
 
 
 // =====================================================================
+// Get Logged Player's Name
+// =====================================================================
+let logged_PlayerName;
+
+const playerLogged = (socket) => {
+
+   logged_PlayerName = logFormInput.value;
+   socket.emit("playerName", logged_PlayerName);
+   logFormInput.value = "";
+}
+
+
+// =====================================================================
+// Pop Up Alert Message
+// =====================================================================
+const alertMessage = (messageClass) => {
+   const duration = 2500;
+   messageClass.classList.add("visible");
+   setTimeout(() => messageClass.classList.remove("visible"), duration);
+}
+
+
+// =====================================================================
 // Form Validation
 // =====================================================================
 const emptyFieldAlert = document.querySelector(".empty-field");
@@ -71,6 +101,8 @@ const playerNameRegEx = new RegExp(/^[A-Za-zÜ-ü]+$/);
 
 // if include: White Space
 const includeSpaceRegEx = new RegExp(" ");
+
+let isSocket = false;
 
 const formValidation = () => {
 
@@ -90,14 +122,14 @@ const formValidation = () => {
    else if(!playerNameRegEx.test(logFormInput.value)) alertMessage(invalidAlert);
 
    // if everything's fine ==> Connect Player
-   else {
-      logScreen.classList.add("hide_LogScreen");
-      scripts.forEach(item => instantiate(item));
-   }
-}
+   else if(!isSocket) {
 
-const alertMessage = (messageClass) => {
-   const duration = 2500;
-   messageClass.classList.add("visible");
-   setTimeout(() => messageClass.classList.remove("visible"), duration);
+      isSocket = true;
+      const socket = io();
+      playerLogged(socket);
+      initClientScripts(socket);
+      
+      logFormInput.blur();
+      logScreen.classList.add("hide_LogScreen");
+   }
 }
