@@ -2,6 +2,17 @@
 "use strict"
 
 // =====================================================================
+// Calculate player's Render Canvas 
+// =====================================================================
+const playerCtx = (player) => {
+   const playerRenderRange = Math.floor(canvasArray[0].height / canvasCharsNumber);
+   let canvasIndex = Math.floor(player.y / playerRenderRange);
+   let ctxIndexed = ctxArray[canvasIndex];
+   return ctxIndexed;
+}
+
+
+// =====================================================================
 // DOM Player UI
 // =====================================================================
 const playerStats = (data) => {
@@ -62,7 +73,6 @@ const controls = {
       heal: "r",
    }
 }
-
 
 
 // =====================================================================
@@ -134,7 +144,17 @@ const playerFloatingText = (player, textColor, textValue) => {
       textSize: 30,
    };
 
-   const newText = new FloatingText(ctxChars, player.x, player.y, text.offsetX, text.offsetY, text.textSize, textColor, textValue);
+   const newText = new FloatingText(
+      playerCtx(player),
+      player.x,
+      player.y,
+      text.offsetX,
+      text.offsetY,
+      text.textSize,
+      textColor,
+      textValue
+   );
+
    floatTextArray.push(newText);
 }
 
@@ -184,7 +204,7 @@ const drawBar = (player) => {
 
    gameBarArray.forEach(bar => {
       if(player.isDead) bar.value = 0;
-      new GameBar(ctxChars, player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      new GameBar(playerCtx(player), player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
       barGap += 11;
    });
 }
@@ -194,7 +214,7 @@ const drawBar = (player) => {
 // Draw Player
 // =====================================================================
 const drawPlayer = (player, animImg) => {
-
+   
    const sprites = {
       height: 200,
       width: 200,
@@ -202,15 +222,17 @@ const drawPlayer = (player, animImg) => {
       radius: 45,
    }
 
+   let ctxIndexed = playerCtx(player);
+   
    // Player Shadow
-   ctxChars.fillStyle = "rgba(30, 30, 30, 0.6)";
-   ctxChars.beginPath();
-   ctxChars.ellipse(player.x, player.y + sprites.radius, sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2);
-   ctxChars.fill();
-   ctxChars.closePath();
+   ctxIndexed.fillStyle = "rgba(30, 30, 30, 0.6)";
+   ctxIndexed.beginPath();
+   ctxIndexed.ellipse(player.x, player.y + sprites.radius, sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2);
+   ctxIndexed.fill();
+   ctxIndexed.closePath();
 
    // Player
-   ctxChars.drawImage(
+   ctxIndexed.drawImage(
       animImg,
       player.frameX * sprites.width,
       player.frameY * sprites.height,
@@ -224,16 +246,18 @@ const drawPlayer = (player, animImg) => {
 }
 
 const drawPlayerName = (player) => {
-
+      
    const namePos = {
       x: player.x - (player.name.length * 6),
       y: player.y + 85,
    };
    
-   ctxChars.fillStyle = "lime";
-   ctxChars.font = "22px Orbitron-ExtraBold";
-   ctxChars.fillText(player.name, namePos.x, namePos.y);
-   ctxChars.strokeText(player.name, namePos.x, namePos.y);
+   let ctxIndexed = playerCtx(player);
+
+   ctxIndexed.fillStyle = "lime";
+   ctxIndexed.font = "22px Orbitron-ExtraBold";
+   ctxIndexed.fillText(player.name, namePos.x, namePos.y);
+   ctxIndexed.strokeText(player.name, namePos.x, namePos.y);
 }
 
 

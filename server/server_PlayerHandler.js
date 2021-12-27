@@ -100,46 +100,6 @@ exports.onDisconnect = (socket) => {
 
 
 // =====================================================================
-// Player Global Count Down   (Attack & Spell Cast)
-// =====================================================================
-const playerGcD = (player, socketList) => {
-   
-   // Regen Mana
-   if(player.mana < player.baseMana) player.mana += player.regenMana;
-   
-   // Regen GcD
-   if(player.speedGcD < player.GcD) {
-      player.speedGcD +=process.env.SYNC_COEFF* 1;
-      if(player.isAttacking) player.isAttacking = false;
-   }
-   
-   if(player.speedGcD >= player.GcD) {
-
-      // Player Attack
-      if(player.isAttacking && !player.attack_isAnimable) {
-
-         player.speedGcD = 0;
-         player.isAttacking = false;
-         player.attack_isAnimable = true;
-
-         setTimeout(() => player.attack_isAnimable = false,
-            animTimeOut(anim.attack.index, anim.attack.spritesNumber)
-         );
-
-         damagingEnemy(player, socketList);
-         // damagingEnemy(player, mobList); // <== When Mob class gonna be created
-      }
-
-      // Player Spell Cast
-      if(player.isCasting) {
-         
-         player.isCasting = false;
-         playerHealing(player, socketList);
-      }
-   }
-}
-
-// =====================================================================
 // Player Movements
 // =====================================================================
 const playerMovements = (player) => {
@@ -168,36 +128,45 @@ const playerMovements = (player) => {
 
 const crossMove = (player, moveSpeed, axisOffset) => {
 
-   // Up (yAxis)
-   if(player.up) {
-      player.frameY = 0;
-      player.y -= moveSpeed;
-      player.attkOffset_X = axisOffset.yAxis_x;
-      player.attkOffset_Y = -axisOffset.yAxis_y;
-   }
-   
-   // Down (yAxis)
-   if(player.down) {
+   // Up & Down or Left & Right at the Same Time
+   if(player.up && player.down || player.left && player.right) {
       player.frameY = 1;
-      player.y += moveSpeed;
       player.attkOffset_X = axisOffset.yAxis_x;
       player.attkOffset_Y = axisOffset.yAxis_y;
    }
-   
-   // Left (xAxis)
-   if(player.left) {
-      player.frameY = 2;
-      player.x -= moveSpeed;
-      player.attkOffset_X = -axisOffset.xAxis_x;
-      player.attkOffset_Y = axisOffset.xAxis_y;
-   }
-   
-   // Right (xAxis)
-   if(player.right) {      
-      player.frameY = 3;
-      player.x += moveSpeed;
-      player.attkOffset_X = axisOffset.xAxis_x;
-      player.attkOffset_Y = axisOffset.xAxis_y;
+
+   else {
+      // Up (yAxis)
+      if(player.up) {
+         player.frameY = 0;
+         player.y -= moveSpeed;
+         player.attkOffset_X = axisOffset.yAxis_x;
+         player.attkOffset_Y = -axisOffset.yAxis_y;
+      }
+      
+      // Down (yAxis)
+      if(player.down) {
+         player.frameY = 1;
+         player.y += moveSpeed;
+         player.attkOffset_X = axisOffset.yAxis_x;
+         player.attkOffset_Y = axisOffset.yAxis_y;
+      }
+      
+      // Left (xAxis)
+      if(player.left) {
+         player.frameY = 2;
+         player.x -= moveSpeed;
+         player.attkOffset_X = -axisOffset.xAxis_x;
+         player.attkOffset_Y = axisOffset.xAxis_y;
+      }
+      
+      // Right (xAxis)
+      if(player.right) {      
+         player.frameY = 3;
+         player.x += moveSpeed;
+         player.attkOffset_X = axisOffset.xAxis_x;
+         player.attkOffset_Y = axisOffset.xAxis_y;
+      }
    }
 }
 
@@ -263,6 +232,64 @@ const playerRunning = (player) => {
 
 
 // =====================================================================
+// Player Global Count Down
+// =====================================================================
+const playerGcD = (player, socketList) => {
+   
+   // Regen Mana
+   if(player.mana < player.baseMana) player.mana += player.regenMana;
+   
+   // Regen GcD
+   if(player.speedGcD < player.GcD) {
+      player.speedGcD +=process.env.SYNC_COEFF* 1;
+      if(player.isAttacking) player.isAttacking = false;
+   }
+   
+   // GcD Up
+   if(player.speedGcD >= player.GcD) {
+      playerAttack(player, socketList);
+      playerCast(player, socketList);
+   }
+}
+
+
+// =====================================================================
+// Player Attack
+// =====================================================================
+const playerAttack = (player, socketList) => {
+
+   // Player Attack
+   if(player.isAttacking && !player.attack_isAnimable) {
+
+      player.frameX = 0;
+      player.speedGcD = 0;
+      player.isAttacking = false;
+      player.attack_isAnimable = true;
+
+      setTimeout(() => player.attack_isAnimable = false,
+         animTimeOut(anim.attack.index, anim.attack.spritesNumber)
+      );
+
+      damagingEnemy(player, socketList);
+      // damagingEnemy(player, mobList); // <== When Mob class gonna be created
+   }
+}
+
+
+// =====================================================================
+// Player Cast
+// =====================================================================
+const playerCast = (player, socketList) => {
+   
+   if(player.isCasting) {
+      player.isCasting = false;
+
+      playerHealing(player, socketList);
+   }
+}
+
+
+// =====================================================================
 // Player Healing
 // =====================================================================
 const playerHealing = (player, socketList) => {
@@ -271,6 +298,7 @@ const playerHealing = (player, socketList) => {
    && player.mana >= player.healCost
    && player.health < player.baseHealth) {
 
+      player.frameX = 0;
       player.speedGcD = 0;
       player.cast_Heal = false;
       player.heal_isAnimable = true;
@@ -417,43 +445,42 @@ const animTimeOut = (index, spritesNumber) => {
 }
 
 const handlePlayerState = (player) => {
-   let isMoving = false;
-
-   if(player.up || player.down || player.left || player.right) {
-      isMoving = true;
-   }
    
-   // Walk State
-   if(isMoving && !player.attack_isAnimable && !player.heal_isAnimable) {
-      if(player.isRunning && !player.isRunnable || !player.isRunning) {
-         player.animation(frame, anim.walk.index, anim.walk.spritesNumber);
-         return player.state = "walk";
-      }
-   }
-
-   // Run State
-   if(isMoving && player.isRunning && player.isRunnable && !player.attack_isAnimable) {
-      player.animation(frame, anim.run.index, anim.run.spritesNumber);
-      return player.state = "run";
-   }
-
    // Attack State
    if(player.attack_isAnimable) {
       player.animation(frame, anim.attack.index, anim.attack.spritesNumber);
       return player.state = "attack";
    }
-   
+
    // Heal State
    if(player.heal_isAnimable) {
       player.animation(frame, anim.heal.index, anim.heal.spritesNumber);
       return player.state = "heal";
    }
+   
+   // Moving State
+   if(player.up || player.down || player.left || player.right) {
+
+      if(player.up && player.down || player.left && player.right) {
+         player.animation(frame, anim.idle.index, anim.idle.spritesNumber);
+         return player.state = "idle";
+      }
+
+      // Run State
+      else if(player.isRunning && player.isRunnable) {
+         player.animation(frame, anim.run.index, anim.run.spritesNumber);
+         return player.state = "run";
+      }
+
+      // Walk State
+      else {
+         player.animation(frame, anim.walk.index, anim.walk.spritesNumber);
+         return player.state = "walk";
+      }
+   }
 
    // Idle State
-   else if(!isMoving && !player.attack_isAnimable
-   || player.up && player.down && !player.left && !player.right
-   || player.left && player.right && !player.up && !player.down) {
-      
+   else {
       player.animation(frame, anim.idle.index, anim.idle.spritesNumber);
       return player.state = "idle";
    }

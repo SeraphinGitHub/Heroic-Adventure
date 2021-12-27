@@ -21,7 +21,7 @@ class Player {
       this.respawnTimer = this.baseRespawnTimer;
       this.deathCounts = 0;
       
-      // Global Count Down
+      // GcD
       this.baseGcD = 30;
       this.GcD = process.env.SYNC_COEFF* this.baseGcD; // More high ==> more slow
       this.speedGcD = this.GcD;

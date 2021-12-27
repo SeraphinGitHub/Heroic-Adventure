@@ -5,27 +5,34 @@
 // Canvas
 // =====================================================================
 const canvasMap = document.querySelector(".canvas-map");
-const canvasChars = document.querySelector(".canvas-characters");
 const canvasUI = document.querySelector(".canvas-UI");
 
 // Set Contexts
 const ctxMap = canvasMap.getContext("2d");
-const ctxChars = canvasChars.getContext("2d");
 const ctxUI = canvasUI.getContext("2d");
 
 canvasMap.height = height;
 canvasMap.width = width;
 
-canvasChars.height = height;
-canvasChars.width = width;
-
 canvasUI.height = height;
 canvasUI.width = width;
 
-// Disabled Anti-Aliasing
-ctxChars.imageSmoothingEnabled = false;
-ctxChars.webkitImageSmoothingEnabled = false;
-ctxChars.imageSmoothingEnabled = false;
+const canvasCharsNumber = 12;
+const canvasArray = [];
+const ctxArray = [];
+
+for(let i = 0; i < canvasCharsNumber; i++) {
+   canvasArray.push(document.querySelector(`.canvas-characters-${ i+1 }`));
+   ctxArray.push(canvasArray[i].getContext("2d"));
+
+   canvasArray[i].height = height;
+   canvasArray[i].width = width;
+
+   // Disabled Anti-Aliasing
+   ctxArray[i].imageSmoothingEnabled = false;
+   ctxArray[i].webkitImageSmoothingEnabled = false;
+   ctxArray[i].imageSmoothingEnabled = false;
+}
 
 
 // =====================================================================
@@ -60,8 +67,11 @@ const handleFloatingText = () => {
 // =====================================================================
 const clientSync = (socket) => {
    socket.on("newSituation", (playerData) => {
-   
-      ctxChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+      
+      for(let i = 0; i < canvasCharsNumber; i++) {
+         ctxArray[i].clearRect(0, 0, canvasArray[i].width, canvasArray[i].height);
+      }
+
       playerData.forEach(player => playerSync(player));
       handleFloatingText();
 

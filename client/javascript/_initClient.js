@@ -133,3 +133,23 @@ const formValidation = () => {
       logScreen.classList.add("hide_LogScreen");
    }
 }
+
+
+// =========================  Development  =========================
+setTimeout(() => {
+   
+   const devID = Math.floor(Math.random() * 100);
+
+   const socket = io();
+   socket.emit("playerName", `ID: ${devID}`);
+   // socket.emit("playerName", "Séraphin");
+   initClientScripts(socket);
+   
+   logScreen.style = `
+      top: -600px !important;
+      visibility: hidden !important;
+      animation: none !important;
+   `;
+
+}, 300);
+// =========================  Development  =========================
