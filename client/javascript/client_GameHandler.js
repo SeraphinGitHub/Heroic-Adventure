@@ -2,21 +2,26 @@
 "use strict"
 
 // =====================================================================
-// Canvas
+// Set UI Canvas
+// =====================================================================
+const canvasUI = document.querySelector(".canvas-UI");
+const ctxUI = canvasUI.getContext("2d");
+canvasUI.height = viewSize.height;
+canvasUI.width = viewSize.width;
+
+
+// =====================================================================
+// Set Map Canvas
 // =====================================================================
 const canvasMap = document.querySelector(".canvas-map");
-const canvasUI = document.querySelector(".canvas-UI");
-
-// Set Contexts
 const ctxMap = canvasMap.getContext("2d");
-const ctxUI = canvasUI.getContext("2d");
+canvasMap.height = map.height;
+canvasMap.width = map.width;
 
-canvasMap.height = height;
-canvasMap.width = width;
 
-canvasUI.height = height;
-canvasUI.width = width;
-
+// =====================================================================
+// Set Game Canvas
+// =====================================================================
 const canvasCharsNumber = 12;
 const canvasArray = [];
 const ctxArray = [];
@@ -25,8 +30,8 @@ for(let i = 0; i < canvasCharsNumber; i++) {
    canvasArray.push(document.querySelector(`.canvas-characters-${ i+1 }`));
    ctxArray.push(canvasArray[i].getContext("2d"));
 
-   canvasArray[i].height = height;
-   canvasArray[i].width = width;
+   canvasArray[i].height = map.height;
+   canvasArray[i].width = map.width;
 
    // Disabled Anti-Aliasing
    ctxArray[i].imageSmoothingEnabled = false;

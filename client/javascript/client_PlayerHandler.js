@@ -7,7 +7,8 @@
 const playerCtx = (player) => {
    const playerRenderRange = Math.floor(canvasArray[0].height / canvasCharsNumber);
    let canvasIndex = Math.floor(player.y / playerRenderRange);
-   let ctxIndexed = ctxArray[canvasIndex];
+   // let ctxIndexed = ctxArray[canvasIndex];
+   let ctxIndexed = ctxArray[0];
    return ctxIndexed;
 }
 
@@ -205,6 +206,7 @@ const drawBar = (player) => {
    gameBarArray.forEach(bar => {
       if(player.isDead) bar.value = 0;
       new GameBar(playerCtx(player), player.x, player.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
+      new GameBar(ctxUI, 100, 150, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
       barGap += 11;
    });
 }
@@ -214,7 +216,7 @@ const drawBar = (player) => {
 // Draw Player
 // =====================================================================
 const drawPlayer = (player, animImg) => {
-   
+
    const sprites = {
       height: 200,
       width: 200,
@@ -243,6 +245,14 @@ const drawPlayer = (player, animImg) => {
       sprites.height,
       sprites.width,
    );
+
+   
+   viewport.scrollLeft = player.x - 1500; // <== player.x - half size of the viewport
+   viewport.scrollTop = player.y - 1000; // <== player.y - half size of the viewport
+
+   // console.log(viewport.scrollLeft); // 930px
+   // console.log("x: " + player.x); // 1920px
+   // console.log("y: " + player.y);
 }
 
 const drawPlayerName = (player) => {

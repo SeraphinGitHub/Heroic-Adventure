@@ -49,6 +49,30 @@ const drawMap = () => {
    ctxMap.drawImage(tree_1, 0, 0, 285, 297, 200, 400, cellSize, cellSize);
    ctxMap.drawImage(tree_1, 0, 0, 285, 297, 800, 200, cellSize, cellSize);
    ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 250, 25, 87, 162);
+
+
+   // Test (Temporary)
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 1200, 400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 1800, 200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 1250, 25, 87, 162);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 600, 800, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 1600, 800, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 2600, 800, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 2200, 400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 2800, 200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 2250, 25, 87, 162);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 200, 1400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 800, 1200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 250, 1025, 87, 162);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 1200, 1400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 1800, 1200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 1250, 1025, 87, 162);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 2200, 1400, cellSize, cellSize);
+   ctxMap.drawImage(tree_1, 0, 0, 285, 297, 2800, 1200, cellSize, cellSize);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 2250, 1025, 87, 162);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 650, 1625, 87, 162);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 1650, 1625, 87, 162);
+   ctxMap.drawImage(greenery_3, 0, 0, 87, 162, 2650, 1625, 87, 162);
 }
 
 

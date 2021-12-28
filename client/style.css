@@ -360,6 +360,18 @@ p {
 /* ===================================================================== */
 /* Game Window
 /* ===================================================================== */
+.canvas-UI {
+   position: fixed;
+}
+
+.viewport {
+   position: relative;
+   overflow: scroll;
+   /* overflow: hidden; */
+   border: 1px solid black;
+   background: linear-gradient(to bottom right, violet, white, violet);
+}
+
 .death-screen {
    visibility: hidden;
    position: absolute;
@@ -397,10 +409,6 @@ p {
    font-size: 30px;
 }
 
-.game-window {
-   border: 1px solid black;
-}
-
 
 /* ===================================================================== */
 /* Player UI
@@ -408,7 +416,6 @@ p {
 .player-UI{
    align-content: space-between;
 }
-
 
 /* ========== Player Infos ========== */
 .player-infos {

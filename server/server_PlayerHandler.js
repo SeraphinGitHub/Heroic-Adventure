@@ -106,14 +106,14 @@ const playerMovements = (player) => {
       
    let moveSpeed = player.walkSpeed;
    if(player.isRunning && player.isRunnable) moveSpeed = player.runSpeed;
-
+   
    // Map Border Reached ==> Temporary (Await Scrolling Cam)
-   if(player.up && player.y < 65
-   || player.down && player.y > 740
-   || player.left && player.x < 50
-   || player.right && player.x > 1150) {
-      moveSpeed = 0;
-   }
+   // if(player.up && player.y < 460
+   // || player.down && player.y > 1540
+   // || player.left && player.x < 450
+   // || player.right && player.x > 1950) {
+   //    moveSpeed = 0;
+   // }
 
    const axisOffset = {
       yAxis_x: 0,

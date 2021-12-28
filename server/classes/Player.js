@@ -7,8 +7,12 @@ class Player {
       this.name = "";
 
       // Player Hitbox
-      this.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on load
-      this.y = Math.floor(Math.random() * 700) + 50; // depend of canvas size (1000 x 700)
+      // this.x = Math.floor(Math.random() * 2800) +100; // <== Randomize position on load
+      // this.y = Math.floor(Math.random() * 1800) +100; // map size - sprite.size (200x200) + half sprite.size
+
+      this.x = 1500; // <== player.x = half size of the map
+      this.y = 1000; // <== player.y = half size of the map
+
       this.radius = 42;
 
       // Attack Hitbox
@@ -33,8 +37,10 @@ class Player {
       // Player Energy
       this.baseEnergy = 150;
       this.energy = this.baseEnergy;
-      this.energyCost = 0.8;
-      this.baseRegenEnergy = 0.2;
+      // this.energyCost = 0.8;
+      this.energyCost = 0.1;
+      this.baseRegenEnergy = 0.8;
+      // this.baseRegenEnergy = 0.2;
       this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
       // Player Mana

@@ -52,7 +52,7 @@
 
 
         <!-- Game window -->
-        <section class="flexCenter game-window">
+        <section class="flexCenter viewport">
             <canvas class="absolute canvas-map"></canvas>
 
             <canvas class="absolute canvas-characters-1"></canvas>
@@ -68,7 +68,7 @@
             <canvas class="absolute canvas-characters-11"></canvas>
             <canvas class="absolute canvas-characters-12"></canvas>
             
-            <canvas class="absolute canvas-UI"></canvas>
+            <canvas class="canvas-UI"></canvas>
 
             <div class="death-screen">
                 <p class="death-message"></p>
@@ -124,9 +124,9 @@
             </div>
 
         </section>
-        
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="http://localhost:3000/client/javascript/_initClient.js"></script>
-        <!-- <script src="https://multi-game-01.herokuapp.com/client/javascript/_initClient.js"></script> -->
     </body>
+        
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://localhost:3000/client/javascript/_initClient.js"></script>
+    <!-- <script src="https://multi-game-01.herokuapp.com/client/javascript/_initClient.js"></script> -->
 </html>

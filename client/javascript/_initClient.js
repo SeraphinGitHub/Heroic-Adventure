@@ -2,17 +2,23 @@
 "use strict"
 
 // =====================================================================
-// Canvas Size
+// Set Viewport & Map Size
 // =====================================================================
-const gameWindow = document.querySelector(".game-window");
+const viewport = document.querySelector(".viewport");
 
-const height = 800;
-const width = 1200;
+const viewSize = {
+   height: 800,
+   width: 1200,
+}
 
-gameWindow.style = `
-   height: ${height}px;
-   width: ${width}px;
-   background: linear-gradient(to bottom right, violet, white, violet);
+const map = {
+   height: 2000,
+   width: 3000,
+}
+
+viewport.style = `
+   height: ${viewSize.height}px;
+   width: ${viewSize.width}px;
 `;
 
 
@@ -42,7 +48,7 @@ const instantiate = (scriptName) => {
    const newScript = document.createElement("script");
    newScript.type = "text/javascript";
    newScript.src = `/client/javascript/${scriptName}`;
-   document.body.appendChild(newScript);
+   document.body.insertAdjacentElement("afterend", newScript);
 }
 
 scripts.forEach(item => instantiate(item));
