@@ -2,9 +2,9 @@
 "use strict"
 
 class Viewport {
-   constructor(width, height) {
-      this.x = 0;
-      this.y = 0;
+   constructor(x, y, width, height) {
+      this.x = x;
+      this.y = y;
       this.width = width;
       this.height = height;
    }

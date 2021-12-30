@@ -23,10 +23,10 @@ const playerCtx = (player) => {
 const mapTile_3lands = new Image();
 mapTile_3lands.src = "client/images/map/map_tile_3_lands.png";
 
-const vpOffsetX = viewport.width/2;
-const vpOffsetY = viewport.height/2;
-const player_X = viewport.x + vpOffsetX;
-const player_Y = viewport.y + vpOffsetY;
+// const vpOffsetX = viewport.width/2;
+// const vpOffsetY = viewport.height/2;
+// const player.x = viewport.x + vpOffsetX;
+// const player.y = viewport.y + vpOffsetY;
 
 const cellSize = 200;
 const spriteSize = 256;
@@ -37,35 +37,43 @@ const mapArray = [
    0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
    0, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 0,
-   0, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1, 0,
-   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-   0, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1, 0,
+   0, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 0,
+   1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 
+   0, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 0,
    0, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 0,
    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
    0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
 ];
 
+const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 
 // =====================================================================
 // Scroll Camera
 // =====================================================================
 const scrollCam = (player) => {
 
+   
    let vpOriginX = Math.floor(viewport.x);
    let vpOriginY = Math.floor(viewport.y);
    let nbrOfCellX = Math.ceil(viewport.width) /cellSize;
    let nbrOfCellY = Math.ceil(viewport.height) /cellSize;
 
-   for(let x = vpOriginX; x < nbrOfCellX; x++) {
-      for(let y = vpOriginY; y < nbrOfCellY; y++) {
+   // playerCtx(player).strokeStyle = "black";
+   // playerCtx(player).strokeRect(player.x-viewSize.width/2, player.y-viewSize.height/2, viewSize.width, viewSize.height);
+
+   // for(let x = vpOriginX; x < nbrOfCellX; x++) {
+   //    for(let y = vpOriginY; y < nbrOfCellY; y++) {
+
+   for(let x = 0; x < columns; x++) {
+      for(let y = 0; y < rows; y++) {
          
          let index = y * columns + x;
          let value = mapArray[index];
          
          ctxMap.drawImage(mapTile_3lands,
             value * spriteSize, 0, spriteSize, spriteSize,
-            x * cellSize - player.x + vpOffsetX,
-            y * cellSize - player.y + vpOffsetY,
+            x * cellSize -player.x,
+            y * cellSize -player.y,
             cellSize,
             cellSize
          );
@@ -208,8 +216,8 @@ const playerFloatingText = (player, textColor, textValue) => {
 
    const newText = new FloatingText(
       playerCtx(player),
-      player_X,
-      player_Y,
+      player.x,
+      player.y,
       text.offsetX,
       text.offsetY,
       text.textSize,
@@ -291,8 +299,8 @@ const drawPlayer = (player, animImg) => {
    ctxIndexed.fillStyle = "rgba(30, 30, 30, 0.6)";
    ctxIndexed.beginPath();
    ctxIndexed.ellipse(
-      player_X,
-      player_Y + sprites.radius,
+      player.x,
+      player.y + sprites.radius,
       sprites.radius * 0.8,
       sprites.radius * 0.4,
       0, 0, Math.PI * 2
@@ -307,8 +315,11 @@ const drawPlayer = (player, animImg) => {
       player.frameY * sprites.height,
       sprites.width,
       sprites.height,
-      player_X - sprites.height/2,
-      player_Y - sprites.width/2 - sprites.offsetY,
+      // player.x - sprites.height/2,
+      // player.y - sprites.width/2 - sprites.offsetY,
+      viewport.width/2 - sprites.height/2,
+      viewport.height/2 - sprites.width/2 - sprites.offsetY,
+      
       sprites.height,
       sprites.width,
    );
@@ -317,8 +328,8 @@ const drawPlayer = (player, animImg) => {
 const drawPlayerName = (player) => {
       
    const namePos = {
-      x: player_X - (player.name.length * 6),
-      y: player_Y + 85,
+      x: player.x - (player.name.length * 6),
+      y: player.y + 85,
    };
    
    let ctxIndexed = playerCtx(player);
@@ -462,8 +473,8 @@ const playerSync = (player) => {
    drawBar(player);
    drawPlayerName(player);
 
-   drawPlayer_DebugMode(player);
-   drawAttackArea_DebugMode(player);
+   // drawPlayer_DebugMode(player);
+   // drawAttackArea_DebugMode(player);
    // drawHealthNumber_DebugMode(player);
 
    playerAnimState(player);

@@ -9,7 +9,7 @@ const viewSize = {
    width: 1200,
 }
 
-const viewport = new Viewport(viewSize.width, viewSize.height);
+// const viewport = new Viewport(viewSize.width, viewSize.height);
 const viewport_HTML = document.querySelector(".viewport");
 
 viewport_HTML.style = `
