@@ -366,8 +366,7 @@ p {
 
 .viewport {
    position: relative;
-   overflow: scroll;
-   /* overflow: hidden; */
+   overflow: hidden;
    border: 1px solid black;
    background: linear-gradient(to bottom right, violet, white, violet);
 }

@@ -5,11 +5,72 @@
 // Calculate player's Render Canvas 
 // =====================================================================
 const playerCtx = (player) => {
-   const playerRenderRange = Math.floor(canvasArray[0].height / canvasCharsNumber);
-   let canvasIndex = Math.floor(player.y / playerRenderRange);
+   // const playerRenderRange = Math.floor(canvasArray[0].height / canvasCharsNumber);
+   // let canvasIndex = Math.floor(player.y / playerRenderRange);
    // let ctxIndexed = ctxArray[canvasIndex];
+
+   // ***************************************************
    let ctxIndexed = ctxArray[0];
+   // ***************************************************
+
    return ctxIndexed;
+}
+
+
+// =====================================================================
+// Map Settings
+// =====================================================================
+const mapTile_3lands = new Image();
+mapTile_3lands.src = "client/images/map/map_tile_3_lands.png";
+
+const vpOffsetX = viewport.width/2;
+const vpOffsetY = viewport.height/2;
+const player_X = viewport.x + vpOffsetX;
+const player_Y = viewport.y + vpOffsetY;
+
+const cellSize = 200;
+const spriteSize = 256;
+const columns = 12;
+const rows = 9;
+
+const mapArray = [
+   0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+   0, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 0,
+   0, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1, 0,
+   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
+   0, 1, 2, 1, 1, 2, 2, 1, 1, 2, 1, 0,
+   0, 1, 2, 2, 1, 2, 2, 1, 2, 2, 1, 0,
+   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+   0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+];
+
+
+// =====================================================================
+// Scroll Camera
+// =====================================================================
+const scrollCam = (player) => {
+
+   let vpOriginX = Math.floor(viewport.x);
+   let vpOriginY = Math.floor(viewport.y);
+   let nbrOfCellX = Math.ceil(viewport.width) /cellSize;
+   let nbrOfCellY = Math.ceil(viewport.height) /cellSize;
+
+   for(let x = vpOriginX; x < nbrOfCellX; x++) {
+      for(let y = vpOriginY; y < nbrOfCellY; y++) {
+         
+         let index = y * columns + x;
+         let value = mapArray[index];
+         
+         ctxMap.drawImage(mapTile_3lands,
+            value * spriteSize, 0, spriteSize, spriteSize,
+            x * cellSize - player.x + vpOffsetX,
+            y * cellSize - player.y + vpOffsetY,
+            cellSize,
+            cellSize
+         );
+      }
+   }
 }
 
 
@@ -147,8 +208,8 @@ const playerFloatingText = (player, textColor, textValue) => {
 
    const newText = new FloatingText(
       playerCtx(player),
-      player.x,
-      player.y,
+      player_X,
+      player_Y,
       text.offsetX,
       text.offsetY,
       text.textSize,
@@ -229,7 +290,13 @@ const drawPlayer = (player, animImg) => {
    // Player Shadow
    ctxIndexed.fillStyle = "rgba(30, 30, 30, 0.6)";
    ctxIndexed.beginPath();
-   ctxIndexed.ellipse(player.x, player.y + sprites.radius, sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2);
+   ctxIndexed.ellipse(
+      player_X,
+      player_Y + sprites.radius,
+      sprites.radius * 0.8,
+      sprites.radius * 0.4,
+      0, 0, Math.PI * 2
+   );
    ctxIndexed.fill();
    ctxIndexed.closePath();
 
@@ -240,26 +307,18 @@ const drawPlayer = (player, animImg) => {
       player.frameY * sprites.height,
       sprites.width,
       sprites.height,
-      player.x - sprites.height * 0.5,
-      player.y - sprites.width * 0.5 - sprites.offsetY,
+      player_X - sprites.height/2,
+      player_Y - sprites.width/2 - sprites.offsetY,
       sprites.height,
       sprites.width,
    );
-
-   
-   viewport.scrollLeft = player.x - 1500; // <== player.x - half size of the viewport
-   viewport.scrollTop = player.y - 1000; // <== player.y - half size of the viewport
-
-   // console.log(viewport.scrollLeft); // 930px
-   // console.log("x: " + player.x); // 1920px
-   // console.log("y: " + player.y);
 }
 
 const drawPlayerName = (player) => {
       
    const namePos = {
-      x: player.x - (player.name.length * 6),
-      y: player.y + 85,
+      x: player_X - (player.name.length * 6),
+      y: player_Y + 85,
    };
    
    let ctxIndexed = playerCtx(player);
@@ -327,28 +386,31 @@ const playerAnimState = (player) => {
 // ==>  Debug Mode  <==
 // =====================================================================
 const drawPlayer_DebugMode = (player) => {
-
-   ctxChars.fillStyle = "darkviolet";
-   ctxChars.beginPath();
-   ctxChars.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-   ctxChars.fill();
-   ctxChars.closePath();
+   let ctxIndexed = playerCtx(player);
+   
+   ctxIndexed.fillStyle = "darkviolet";
+   ctxIndexed.beginPath();
+   ctxIndexed.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+   ctxIndexed.fill();
+   ctxIndexed.closePath();
 }
 
 const drawAttackArea_DebugMode = (player) => {
+   let ctxIndexed = playerCtx(player);
 
-   ctxChars.fillStyle = "orangered";
-   ctxChars.beginPath();
-   ctxChars.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, 0, Math.PI * 2);
-   ctxChars.fill();
-   ctxChars.closePath();
+   ctxIndexed.fillStyle = "orangered";
+   ctxIndexed.beginPath();
+   ctxIndexed.arc(player.x + player.attkOffset_X, player.y + player.attkOffset_Y, player.attkRadius, 0, Math.PI * 2);
+   ctxIndexed.fill();
+   ctxIndexed.closePath();
 }
 
 const drawHealthNumber_DebugMode = (player) => {
+   let ctxIndexed = playerCtx(player);
 
-   ctxChars.fillStyle = "black";
-   ctxChars.font = "26px Orbitron-Regular";
-   ctxChars.fillText(Math.floor(player.health), player.x -35, player.y -15);
+   ctxIndexed.fillStyle = "black";
+   ctxIndexed.font = "26px Orbitron-Regular";
+   ctxIndexed.fillText(Math.floor(player.health), player.x -35, player.y -15);
 }
 
 
@@ -382,22 +444,6 @@ const toggleDeathScreen = (socket) => {
 
 
 // =====================================================================
-// Player Sync (Every frame)
-// =====================================================================
-const playerSync = (player) => {
-
-   drawBar(player);
-   drawPlayerName(player);
-
-   // drawPlayer_DebugMode(player);
-   // drawAttackArea_DebugMode(player);
-   // drawHealthNumber_DebugMode(player);
-
-   playerAnimState(player);
-}
-
-
-// =====================================================================
 // Event Listeners
 // =====================================================================
 const playerEventListeners = (socket) => {
@@ -408,14 +454,30 @@ const playerEventListeners = (socket) => {
 
 
 // =====================================================================
+// Player Sync (Every frame)
+// =====================================================================
+const playerSync = (player) => {
+
+   scrollCam(player);
+   drawBar(player);
+   drawPlayerName(player);
+
+   drawPlayer_DebugMode(player);
+   drawAttackArea_DebugMode(player);
+   // drawHealthNumber_DebugMode(player);
+
+   playerAnimState(player);
+}
+
+
+// =====================================================================
 // Init Player
 // =====================================================================
 const initPlayer = (socket) => {
-   
+
    initPlayerUI(socket);
    toggleFloatingText(socket)
    toggleDeathScreen(socket);
-
    playerEventListeners(socket);
 }
 

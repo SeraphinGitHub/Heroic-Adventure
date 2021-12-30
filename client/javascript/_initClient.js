@@ -1,25 +1,27 @@
 
 "use strict"
 
-// =====================================================================
-// Set Viewport & Map Size
-// =====================================================================
-const viewport = document.querySelector(".viewport");
 
-const viewSize = {
-   height: 800,
-   width: 1200,
-}
+// =========================  Development  =========================
+setTimeout(() => {
+      
+   const devID = Math.floor(Math.random() * 100);
 
-const map = {
-   height: 2000,
-   width: 3000,
-}
+   const socket = io();
+   socket.emit("playerName", `ID: ${devID}`);
+   // socket.emit("playerName", "Séraphin");
+   initClientScripts(socket);
+   
+   logFormInput.blur();
+   logScreen.style = `
+      top: -600px !important;
+      visibility: hidden !important;
+      animation: none !important;
+   `;
 
-viewport.style = `
-   height: ${viewSize.height}px;
-   width: ${viewSize.width}px;
-`;
+}, 200);
+// =========================  Development  =========================
+
 
 
 // =====================================================================
@@ -31,17 +33,15 @@ const scripts = [
    "classes/FloatingText.js",
    "classes/GameBar.js",
    "classes/Tile.js",
+   "classes/Viewport.js",
    
    // Scripts
-   "client_Map.js",
    "client_Chat.js",
    "client_UI.js",
 
-   // Player Handler
-   "client_PlayerHandler.js",
-
-   // Game Handler
+   // Handlers
    "client_GameHandler.js",
+   "client_PlayerHandler.js",
 ];
 
 const instantiate = (scriptName) => {
@@ -53,9 +53,19 @@ const instantiate = (scriptName) => {
 
 scripts.forEach(item => instantiate(item));
 
+// =====================================================================
+// Init Client Scripts
+// =====================================================================
+const initClientScripts = (socket) => {
+
+   clientSync(socket);
+   initChat(socket);
+   initPlayer(socket);
+}
+
 
 // =====================================================================
-// Login Button
+// Login System
 // =====================================================================
 const logScreen = document.querySelector(".log-screen");
 const logBtn = document.querySelector(".log-btn");
@@ -139,23 +149,3 @@ const formValidation = () => {
       logScreen.classList.add("hide_LogScreen");
    }
 }
-
-
-// =========================  Development  =========================
-setTimeout(() => {
-   
-   const devID = Math.floor(Math.random() * 100);
-
-   const socket = io();
-   socket.emit("playerName", `ID: ${devID}`);
-   // socket.emit("playerName", "Séraphin");
-   initClientScripts(socket);
-   
-   logScreen.style = `
-      top: -600px !important;
-      visibility: hidden !important;
-      animation: none !important;
-   `;
-
-}, 300);
-// =========================  Development  =========================
