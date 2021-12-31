@@ -7,11 +7,11 @@ class Player {
       this.name = "";
 
       // Player Hitbox
-      // this.x = Math.floor(Math.random() * 2800) +100; // <== Randomize position on load
-      // this.y = Math.floor(Math.random() * 1800) +100; // map size - sprite.size (200x200) + half sprite.size
-
-      this.x = 600; // <== player.x = half size of the map
-      this.y = 400; // <== player.y = half size of the map
+      // this.x = Math.floor(Math.random() * 2200) +100; // <== Randomize position on load
+      // this.y = Math.floor(Math.random() * 1600) +100; // map size - sprite.size (200x200) + half sprite.size
+      
+      this.x = 1080;
+      this.y = 800;
 
       this.radius = 42;
 
@@ -32,18 +32,21 @@ class Player {
 
       // Player Health
       this.baseHealth = 250;
-      this.health = this.baseHealth;
+      this.health = 100;
+      // this.health = this.baseHealth;
 
       // Player Energy
       this.baseEnergy = 150;
-      this.energy = this.baseEnergy;
+      this.energy = 50;
+      // this.energy = this.baseEnergy;
       this.energyCost = 0.8;
       this.baseRegenEnergy = 0.2;
       this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
       // Player Mana
       this.baseMana = 150;
-      this.mana = this.baseMana;
+      this.mana = 80;
+      // this.mana = this.baseMana;
       this.baseRegenMana = 0.12;
       this.regenMana = process.env.SYNC_COEFF* this.baseRegenMana;
 

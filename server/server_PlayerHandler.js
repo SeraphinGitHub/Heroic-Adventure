@@ -27,6 +27,9 @@ exports.onConnect = (socket, socketList) => {
       
       let receiverID;
       let receiverName;
+      
+      // Send player ID
+      socket.emit("playerID", player.id);
 
       // Init Player Stats
       socket.emit("playerStats", {
@@ -103,17 +106,19 @@ exports.onDisconnect = (socket) => {
 // Player Movements
 // =====================================================================
 const playerMovements = (player) => {
-      
    let moveSpeed = player.walkSpeed;
    if(player.isRunning && player.isRunnable) moveSpeed = player.runSpeed;
-   
-   // Map Border Reached ==> Temporary (Await Scrolling Cam)
-   // if(player.up && player.y < 460
-   // || player.down && player.y > 1540
-   // || player.left && player.x < 450
-   // || player.right && player.x > 1950) {
-   //    moveSpeed = 0;
-   // }
+
+   // console.log(player.x);
+   // console.log(player.y);
+
+   // Map Border Reached
+   if(player.up && player.y < -15
+   || player.down && player.y > 1550
+   || player.left && player.x < 45
+   || player.right && player.x > 2120) {
+      return;
+   }
 
    const axisOffset = {
       yAxis_x: 0,
@@ -315,6 +320,7 @@ const playerHealing = (player, socketList) => {
       let socket = socketList[player.id];
 
       socket.emit("getHeal", {
+         id: player.id,
          x: player.x,
          y: player.y,
          calcHealing: player.calcHealing,
@@ -351,6 +357,7 @@ const damagingEnemy = (player, socketList) => {
          }
 
          const otherPlayerData = {
+            id: otherPlayer.id,
             x: otherPlayer.x,
             y: otherPlayer.y,
             calcDamage: otherPlayer.calcDamage,
@@ -395,8 +402,8 @@ const playerDeath = (player) => {
          player.color = "darkviolet"; // <== Debug Mode
 
          // ================  Temporary  ================
-         player.x = Math.floor(Math.random() * 1000) + 100; // <== Randomize position on respawn
-         player.y = Math.floor(Math.random() * 700) + 50;
+         player.x = Math.floor(Math.random() * 2200) + 100; // <== Randomize position on respawn
+         player.y = Math.floor(Math.random() * 1700) + 100;
          // ================  Temporary  ================
 
          clearInterval(respawnCooldown);

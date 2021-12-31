@@ -368,7 +368,7 @@ p {
    position: relative;
    overflow: hidden;
    border: 1px solid black;
-   background: linear-gradient(to bottom right, violet, white, violet);
+   background-color: black;
 }
 
 .death-screen {

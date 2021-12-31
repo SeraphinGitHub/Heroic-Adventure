@@ -5,12 +5,9 @@
 // =========================  Development  =========================
 setTimeout(() => {
       
-   const devID = Math.floor(Math.random() * 100);
-
    const socket = io();
-   socket.emit("playerName", `ID: ${devID}`);
-   // socket.emit("playerName", "Séraphin");
-   initClientScripts(socket);
+   socket.emit("playerName", "Séraphin");
+   initClient(socket);
    
    logFormInput.blur();
    logScreen.style = `
@@ -29,15 +26,9 @@ setTimeout(() => {
 // =====================================================================
 const scripts = [
    
-   // Classes
-   "classes/FloatingText.js",
-   "classes/GameBar.js",
-   "classes/Tile.js",
-   "classes/Viewport.js",
-   
    // Scripts
+   "client_Classes.js",
    "client_Chat.js",
-   "client_UI.js",
 
    // Handlers
    "client_GameHandler.js",
@@ -56,7 +47,7 @@ scripts.forEach(item => instantiate(item));
 // =====================================================================
 // Init Client Scripts
 // =====================================================================
-const initClientScripts = (socket) => {
+const initClient = (socket) => {
 
    clientSync(socket);
    initChat(socket);
@@ -143,7 +134,7 @@ const formValidation = () => {
       isSocket = true;
       const socket = io();
       playerLogged(socket);
-      initClientScripts(socket);
+      initClient(socket);
       
       logFormInput.blur();
       logScreen.classList.add("hide_LogScreen");

@@ -2,74 +2,51 @@
 "use strict"
 
 // =====================================================================
-// Set Viewport & Map Size
+// Set Viewport
 // =====================================================================
+const viewport_HTML = document.querySelector(".viewport");
+
 const viewSize = {
    height: 800,
    width: 1200,
 }
-
-// const viewport = new Viewport(viewSize.width, viewSize.height);
-const viewport_HTML = document.querySelector(".viewport");
 
 viewport_HTML.style = `
    height: ${viewSize.height}px;
    width: ${viewSize.width}px;
 `;
 
-
-// =====================================================================
-// Set UI Canvas
-// =====================================================================
-const canvasUI = document.querySelector(".canvas-UI");
-const ctxUI = canvasUI.getContext("2d");
-
-canvasUI.height = viewSize.height;
-canvasUI.width = viewSize.width;
-
-ctxUI.imageSmoothingEnabled = false;
-ctxUI.webkitImageSmoothingEnabled = false;
+const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
+const centerVp_X = viewSize.width/2 - viewport.width/2;
+const centerVp_Y = viewSize.height/2 - viewport.height/2;
 
 
 // =====================================================================
-// Set Map Canvas
+// Set All Canvas & Contexts
 // =====================================================================
-const canvasMap = document.querySelector(".canvas-map");
-const ctxMap = canvasMap.getContext("2d");
+const allCanvas = document.getElementsByTagName("canvas");
+let ctxArray = [];
 
-canvasMap.height = viewSize.height;
-canvasMap.width = viewSize.width;
+for(let i = 0; i < allCanvas.length; i++) {
+   let canvasIndexed = allCanvas[i];
+   ctxArray.push(canvasIndexed.getContext("2d"));
 
-ctxMap.imageSmoothingEnabled = false;
-ctxMap.webkitImageSmoothingEnabled = false;
-
-
-// =====================================================================
-// Set Game Canvas
-// =====================================================================
-const canvasCharsNumber = 12;
-const canvasArray = [];
-const ctxArray = [];
-
-for(let i = 0; i < canvasCharsNumber; i++) {
-   canvasArray.push(document.querySelector(`.canvas-characters-${ i+1 }`));
-   ctxArray.push(canvasArray[i].getContext("2d"));
-
-   canvasArray[i].height = viewSize.height;
-   canvasArray[i].width = viewSize.width;
-
-   // Disabled Anti-Aliasing
+   canvasIndexed.height = viewSize.height;
+   canvasIndexed.width = viewSize.width;
    ctxArray[i].imageSmoothingEnabled = false;
-   ctxArray[i].webkitImageSmoothingEnabled = false;
 }
+
+const ctxMap = ctxArray[0];
+const ctxPlayer = ctxArray[1];
+const ctxUI = ctxArray[2];
 
 
 // =====================================================================
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-canvasUI.addEventListener("mouseover", () => insideCanvas = true);
-canvasUI.addEventListener("mouseleave", () => insideCanvas = false);
+viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
+viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
@@ -97,13 +74,7 @@ const handleFloatingText = () => {
 const clientSync = (socket) => {
    socket.on("newSituation", (playerData) => {
       
-      // for(let i = 0; i < canvasCharsNumber; i++) {
-      //    ctxArray[i].clearRect(0, 0, canvasArray[i].width, canvasArray[i].height);
-      // }
-
-      ctxArray[0].clearRect(0, 0, canvasArray[0].width, canvasArray[0].height);
-      ctxMap.clearRect(0, 0, canvasMap.width, canvasMap.height);
-
+      ctxArray.forEach(ctx => ctx.clearRect(0, 0, viewSize.width, viewSize.height));
       playerData.forEach(player => playerSync(player));
       handleFloatingText();
 
