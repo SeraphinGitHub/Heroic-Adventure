@@ -85,6 +85,19 @@ class GameBar {
       // Value Bar
       this.baseBar(this.fillColor, this.width, this.borderSize);
    }
+
+   drawImg(img, imgX, imgY, imgW, imgH) {
+      if(this.width <= 0) this.width = 0;
+      
+      // Value Bar Image Version
+      this.ctx.drawImage(img,
+         imgX, imgY, imgW, imgH,
+         this.x + this.borderSize/2,
+         this.y + this.borderSize/2,
+         this.width,
+         this.height - this.borderSize
+      );
+   }
 }
 
 

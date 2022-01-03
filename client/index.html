@@ -6,7 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- ==== Prevent Favicon Error ==== -->
         <link rel="icon" href="data:;base64,=">
-        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/style.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/style.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/viewport.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/chat.css">
         <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/style.css"> -->
         <title>Multi Player RPG</title>
     </head>
@@ -15,6 +17,8 @@
 
         <!-- Log Player -->
         <section class="flexCenter absolute log-screen">
+            <div class="flag"></div>
+            
             <form class="flexCenter log-form">
                 <input type="text" placeholder="Player name" autofocus>
 
@@ -23,9 +27,9 @@
                 <p class="flexCenter alert white-space">Cannot include space</p>
                 <p class="flexCenter alert min-chars">Min 4 characters</p>
                 <p class="flexCenter alert max-chars">Max 10 characters</p>
+                
+                <button class="btn green-btn log-btn">Enter Game</button>
             </form>
-
-            <button class="btn green-btn log-btn">Enter Game</button>
         </section>
 
         <!-- Chat -->
@@ -51,16 +55,30 @@
         </section>
 
 
-        <!-- Game window -->
-        <section class="flexCenter viewport" id="">
-            <canvas class="absolute canvas-map"></canvas>
-            <canvas class="absolute canvas-player"></canvas>
-            <canvas class="canvas-UI"></canvas>
-
-            <div class="death-screen">
-                <p class="death-message"></p>
-                <p class="respawn-timer"></p>
+        <!-- Viewport -->
+        <section class="viewport" id="">
+            
+            <div class="flexCenter game-window">
+                <canvas class="canvas-map"></canvas>
+                <canvas class="canvas-player"></canvas>
+                <canvas class="canvas-UI"></canvas>
+    
+                <div class="death-screen">
+                    <p class="death-message"></p>
+                    <p class="respawn-timer"></p>
+                </div>
             </div>
+
+            <!-- Style frame, Game window's surround -->
+            <div class="out-frame top-side"></div>
+            <div class="out-frame bottom-side"></div>
+            <div class="out-frame left-side"></div>
+            <div class="out-frame right-side"></div>
+            <div class="out-frame corner-top-left"></div>
+            <div class="out-frame corner-top-right"></div>
+            <div class="out-frame corner-bottom-left"></div>
+            <div class="out-frame corner-bottom-right"></div>
+            
         </section>
 
 

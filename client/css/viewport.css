@@ -1,0 +1,135 @@
+
+/* ===================================================================== */
+/* Viewport
+/* ===================================================================== */
+canvas {
+   position: fixed;
+}
+
+.viewport {
+   position: relative;
+   height: 100%;
+   width: 100%;
+   background-color: black;
+}
+
+.game-window {
+   position: absolute;
+   overflow: hidden;
+   height: 100%;
+   width: 100%;
+   background-color: black;
+}
+
+.out-frame {
+   position: absolute;
+   display: block;
+   background: url("../images/playerUI/Game Frame.png") no-repeat;
+}
+
+
+/* ===== Sides ===== */
+.top-side,
+.right-side,
+.bottom-side,
+.left-side {
+   width: 1310px;
+	height: 13px;
+   background-position: 0 0;
+}
+
+.top-side {
+   top: -10px;
+   left: 50%;
+   transform: translate(-50%) scale(80%, -130%);
+}
+
+.bottom-side {
+   bottom: -10px;
+   left: 50%;
+   transform: translate(-50%) scale(80%, 130%)
+}
+
+.left-side {
+   bottom: 49%;
+   left: -3px;
+   transform: translate(-50%) rotate(90deg) scale(59%, 130%)
+}
+
+.right-side {
+   top: 49%;
+   right: -4px;
+   transform: translate(50%) rotate(90deg) scale(59%, -130%)
+}
+
+
+/* ===== Corners ===== */
+.corner-top-left,
+.corner-top-right,
+.corner-bottom-right,
+.corner-bottom-left {
+   width: 145px;
+	height: 83px;
+   background-position: 0 -14px;
+}
+
+.corner-top-left {
+   top: -25px;
+   left: -20px;
+   transform: scale(100%, -100%);
+}
+
+.corner-top-right {
+   top: -25px;
+   right: -20px;
+   transform: scale(-100%, -100%);
+}
+
+.corner-bottom-right {
+   bottom: -25px;
+   right: -20px;
+   transform: scale(-100%, 100%);
+}
+
+.corner-bottom-left {
+   bottom: -25px;
+   left: -20px;
+}
+
+/* ===== Death Screen ===== */
+.death-screen {
+   visibility: hidden;
+   position: absolute;
+   top: 28%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   
+   width: auto;
+   padding: 40px;
+   border-radius: 40px;
+   background: white;
+   box-shadow: 0 0 100px red;
+
+   animation: deathScreen_fadeOut 2s linear infinite;
+}
+
+@keyframes deathScreen_fadeOut {
+   0% { box-shadow: 0 0 100px red }
+   50% { box-shadow: 0 0 10px red }
+   100% { box-shadow: 0 0 100px red }
+}
+
+.death-message,
+.respawn-timer {
+   text-align: center;
+   font-family: "Orbitron-ExtraBold";
+   color: red;
+}
+
+.death-message {
+   font-size: 60px;
+}
+
+.respawn-timer {
+   font-size: 30px;
+}

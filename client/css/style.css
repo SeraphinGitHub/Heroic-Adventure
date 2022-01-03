@@ -4,7 +4,7 @@
 }
 
 body {
-   justify-content: space-around !important;
+   justify-content: space-between !important;
    height: 100vh;
    
    background: linear-gradient(to bottom right, dodgerblue, lightgray, orange);
@@ -31,13 +31,13 @@ body {
 /* Orbitron Regular */
 @font-face {
    font-family: "Orbitron-Regular";
-   src: url("fonts/Orbitron-Regular.ttf");
+   src: url("../fonts/Orbitron-Regular.ttf");
 }
 
 /* Orbitron Extra Bold */
 @font-face {
    font-family: "Orbitron-ExtraBold";
-   src: url("fonts/Orbitron-ExtraBold.ttf");
+   src: url("../fonts/Orbitron-ExtraBold.ttf");
 }
 
 h1, h2, h3, h4, p {
@@ -126,32 +126,40 @@ p {
    z-index: 100;
    align-content: flex-end;
 
-   top: 0px;
-   height: 500px;
-   width: 350px;
-   
-   border-radius: 0px 0px 40px 40px;
-   background: linear-gradient(to bottom right, rgb(20, 20, 20),gray, white, gray);
-   box-shadow: black 0px 0px 50px;
+   top: -10px;
+   left: 50%;
+   height: 831px;
+   width: 359px;
+   transform: translate(-50%);
    
    animation: show_LogScreen 0.7s linear 1;
    transition-duration: 0.7s;
 }
 
 @keyframes show_LogScreen {
-   0% { top: -600px }
-   100% { top: 0px }
+   0% { top: -850px }
+   100% { top: -10px }
 }
 
 .hide_LogScreen {
-   top: -600px;
+   top: -850px;
    visibility: hidden;   
+}
+
+.flag {
+   position: absolute;
+   display: block;
+   height: 100%;
+   width: 100%;
+   transform: scale(110%, 95%);
+   background: url("../images/playerUI/Flag.png") no-repeat -1px 0px;
 }
 
 .log-form {
    position: relative;
    height: 50px;
    width: 80%;
+   margin-bottom: 280px;
 }
 
 .log-form input {
@@ -162,19 +170,14 @@ p {
    font-size: 20px;
    font-family: Verdana;
 
-   border: double darkviolet 6px;
-   border-radius: 15px;
-   background: linear-gradient(to bottom left, violet,white, lightblue, white);
+   border: solid darkviolet 4px;
+   border-radius: 10px;
 }
 
 .log-btn {
-   height: 70px;
-   width: 60%;
-}
-
-.log-form,
-.log-btn {
-   margin-bottom: 50px;
+   height: 60px;
+   width: 80%;
+   margin-top: 50px;
 }
 
 
@@ -197,223 +200,11 @@ p {
 
 
 /* ===================================================================== */
-/* Chat
-/* ===================================================================== */
-.chat {
-   position: relative;
-   justify-content: space-between;
-   align-content: flex-end;
-   height: 710px;
-}
-
-/* Chrome scroll bar */
-::-webkit-scrollbar {
-   width: 8px;
-   background: transparent;
-}
-::-webkit-scrollbar-thumb {
-   background: white;
-}
-
-.general-chat-btn,
-.private-chat-btn {
-   top: 4px;
-   height: 50px;
-   width: 48%;
-   border-radius: 10px 10px 0px 0px;
-}
-
-.general-chat,
-.private-chat {
-   overflow-y: scroll;
-   scrollbar-width: thin;
-   scrollbar-color: white transparent;
-
-   top: 54px;
-   left: 50%;
-   height: 465px;
-   width: 89%;
-   
-   padding: 10px;
-   transform: translate(-50%);
-}
-
-
-/* ========== General Chat ========== */
-.general-chat-btn {
-   left: 4px;
-   background: rgb(206, 83, 255);
-}
-
-.general-chat {
-   z-index: 10;
-
-   border-radius: 0px 10px 10px 10px;
-   border: solid 4px rgb(206, 83, 255);
-   background: linear-gradient(to bottom, rgb(206, 83, 255), lightgray);
-}
-
-
-/* ========== Private Chat ========== */
-.private-chat-btn {
-   right: 4px;
-   background: orange;
-}
-
-.private-chat {
-   z-index: 0;
-
-   border-radius: 10px 0px 10px 10px;
-   border: solid 4px orange;
-   background: linear-gradient(to bottom, orange, lightgray);
-}
-
-.message-receiver {
-   z-index: 20;
-   position: absolute;
-
-   left: 50%;
-   bottom: 125px;
-   height: 35px;
-   width: 90%;
-   
-   font-size: 20px;
-   text-align: center;
-   transform: translate(-50%);
-   
-   border-radius: 30px;
-   border: solid 2px rgb(206, 83, 255);
-   background: linear-gradient(to bottom left, violet, white, lightblue, white);
-}
-
-.private-message-received {
-   animation: privateReceived linear 0.2s;
-}
-
-@keyframes privateReceived {
-   0% { background: red }
-   100% { background: orange }
-}
-
-
-/* ========== Btn Hover/Active ========== */
-.general-chat-btn:hover,
-.private-chat-btn:hover,
-.clear-chat-btn:hover {
-   box-shadow: none;
-}
-
-.general-chat-btn:active,
-.private-chat-btn:active {
-   border: none;
-}
-
-
-.general-chat,
-.chat-enter {
-   margin-bottom: 5px;
-}
-
-.chat,
-.player-UI {
-   width: 17%;
-}
-
-.message,
-.player-controls div p {
-   margin-bottom: 8px;
-}
-
-.chat-enter input {
-   height: 100%;
-   width: 100%;
-   padding-left: 15px;
-   border: none;
-   background: rgb(105, 197, 255);
-}
-
-.chat-enter input,
-.clear-chat-btn  {
-   border-radius: 10px;
-}
-
-.general-chat,
-.chat-enter input,
-.controls-message div p {
-   font-size: 18px;
-   font-family: "Verdana";
-}
-
-.chat-enter,
-.clear-chat-btn {
-   height: 55px;
-}
-
-
-/* ========== Message Hover ========== */
-.message:hover {
-   cursor: pointer;
-   color: white;
-}
-
-
-/* ===================================================================== */
-/* Game Window
-/* ===================================================================== */
-.canvas-UI {
-   position: fixed;
-}
-
-.viewport {
-   position: relative;
-   overflow: hidden;
-   border: 1px solid black;
-   background-color: black;
-}
-
-.death-screen {
-   visibility: hidden;
-   position: absolute;
-   top: 28%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-   
-   width: auto;
-   padding: 40px;
-   border-radius: 40px;
-   background: white;
-   box-shadow: 0 0 100px red;
-
-   animation: deathScreen_fadeOut 2s linear infinite;
-}
-
-@keyframes deathScreen_fadeOut {
-   0% { box-shadow: 0 0 100px red }
-   50% { box-shadow: 0 0 10px red }
-   100% { box-shadow: 0 0 100px red }
-}
-
-.death-message,
-.respawn-timer {
-   text-align: center;
-   font-family: "Orbitron-ExtraBold";
-   color: red;
-}
-
-.death-message {
-   font-size: 60px;
-}
-
-.respawn-timer {
-   font-size: 30px;
-}
-
-
-/* ===================================================================== */
 /* Player UI
 /* ===================================================================== */
 .player-UI{
    align-content: space-between;
+   margin-right: 10px;
 }
 
 /* ========== Player Infos ========== */

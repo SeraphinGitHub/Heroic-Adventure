@@ -39,7 +39,7 @@ const instantiate = (scriptName) => {
    const newScript = document.createElement("script");
    newScript.type = "text/javascript";
    newScript.src = `/client/javascript/${scriptName}`;
-   document.body.insertAdjacentElement("afterend", newScript);
+   document.body.insertAdjacentElement("beforeend", newScript);
 }
 
 scripts.forEach(item => instantiate(item));
