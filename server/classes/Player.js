@@ -35,10 +35,10 @@ class Player {
       this.health = this.baseHealth;
 
       // Player Energy
-      this.baseEnergy = 150;
+      this.baseEnergy = 200;
       this.energy = this.baseEnergy;
-      this.energyCost = 0.8;
-      this.baseRegenEnergy = 0.2;
+      this.energyCost = 0.7;
+      this.baseRegenEnergy = 0.15;
       this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
 
       // Player Mana

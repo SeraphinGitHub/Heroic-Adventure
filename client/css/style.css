@@ -7,7 +7,8 @@ body {
    justify-content: space-between !important;
    height: 100vh;
    
-   background: linear-gradient(to bottom right, dodgerblue, lightgray, orange);
+   /* background: linear-gradient(to bottom right, dodgerblue, lightgray, orange); */
+   background: url("../images/Background Tile.jpg") repeat;
 }
 
 .flexCenter {
@@ -88,12 +89,12 @@ p {
 .violet-btn { background: linear-gradient(to bottom right, pink, rgb(185, 23, 255)) }
 
 .btn:hover {
-   box-shadow: gray 5px 5px 8px;
+   box-shadow: gray 0px 15px 20px;
 }
 
 .btn:active {
-   border-top: solid grey 5px;
-   border-left: solid grey 5px;
+   border-top: solid gray 5px;
+   border-left: solid gray 5px;
    transition-duration: 0s;
 }
 
@@ -116,68 +117,6 @@ p {
    background: pink;
 
    transition-duration: 1s;
-}
-
-
-/* ===================================================================== */
-/* Log Screen
-/* ===================================================================== */
-.log-screen {
-   z-index: 100;
-   align-content: flex-end;
-
-   top: -10px;
-   left: 50%;
-   height: 831px;
-   width: 359px;
-   transform: translate(-50%);
-   
-   animation: show_LogScreen 0.7s linear 1;
-   transition-duration: 0.7s;
-}
-
-@keyframes show_LogScreen {
-   0% { top: -850px }
-   100% { top: -10px }
-}
-
-.hide_LogScreen {
-   top: -850px;
-   visibility: hidden;   
-}
-
-.flag {
-   position: absolute;
-   display: block;
-   height: 100%;
-   width: 100%;
-   transform: scale(110%, 95%);
-   background: url("../images/playerUI/Flag.png") no-repeat -1px 0px;
-}
-
-.log-form {
-   position: relative;
-   height: 50px;
-   width: 80%;
-   margin-bottom: 280px;
-}
-
-.log-form input {
-   height: 100%;
-   width: 100%;
-   padding-left: 20px;
-
-   font-size: 20px;
-   font-family: Verdana;
-
-   border: solid darkviolet 4px;
-   border-radius: 10px;
-}
-
-.log-btn {
-   height: 60px;
-   width: 80%;
-   margin-top: 50px;
 }
 
 
@@ -272,6 +211,19 @@ p {
    h2, h3, p {
       font-size: 16px;
       line-height: 90%;
+   }
+
+   .viewport {
+      height: 790px !important;
+      width: 980px !important;
+   }
+
+   .top-side {
+      transform: translate(-50%) scale(70%, 130%) !important;
+   }
+
+   .bottom-side {
+      transform: translate(-50%) scale(70%, 130%) !important;
    }
 
    .chat,

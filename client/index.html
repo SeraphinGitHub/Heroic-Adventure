@@ -7,6 +7,7 @@
         <!-- ==== Prevent Favicon Error ==== -->
         <link rel="icon" href="data:;base64,=">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/style.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/logScreen.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/viewport.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/chat.css">
         <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/style.css"> -->
@@ -16,7 +17,7 @@
     <body class="flexCenter">
 
         <!-- Log Player -->
-        <section class="flexCenter absolute log-screen">
+        <section class="log-screen">
             <div class="flag"></div>
             
             <form class="flexCenter log-form">
@@ -69,15 +70,17 @@
                 </div>
             </div>
 
-            <!-- Style frame, Game window's surround -->
-            <div class="out-frame top-side"></div>
-            <div class="out-frame bottom-side"></div>
-            <div class="out-frame left-side"></div>
-            <div class="out-frame right-side"></div>
-            <div class="out-frame corner-top-left"></div>
-            <div class="out-frame corner-top-right"></div>
-            <div class="out-frame corner-bottom-left"></div>
-            <div class="out-frame corner-bottom-right"></div>
+            <!-- Game window's surround -->
+            <div class="style-frame">
+                <div class="top-side"></div>
+                <div class="bottom-side"></div>
+                <div class="left-side"></div>
+                <div class="right-side"></div>
+                <div class="corner-top-left"></div>
+                <div class="corner-top-right"></div>
+                <div class="corner-bottom-left"></div>
+                <div class="corner-bottom-right"></div>
+            </div>
             
         </section>
 

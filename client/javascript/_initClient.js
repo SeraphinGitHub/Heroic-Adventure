@@ -10,13 +10,8 @@ setTimeout(() => {
    initClient(socket);
    
    logFormInput.blur();
-   logScreen.style = `
-      top: -600px !important;
-      visibility: hidden !important;
-      animation: none !important;
-   `;
 
-}, 200);
+}, 100);
 // =========================  Development  =========================
 
 
@@ -80,7 +75,7 @@ const playerLogged = (socket) => {
 
    logged_PlayerName = logFormInput.value;
    socket.emit("playerName", logged_PlayerName);
-   logFormInput.value = "";
+   setTimeout(() => logFormInput.value = "", 200);
 }
 
 
@@ -137,6 +132,6 @@ const formValidation = () => {
       initClient(socket);
       
       logFormInput.blur();
-      logScreen.classList.add("hide_LogScreen");
+      logScreen.classList.add("hide-LogScreen");
    }
 }

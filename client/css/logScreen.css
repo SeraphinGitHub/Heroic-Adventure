@@ -1,0 +1,101 @@
+
+/* ===================================================================== */
+/* Log Screen
+/* ===================================================================== */
+.hide-LogScreen {
+   top: -900px !important;
+}
+
+.log-screen {
+
+   /* ***** Dev Mode ***** */
+   visibility: hidden !important;
+   /* ***** Dev Mode ***** */
+
+   z-index: 100;
+   position: fixed;
+   overflow: hidden;
+   top: 10px;
+   height: 830px;
+   width: 417px;
+   animation-name: show_LogScreen;
+}
+
+.flag {
+   position: relative;
+   display: block;
+   height: 100%;
+   width: 100%;
+   background: url("../images/Flag.png") no-repeat 0px 0px;
+   animation-name: show_Flag;
+}
+
+.log-form {
+   position: relative;
+   bottom: 380px;
+   height: auto;
+   width: 65%;
+   animation-name: show_Form;
+}
+
+.log-screen,
+.log-form {
+
+   left: 50%;
+   transform: translate(-50%);
+}
+
+.log-screen,
+.flag,
+.log-form,
+.hide-LogScreen {
+
+   animation-iteration-count: 1;
+   animation-timing-function: ease-in-out;
+   animation-duration: 1.7s;
+   transition-duration: 1.7s;
+}
+
+
+/* ===== Show Flag Anim ===== */
+@keyframes show_LogScreen {
+   0% { top: -900px; }
+   50% { top: 250px; }
+   100% { top: 10px; }
+}
+
+@keyframes show_Flag {
+   0% { height: 0; }
+   20% { height: 0; }
+   100% { height: 830px; }
+}
+
+@keyframes show_Form {
+   0% { bottom: 800px; }
+   45% { bottom: 800px; }
+   85% { bottom: 200px; }
+   100% { bottom: 380px; }
+}
+
+
+
+.log-form input {
+   height: 50px;
+   width: 100%;
+   padding-left: 20px;
+
+   font-size: 20px;
+   font-family: Verdana;
+
+   border: solid darkviolet 3px;
+   border-radius: 8px;
+}
+
+.log-btn {
+   height: 60px;
+   width: 75%;
+   margin-top: 50px;
+
+   border-radius: 8px;
+   box-shadow: black 0px 15px 20px;
+}

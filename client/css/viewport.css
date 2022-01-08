@@ -2,10 +2,6 @@
 /* ===================================================================== */
 /* Viewport
 /* ===================================================================== */
-canvas {
-   position: fixed;
-}
-
 .viewport {
    position: relative;
    height: 100%;
@@ -13,6 +9,8 @@ canvas {
    background-color: black;
 }
 
+
+/* ===== Game ===== */
 .game-window {
    position: absolute;
    overflow: hidden;
@@ -21,7 +19,19 @@ canvas {
    background-color: black;
 }
 
-.out-frame {
+canvas {
+   position: absolute;
+}
+
+
+/* ===== Style ===== */
+.style-frame {
+   position: relative;
+   height: 100%;
+   width: 100%;
+}
+
+.style-frame div {
    position: absolute;
    display: block;
    background: url("../images/playerUI/Game Frame.png") no-repeat;
@@ -35,7 +45,7 @@ canvas {
 .left-side {
    width: 1310px;
 	height: 13px;
-   background-position: 0 0;
+   background-position: 0 0 !important;
 }
 
 .top-side {
@@ -70,7 +80,7 @@ canvas {
 .corner-bottom-left {
    width: 145px;
 	height: 83px;
-   background-position: 0 -14px;
+   background-position: 0 -14px  !important;
 }
 
 .corner-top-left {
@@ -95,6 +105,7 @@ canvas {
    bottom: -25px;
    left: -20px;
 }
+
 
 /* ===== Death Screen ===== */
 .death-screen {
