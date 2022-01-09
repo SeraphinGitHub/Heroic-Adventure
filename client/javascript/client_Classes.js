@@ -39,62 +39,56 @@ class FloatingText {
 // Game Bar
 // =====================================================================
 class GameBar {
-   constructor(ctx, x, y, offsetX, offsetY, maxWidth, height, fillColor, maxValue, value) {
-      this.ctx = ctx;
+   constructor(barObj, offsetX, offsetY, maxValue, value) {
+      this.ctx = barObj.ctx;
       
       // Position
-      this.x = x;
-      this.y = y;
+      this.x = barObj.x;
+      this.y = barObj.y;
       this.offsetX = offsetX;
       this.offsetY = offsetY;
 
       // Specs
-      this.maxWidth = maxWidth;
-      this.height = height;
-      this.fillColor = fillColor;
+      this.width = barObj.width;
+      this.height = barObj.height;
       this.maxValue = maxValue;
       this.value = value;
 
-      // Custom
+      // Frame
       this.borderSize = 2;
-      this.width = ((this.value / this.maxValue) * this.maxWidth) - this.borderSize;
-      this.bordersColor = "black";
-      this.backgroundColor = "rgb(110, 110, 110)";
+      this.barWidth = ((this.value / this.maxValue) * this.width) - this.borderSize;
+      this.borderColor = "black";
+      this.bgdColor = "rgb(110, 110, 110)";
    }
 
-   baseBar(color, barWidth, brd_Size) {
+   barFrame(color, barWidth, brdSize) {
       this.ctx.fillStyle = color;
 
       this.ctx.fillRect(
-         this.x + this.offsetX + brd_Size/2,
-         this.y + this.offsetY + brd_Size/2,
+         this.x + this.offsetX + brdSize/2,
+         this.y + this.offsetY + brdSize/2,
          barWidth,
-         this.height - brd_Size
+         this.height - brdSize
       );
    }
 
-   draw() {
-      if(this.width <= 0) this.width = 0;
+   draw(img, x, y, width, height) {
 
       // Borders
-      this.baseBar(this.bordersColor, this.maxWidth, 0);
+      this.barFrame(this.borderColor, this.width, 0);
 
       // Background
-      this.baseBar(this.backgroundColor, this.maxWidth - this.borderSize, this.borderSize);
+      this.barFrame(this.bgdColor, this.width -this.borderSize, this.borderSize);
+
+      if(this.barWidth <= 0) this.barWidth = 0;
 
       // Value Bar
-      this.baseBar(this.fillColor, this.width, this.borderSize);
-   }
-
-   drawImg(img, imgX, imgY, imgW, imgH) {
-      if(this.width <= 0) this.width = 0;
-      
-      // Value Bar Image Version
-      this.ctx.drawImage(img,
-         imgX, imgY, imgW, imgH,
-         this.x + this.borderSize/2,
-         this.y + this.borderSize/2,
-         this.width,
+      this.ctx.drawImage(
+         img,
+         x, y, width, height,
+         this.x + this.offsetX + this.borderSize/2,
+         this.y + this.offsetY + this.borderSize/2,
+         this.barWidth,
          this.height - this.borderSize
       );
    }

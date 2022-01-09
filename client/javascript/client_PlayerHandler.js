@@ -208,7 +208,7 @@ const onMouseInput = (socket) => {
 // Player Floating Text
 // =====================================================================
 const playerFloatingText = (player, textColor, textValue) => {
-
+   
    const text = {
       offsetX: -35,
       offsetY: -117,
@@ -238,186 +238,315 @@ const floatingText = (socket) => {
 const hudImage = new Image();
 hudImage.src = "client/images/playerUI/HUD.png";
 
+const scale_X = 1.2;
+const scale_Y = 1;
+
+const minHealthRatio = 0.3; // Min Health before flash (%)
+const flashingSpeed = 6;
 let flashFrame = 0;
 
+const hud = {
+   x: viewport.width/2 -400/2 *scale_X,
+   y: viewport.height -110 *scale_Y,
+   width: 400 *scale_X,
+   height: 100 *scale_Y,
+}
+
 const drawHUD = (player) => {
-
-   const scale_X = 1.2;
-   const scale_Y = 1;
-
-   const minHealthRatio = 0.3; // <== Min Health in %
-   const flashingSpeed = 6; // <== Modulo
-
-   const hud = {
-      x: viewport.width/2 -400/2 *scale_X,
-      y: viewport.height -110 *scale_Y,
-      width: 400 *scale_X,
-      height: 100 *scale_Y,
-   }
    
-   // ========== HUD Background ==========
+   // Background
    if(player.mana !== player.baseMana
    || player.health !== player.baseHealth
    || player.energy !== player.baseEnergy) {
 
       ctxUI.drawImage(hudImage,
          4, 179, 729, 141,
-         hud.x + (15 *scale_X),        // Pos X
-         hud.y + (10 *scale_Y),        // Pos Y
-         hud.width - (30 *scale_X),    // Width
-         hud.height - (20 *scale_Y)    // Height
+         hud.x + (15 *scale_X), // Pos X
+         hud.y + (10 *scale_Y), // Pos Y
+         hud.width - (30 *scale_X), // Width
+         hud.height - (20 *scale_Y) // Height
       );
    }
 
-   // ========== Mana Bar ==========
-   let manaRatio = player.mana / player.baseMana;
-   
-   if(player.mana >= player.healCost) {
+   // Bars
+   drawHUD_Mana(player);
+   drawHUD_Health(player);
+   drawHUD_Energy(player);
 
-      // Still Castable Mana
-      ctxUI.drawImage(hudImage,
-         4, 382, 460 *manaRatio, 47,
-         hud.x + (82 *scale_X),                    // Pos X
-         hud.y + (10 *scale_Y),                    // Pos Y
-         (hud.width - (165 *scale_X)) *manaRatio,  // Width
-         hud.height/3 - (8 *scale_Y)               // Height
-      );
-   }
-   
-   else {
-      // Low Mana
-      ctxUI.drawImage(hudImage,
-         2, 328, 462 *manaRatio, 47,
-         hud.x + (82 *scale_X),                    // Pos X
-         hud.y + (10 *scale_Y),                    // Pos Y
-         (hud.width - (165 *scale_X)) *manaRatio,  // Width
-         hud.height/3 - (8 *scale_Y)               // Height
-      );
-   }
-   
-   
-   // ========== Health Bar ==========
-   let healthRatio = player.health / player.baseHealth;
-
-   // Normal Bar
-   ctxUI.drawImage(hudImage,
-      5, 486, 729 *healthRatio, 45,
-      hud.x + (15 *scale_X),                    // Pos X
-      hud.y + (39 *scale_Y),                    // Pos Y
-      (hud.width - (30 *scale_X)) *healthRatio, // Width
-      hud.height/3 - (9 *scale_Y)               // Height
-   );
-
-   // if Under ( 30% ) Health ==> Health Flash
-   if(player.health <= player.baseHealth * minHealthRatio) {
-      
-      flashFrame++;
-
-      if(flashFrame % flashingSpeed === 0) {
-         flashFrame = 0;
-
-         // Flashing Bar
-         ctxUI.drawImage(hudImage,
-            4, 435, 729 *healthRatio, 45,
-            hud.x + (15 *scale_X),                    // Pos X
-            hud.y + (39 *scale_Y),                    // Pos Y
-            (hud.width - (30 *scale_X)) *healthRatio, // Width
-            hud.height/3 - (9 *scale_Y)               // Height
-         );
-      }
-   }
-
-
-   // ========== Energy Bar ==========
-   let energyRatio = player.energy / player.baseEnergy;
-   
-   // Yellow Bar
-   ctxUI.drawImage(hudImage,
-      5, 536, 469 *energyRatio, 45,
-      hud.x + (82 *scale_X),                    // Pos X
-      hud.y + (65 *scale_Y),                    // Pos Y
-      (hud.width - (165 *scale_X)) *energyRatio,  // Width
-      hud.height/3 - (8 *scale_Y)               // Height
-   );
-
-   // Purple Bar
-   // ctxUI.drawImage(hudImage,
-   //    5, 586, 461 *energyRatio, 50,
-   //    hud.x + (82 *scale_X),                    // Pos X
-   //    hud.y + (65 *scale_Y),                    // Pos Y
-   //    (hud.width - (165 *scale_X)) *energyRatio,  // Width
-   //    hud.height/3 - (8 *scale_Y)               // Height
-   // );
-
-
-   // ========== HUD Sprite ==========
+   // HUD Sprite
    ctxUI.drawImage(hudImage,
       3, 4, 782, 172,
       hud.x, hud.y, hud.width, hud.height
    );
 }
 
-const barSpecs = (color, maxValue, value) => {
-   return { 
-      color: color,
-      maxValue: maxValue,
-      value: value
-   }
+const drawHUD_BaseBar = (ratio, sx, sy, sw, sh, offX, offY, offW, offH) => {
+
+   ctxUI.drawImage(hudImage,
+      sx, sy, sw *ratio, sh,
+      hud.x + (offX *scale_X), // Pos X
+      hud.y + (offY *scale_Y), // Pos Y
+      ( hud.width - (offW *scale_X) ) *ratio, // Width
+      hud.height/3 - (offH *scale_Y) // Height
+   );
 }
 
-const drawBars = (player, hud) => {
-
-   // Mana color on low mana
-   let manaColor = "deepskyblue";
-   if(player.mana < player.healCost) manaColor = "blue";
+const drawHUD_Mana = (player) => {
    
-   // Set up Bar
-   const healthBar = barSpecs("lime", player.baseHealth, player.health);
-   const manaBar   = barSpecs(manaColor, player.baseMana, player.mana);
-   const attackBar = barSpecs("", player.GcD, player.speedGcD);
-   const energyBar = barSpecs("gold", player.baseEnergy, player.energy);
+   let manaRatio = player.mana / player.baseMana;
    
-   const gameBarArray = [
-      healthBar,
-      manaBar,
-      energyBar,
-   ];
-   
-   // Player Bars
-   if(viewport_HTML.id === String(player.id)) {
-      
-      // ========== GcD ==========
-      const GcDwh = 120;
-      new GameBar(ctxUI, viewSize.width/2 - GcDwh/2, viewSize.height/2 - 85,
-      0, 0, GcDwh, 8, attackBar.color, attackBar.maxValue, attackBar.value).draw(); // <== Background
-
-      new GameBar(ctxUI, viewSize.width/2 - GcDwh/2, viewSize.height/2 - 85,
-      0, 0, GcDwh, 8, attackBar.color, attackBar.maxValue, attackBar.value).drawImg(hudImage, // <== Img Bar
-        627, 591, 50, 25    
+   // Still Castable Mana
+   if(player.mana >= player.healCost) {
+      drawHUD_BaseBar(
+         manaRatio,
+         4, 382, 460, 47,
+         82, 10, 165, 8
       );
    }
    
-   let barGap = 0;
+   // Low Mana
+   else {
+      drawHUD_BaseBar(
+         manaRatio,
+         3, 328, 462, 47,
+         82, 10, 165, 8
+      );
+   }
+}
 
-   gameBarArray.forEach(bar => {
-      if(player.isDead) bar.value = 0;
-      
-      // Other Players Bars
-      if(viewport_HTML.id !== String(player.id)) {
+const drawHUD_Health = (player) => {
+   
+   let healthRatio = player.health / player.baseHealth;
 
-         const topOffset = -110;
-         const barWidth = 110;
-         const barHeight = 9;
-         
-         new GameBar(ctxPlayer, player.x - viewport.x, player.y - viewport.y, -barWidth/2, topOffset + barGap, barWidth, barHeight, bar.color, bar.maxValue, bar.value).draw();
-         barGap += 11;
+   // if Health Over 30%
+   if(player.health > player.baseHealth * minHealthRatio) {
+
+      // Normal Bar
+      drawHUD_BaseBar(
+         healthRatio,
+         5, 486, 729, 45,
+         15, 39, 30, 9
+      );
+   }
+
+   // if Health Under 30%
+   else {
+
+      // Flashing Bar
+      drawHUD_BaseBar(
+         healthRatio,
+         4, 435, 729, 45,
+         15, 39, 30, 9
+      );
+
+      flashFrame++;
+
+      if(flashFrame > flashingSpeed) {
+
+         // Normal Bar
+         drawHUD_BaseBar(
+            healthRatio,
+            5, 486, 729, 45,
+            15, 39, 30, 9
+         );
       }
-   });
+
+      if(flashFrame > flashingSpeed *2) {
+         flashFrame = 0;
+      }
+   }
+}
+
+const drawHUD_Energy = (player) => {
+   
+   let energyRatio = player.energy / player.baseEnergy;
+
+   // Yellow Bar
+   drawHUD_BaseBar(
+      energyRatio,
+      4, 536, 461, 45,
+      82, 65, 165, 8
+   );
+
+   // Purple Bar
+   // drawHUD_BaseBar(
+   //    energyRatio,
+   //    4, 586, 461, 50,
+   //    82, 65, 165, 8
+   // );
 }
 
 
 // =====================================================================
-// Draw Player, Shadow & Name
+// Player Bars
+// =====================================================================
+const barWidth = 110;
+const barHeight = 8;
+
+const barsCoordinates = () => {
+   // Coordinates PNG file
+
+   // Health
+   const healthCoord = {
+      x: 498,
+      y: 560,
+      width: 49,
+      height: 25,
+   };
+
+   // Mana
+   const manaCoord = {
+      x: 563,
+      y: 561,
+      width: 49,
+      height: 25,
+   };
+   
+   // Low Mana
+   const lowManaCoord = {
+      x: 627,
+      y: 562,
+      width: 50,
+      height: 25,
+   };
+
+   // Energy
+   const energyCoord = {
+      x: 498,
+      y: 591,
+      width: 49,
+      height: 25,
+   };
+   
+   // Purple Bar
+   const purpleCoord = {
+      x: 563,
+      y: 591,
+      width: 49,
+      height: 25,
+   };
+   
+   // GcD
+   const attackCoord = {
+      x: 627,
+      y: 591,
+      width: 50,
+      height: 25,
+   };
+   
+   return [
+      healthCoord,   // Must be 1st
+      manaCoord,     // Must be 2nd
+      energyCoord,   // Must be 3rd
+
+      purpleCoord,
+      lowManaCoord,  // Must be before last
+      attackCoord,   // Must be last
+   ];
+}
+
+const barCoordArray = barsCoordinates();
+
+
+const clientPlayerBar = {
+   ctx: ctxUI,
+   x: viewSize.width/2 - barWidth/2,
+   y: viewSize.height/2,
+   width: barWidth,
+   height: barHeight,
+}
+
+const drawBars_Client = (player) => {
+   
+   // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
+   const attackBar = new GameBar(clientPlayerBar, 0, -80, player.GcD, player.speedGcD);
+   const attackCoord = barCoordArray[ barCoordArray.length -1 ]; // Always get last index
+
+   attackBar.draw(
+      hudImage,
+      attackCoord.x,
+      attackCoord.y,
+      attackCoord.width,
+      attackCoord.height
+   );
+}
+
+const drawBars_OtherPlayer = (player) => {
+      
+   const healthBar = {
+      name: "health",
+      maxValue: player.baseHealth,
+      value: player.health,
+   };
+
+   const manaBar = {
+      name: "mana",
+      maxValue: player.baseMana,
+      value: player.mana,
+   };
+
+   const energyBar = {
+      name: "energy",
+      maxValue: player.baseEnergy,
+      value: player.energy,
+   };
+
+   // Bar Value Array
+   const barValueArray = [
+      healthBar,
+      manaBar,
+      energyBar,
+   ];
+
+   const otherPlayerBar = {
+      ctx: ctxPlayer,
+      x: player.x - viewport.x,
+      y: player.y - viewport.y,
+      width: barWidth,
+      height: barHeight,
+   }
+   
+   let barGap = 0;
+   let barOffset = 9;
+   
+   for(let i = 0; i < barValueArray.length; i++) {
+      
+      let bar = barValueArray[i];
+      if(player.isDead) bar.value = 0;
+      
+      // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
+      const gameBar = new GameBar(otherPlayerBar, -barWidth/2, -95 +barGap, bar.maxValue, bar.value);
+      
+      let index = i;
+
+      // Mana Bar
+      if(bar.name === "mana") {
+         if(player.mana >= player.healCost) index = i;
+         else index = barCoordArray.length -2;
+      }
+      
+      // Health Bar
+      if(bar.name === "health") {
+         if(player.health > player.baseHealth * minHealthRatio) index = i;
+         else index = barCoordArray.length -1;
+      }
+      
+      // Other Bar
+      gameBar.draw(
+         hudImage,
+         barCoordArray[index].x,
+         barCoordArray[index].y,
+         barCoordArray[index].width,
+         barCoordArray[index].height
+      );
+
+      barGap += barOffset;
+   };
+}
+
+
+// =====================================================================
+// Draw Player, Shadow, Name
 // =====================================================================
 const sprites = {
    height: 200,
@@ -552,11 +681,15 @@ const playerSync = (player) => {
    if(viewport_HTML.id === String(player.id)) {
       scrollCam(player);
       drawHUD(player);
+      drawBars_Client(player);
    }
    
+   else {
+      drawBars_OtherPlayer(player);
+   }
+
    drawShadow(player);
    drawPlayer(player);
-   drawBars(player);
    drawName(player);
 
    // DEBUG_DrawPlayer(player);

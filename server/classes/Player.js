@@ -56,7 +56,7 @@ class Player {
       this.calcHealing;
 
       // Damages
-      this.baseDamage = 25;
+      this.baseDamage = 23;
       this.calcDamage;
       
       // Movements Speed
