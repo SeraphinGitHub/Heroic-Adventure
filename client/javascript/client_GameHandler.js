@@ -41,8 +41,11 @@ for(let i = 0; i < allCanvas.length; i++) {
 }
 
 const ctxMap = ctxArray[0];
-const ctxPlayer = ctxArray[1];
-const ctxUI = ctxArray[2];
+const ctxEnemies = ctxArray[1];
+const ctxPlayer = ctxArray[2];
+const ctxFixedBack = ctxArray[3];
+const ctxUI = ctxArray[4];
+const ctxFixedFront = ctxArray[5];
 
 
 // =====================================================================
@@ -76,10 +79,24 @@ const handleFloatingText = () => {
 // Client Sync (Every frame)
 // =====================================================================
 const clientSync = (socket) => {
-   socket.on("newSituation", (playerData) => {
+   socket.on("newSituation", (playerData, minotaurData) => {
       
-      ctxArray.forEach(ctx => ctx.clearRect(0, 0, viewSize.width, viewSize.height));
+      let ctxFixedBack_index = ctxArray.length -3;
+      let ctxFixedFront_index = ctxArray.length -1;
+
+      // Canvas Clearing
+      for(let i = 0; i < ctxArray.length; i++) {
+         let ctxIndexed = ctxArray[i];
+
+         if(i !== ctxFixedBack_index
+         && i !== ctxFixedFront_index) {
+            ctxIndexed.clearRect(0, 0, viewSize.width, viewSize.height);
+         }
+      }
+
       playerData.forEach(player => playerSync(player));
+      minotaurData.forEach(minotaur => minotaurSync(minotaur));
+
       handleFloatingText();
 
       if(showFPS) frameRate++;

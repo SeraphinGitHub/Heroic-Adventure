@@ -14,6 +14,7 @@ const io = new Server(server);
 // Scrips import
 // =====================================================================
 const playerHandler = require("./server/server_PlayerHandler.js");
+const minotaursHandler = require("./server/Enemies/server_MinotaursHandler.js");
 
 
 // =====================================================================
@@ -35,6 +36,9 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 const playerMax = 300;
 let socketList = {};
+let mobList = [];
+
+minotaursHandler.initMinotaurs(mobList);
 
 
 // =====================================================================
@@ -70,12 +74,13 @@ io.on("connection", (socket) => {
 // Server Sync
 // =====================================================================
 setInterval(() => {
-   let playerData = playerHandler.playerUpdate(socketList);
+   let playerData = playerHandler.playerUpdate(socketList, mobList);
+   let minotaurData = minotaursHandler.minotaurUpdate();
    
    playerData.forEach(player => {
 
       let socket = socketList[player.id];
-      socket.emit("newSituation", playerData);
+      socket.emit("newSituation", playerData, minotaurData);
 
       // Death Screen Event
       if(player.isDead && !player.isRespawning) {

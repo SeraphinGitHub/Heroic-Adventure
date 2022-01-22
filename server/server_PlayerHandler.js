@@ -239,7 +239,7 @@ const playerRunning = (player) => {
 // =====================================================================
 // Player Global Count Down
 // =====================================================================
-const playerGcD = (player, socketList) => {
+const playerGcD = (player, socketList, mobList) => {
    
    // Regen Mana
    if(player.mana < player.baseMana) player.mana += player.regenMana;
@@ -252,7 +252,7 @@ const playerGcD = (player, socketList) => {
    
    // GcD Up
    if(player.speedGcD >= player.GcD) {
-      playerAttack(player, socketList);
+      playerAttack(player, socketList, mobList);
       playerCast(player, socketList);
    }
 }
@@ -261,7 +261,7 @@ const playerGcD = (player, socketList) => {
 // =====================================================================
 // Player Attack
 // =====================================================================
-const playerAttack = (player, socketList) => {
+const playerAttack = (player, socketList, mobList) => {
 
    // Player Attack
    if(player.isAttacking && !player.attack_isAnimable) {
@@ -275,8 +275,8 @@ const playerAttack = (player, socketList) => {
          animTimeOut(anim.attack.index, anim.attack.spritesNumber)
       );
 
-      damagingEnemy(player, socketList);
-      // damagingEnemy(player, mobList); // <== When Mob class gonna be created
+      damagingOtherPlayers(player, socketList);
+      damagingMobs(player, socketList, mobList);
    }
 }
 
@@ -330,9 +330,9 @@ const playerHealing = (player, socketList) => {
 
 
 // =====================================================================
-// Damaging Enemy
+// Damaging Other Players
 // =====================================================================
-const damagingEnemy = (player, socketList) => {
+const damagingOtherPlayers = (player, socketList) => {
 
    for(let i in playerList) {
       let otherPlayer = playerList[i];
@@ -366,6 +366,35 @@ const damagingEnemy = (player, socketList) => {
          let otherSocket = socketList[otherPlayer.id];
          otherSocket.emit("getDamage", otherPlayerData);
          socket.emit("giveDamage", otherPlayerData);
+      }
+   }
+}
+
+
+// =====================================================================
+// Damaging Mobs
+// =====================================================================
+const damagingMobs = (player, socketList, mobList) => {
+
+   for(let i in mobList) {
+      let mob = mobList[i];
+
+      if(!mob.isDead
+      && collision.circle_toCircle(player, mob)) {
+         
+         mob.calcDamage = mob.damageRnG();
+         mob.health -= mob.calcDamage;
+         
+         if(mob.health <= 0) mob.death();
+         
+         const mobData = {
+            x: mob.x,
+            y: mob.y,
+            calcDamage: mob.calcDamage,
+         };
+         
+         let socket = socketList[player.id];
+         socket.emit("giveDamage", mobData);
       }
    }
 }
@@ -499,14 +528,14 @@ const handlePlayerState = (player) => {
 // =====================================================================
 let frame = 0;
 
-exports.playerUpdate = (socketList) => {
+exports.playerUpdate = (socketList, mobList) => {
    let playerData = [];
    
    for(let i in playerList) {
       let player = playerList[i];
       
       if(!player.isDead) {
-         playerGcD(player, socketList);
+         playerGcD(player, socketList, mobList);
          playerMovements(player);
          playerRunning(player);
          handlePlayerState(player);

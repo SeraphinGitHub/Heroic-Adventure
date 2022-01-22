@@ -123,6 +123,7 @@ const playerScore = (data) => {
 
 const initPlayerUI = (socket) => {
 
+   socket.on("playerID", (id) => viewport_HTML.id = id);
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
 }
@@ -252,29 +253,19 @@ const hud = {
    height: 100 *scale_Y,
 }
 
-const drawHUD = (player) => {
+const drawHUD_Frame = () => {
    
    // Background
-   if(player.mana !== player.baseMana
-   || player.health !== player.baseHealth
-   || player.energy !== player.baseEnergy) {
-
-      ctxUI.drawImage(hudImage,
-         4, 179, 729, 141,
-         hud.x + (15 *scale_X), // Pos X
-         hud.y + (10 *scale_Y), // Pos Y
-         hud.width - (30 *scale_X), // Width
-         hud.height - (20 *scale_Y) // Height
-      );
-   }
-
-   // Bars
-   drawHUD_Mana(player);
-   drawHUD_Health(player);
-   drawHUD_Energy(player);
+   ctxFixedBack.drawImage(hudImage,
+      4, 179, 729, 141,
+      hud.x + (15 *scale_X), // Pos X
+      hud.y + (10 *scale_Y), // Pos Y
+      hud.width - (30 *scale_X), // Width
+      hud.height - (20 *scale_Y) // Height
+   );
 
    // HUD Sprite
-   ctxUI.drawImage(hudImage,
+   ctxFixedFront.drawImage(hudImage,
       3, 4, 782, 172,
       hud.x, hud.y, hud.width, hud.height
    );
@@ -447,7 +438,6 @@ const barsCoordinates = () => {
 
 const barCoordArray = barsCoordinates();
 
-
 const clientPlayerBar = {
    ctx: ctxUI,
    x: viewSize.width/2 - barWidth/2,
@@ -499,7 +489,7 @@ const drawBars_OtherPlayer = (player) => {
    ];
 
    const otherPlayerBar = {
-      ctx: ctxPlayer,
+      ctx: ctxEnemies,
       x: player.x - viewport.x,
       y: player.y - viewport.y,
       width: barWidth,
@@ -555,24 +545,24 @@ const sprites = {
    radius: 45,
 }
 
-const drawShadow = (player) => {
+const drawShadow = (ctx, player) => {
    
-   ctxPlayer.fillStyle = "rgba(30, 30, 30, 0.6)";
-   ctxPlayer.beginPath();
-   ctxPlayer.ellipse(
+   ctx.fillStyle = "rgba(30, 30, 30, 0.6)";
+   ctx.beginPath();
+   ctx.ellipse(
       pos(player,"x"),
       pos(player,"y") + sprites.radius,
       sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2
    );
-   ctxPlayer.fill();
-   ctxPlayer.closePath();
+   ctx.fill();
+   ctx.closePath();
 }
 
-const drawPlayer = (player) => {
+const drawPlayer = (ctx, player) => {
 
    let animState = playerAnimState(player);
 
-   ctxPlayer.drawImage(
+   ctx.drawImage(
       animState,
       player.frameX * sprites.width, player.frameY * sprites.height, sprites.width, sprites.height,      
       pos(player,"x") - sprites.width/2,
@@ -581,16 +571,16 @@ const drawPlayer = (player) => {
    );
 }
 
-const drawName = (player) => {
+const drawName = (ctx, player) => {
    
    let offsetY = 90;
    let namePos_X = pos(player,"x") - (player.name.length * 6);
    let namePos_Y = pos(player,"y") + offsetY;
    
-   ctxPlayer.fillStyle = "lime";
-   ctxPlayer.font = "22px Orbitron-ExtraBold";
-   ctxPlayer.fillText(player.name, namePos_X, namePos_Y);
-   ctxPlayer.strokeText(player.name, namePos_X, namePos_Y);
+   ctx.fillStyle = "lime";
+   ctx.font = "22px Orbitron-ExtraBold";
+   ctx.fillText(player.name, namePos_X, namePos_Y);
+   ctx.strokeText(player.name, namePos_X, namePos_Y);
 }
 
 
@@ -678,19 +668,29 @@ const deathScreen = (socket) => {
 // =====================================================================
 const playerSync = (player) => {
 
+   // if Client Player
    if(viewport_HTML.id === String(player.id)) {
       scrollCam(player);
-      drawHUD(player);
+      drawHUD_Mana(player);
+      drawHUD_Health(player);
+      drawHUD_Energy(player);
       drawBars_Client(player);
+
+      // Player
+      drawShadow(ctxPlayer, player);
+      drawPlayer(ctxPlayer, player);
+      drawName(ctxPlayer, player);  
    }
    
+   // if Other Players
    else {
       drawBars_OtherPlayer(player);
-   }
 
-   drawShadow(player);
-   drawPlayer(player);
-   drawName(player);
+      // Player
+      drawShadow(ctxEnemies, player);
+      drawPlayer(ctxEnemies, player);
+      drawName(ctxEnemies, player);   
+   }
 
    // DEBUG_DrawPlayer(player);
    // DEBUG_DrawAttackArea(player);
@@ -703,8 +703,7 @@ const playerSync = (player) => {
 // =====================================================================
 const initPlayer = (socket) => {
 
-   socket.on("playerID", (id) => viewport_HTML.id = id);
-
+   drawHUD_Frame();
    initPlayerUI(socket);
    floatingText(socket)
    deathScreen(socket);

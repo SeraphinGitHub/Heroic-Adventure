@@ -28,6 +28,7 @@ const scripts = [
    // Handlers
    "client_GameHandler.js",
    "client_PlayerHandler.js",
+   "client_MinotaursHandler.js",
 ];
 
 const instantiate = (scriptName) => {
