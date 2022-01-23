@@ -4,7 +4,10 @@
 
 // =========================  Development  =========================
 setTimeout(() => {
-      
+   
+   // CSS ==> logScreen l.12
+   // CSS ==> viewport l.154
+
    const socket = io();
    socket.emit("playerName", "Séraphin");
    initClient(socket);
@@ -38,7 +41,15 @@ const instantiate = (scriptName) => {
    document.body.insertAdjacentElement("beforeend", newScript);
 }
 
-scripts.forEach(item => instantiate(item));
+scripts.forEach(script => {
+
+   const initPromise = new Promise((resolve, reject) => resolve(script));
+
+   initPromise
+   .then((item) => instantiate(item))
+   .catch(() => console.log(`${script} could not be loaded !`));
+});
+
 
 // =====================================================================
 // Init Client Scripts

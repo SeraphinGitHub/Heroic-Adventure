@@ -64,8 +64,8 @@ io.on("connection", (socket) => {
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
       // console.log("User disconnected !");
-      delete socketList[socket.id];
       playerHandler.onDisconnect(socket);
+      delete socketList[socket.id];
    });
 });
 

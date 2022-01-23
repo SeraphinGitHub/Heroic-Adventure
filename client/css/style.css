@@ -6,8 +6,6 @@
 body {
    justify-content: space-between !important;
    height: 100vh;
-   
-   /* background: linear-gradient(to bottom right, dodgerblue, lightgray, orange); */
    background: url("../images/Background Tile.jpg") repeat;
 }
 

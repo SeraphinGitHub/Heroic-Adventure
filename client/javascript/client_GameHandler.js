@@ -6,15 +6,10 @@
 // =====================================================================
 const viewport_HTML = document.querySelector(".viewport");
 
-const viewSize = {
+const viewSize = { // ==> Check to match with viewport size in CSS
    height: 800,
    width: 1200,
 }
-
-viewport_HTML.style = `
-   height: ${viewSize.height}px;
-   width: ${viewSize.width}px;
-`;
 
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 const centerVp_X = viewSize.width/2 - viewport.width/2;

@@ -4,9 +4,16 @@
 /* ===================================================================== */
 .viewport {
    position: relative;
-   height: 100%;
-   width: 100%;
+   height: 800px; /* ==> Check to match with viewport size in JS */
+   width: 1200px;
    background-color: black;
+
+   animation: openGameWindow;
+}
+
+@keyframes openGameWindow {
+   0% { width: 0px; }
+   100% { width: 1200px; }
 }
 
 
@@ -39,37 +46,113 @@ canvas {
 
 
 /* ===== Sides ===== */
-.top-side,
+.top-side-left,
+.top-side-right,
 .right-side,
-.bottom-side,
+.bottom-side-left,
+.bottom-side-right,
+.left-side {
+	height: 13px;
+}
+
+
+/* ===== Left / Right ===== */
+.right-side,
 .left-side {
    width: 1310px;
-	height: 13px;
-   background-position: 0 0 !important;
+   background-position: 0 0;
 }
 
-.top-side {
+
+/* ===== Top / Bottom Left ===== */
+.top-side-left,
+.bottom-side-left  {
+   width: 667px;
+   background-position: 0 0;
+}
+
+
+/* ===== Top / Bottom Right ===== */
+.top-side-right,
+.bottom-side-right {
+   width: 667px;
+   background-position: -667px 0 !important;
+}
+
+
+/* ===== Top ===== */
+.top-side-left,
+.top-side-right {
    top: -10px;
-   left: 50%;
-   transform: translate(-50%) scale(80%, -130%);
+   transform: scale(80%, -130%);
 }
 
-.bottom-side {
+.top-side-left {
+   left: 0;
+   animation: leftSideWindow;
+}
+
+.top-side-right {
+   right: 0;
+   animation: rightSideWindow;
+}
+
+
+/* ===== Top ===== */
+.bottom-side-left,
+.bottom-side-right {
    bottom: -10px;
-   left: 50%;
-   transform: translate(-50%) scale(80%, 130%)
+   transform: scale(80%, 130%);
 }
 
+.bottom-side-left {
+   left: 0;
+   animation: leftSideWindow;
+}
+
+.bottom-side-right {
+   right: 0;
+   animation: rightSideWindow;
+}
+
+
+@keyframes leftSideWindow {
+   0% { width: 0px; background-position: -667px 0; }
+   100% { width: 667px; background-position: 0 0; }
+}
+
+@keyframes rightSideWindow {
+   0% { width: 0px; background-position: -1310px 0; }
+   100% { width: 667px; background-position: -667px 0; }
+}
+
+
+/* Left / Right */
 .left-side {
    bottom: 49%;
    left: -3px;
-   transform: translate(-50%) rotate(90deg) scale(59%, 130%)
+   transform: translate(-50%) rotate(90deg) scale(59%, 130%);
 }
 
 .right-side {
    top: 49%;
    right: -4px;
-   transform: translate(50%) rotate(90deg) scale(59%, -130%)
+   transform: translate(50%) rotate(90deg) scale(59%, -130%);
+}
+
+
+/* ===== Top / Bottom ===== */
+.viewport,
+.top-side-left,
+.top-side-right,
+.bottom-side-left,
+.bottom-side-right {
+   animation-duration: 1.5s;
+   animation-timing-function: linear;
+
+   /* ********************************************* Dev Mode ********************************************* */
+   animation-duration: 0s;
+   /* ********************************************* Dev Mode ********************************************* */
 }
 
 
