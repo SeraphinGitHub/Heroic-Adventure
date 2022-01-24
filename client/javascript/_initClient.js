@@ -4,7 +4,7 @@
 
 // =========================  Development  =========================
 setTimeout(() => {
-   
+      
    // CSS ==> logScreen l.12
    // CSS ==> viewport l.154
 
@@ -42,7 +42,6 @@ const instantiate = (scriptName) => {
 }
 
 scripts.forEach(script => {
-
    const initPromise = new Promise((resolve, reject) => resolve(script));
 
    initPromise

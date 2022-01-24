@@ -30,17 +30,7 @@ exports.onConnect = (socket, socketList) => {
       let receiverName;
       
       // Send player ID
-      const playerID = String(player.id);
-
-      bcrypt.hash( playerID, 15)
-      .then((hashPlayerID) => {
-
-         const prepareHashID = hashPlayerID.split(".");
-         const hashID = prepareHashID.join("");
-         socket.emit("playerID", hashID);
-
-      }).catch(() => console.log("Failed to hash Player ID"));
-
+      socket.emit("playerID", player.id);
 
       // Init Player Stats
       socket.emit("playerStats", {

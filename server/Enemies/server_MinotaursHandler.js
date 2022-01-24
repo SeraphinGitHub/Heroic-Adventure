@@ -15,42 +15,35 @@ let minotaursList = [];
 
 exports.initMinotaurs = (mobList) => {
 
-   // const minotaursCount = 4;
-   const minotaursCount = 1;
-
    const minotaursSpecs = {
 
       health: 100,
       radius: 50,
+      wanderBreakTime: 1500,
+      wanderRange: 150,
+      chasingRange: 300,
       GcD: 50,
       respawn: 5000,
       damages: 15,
       damageRatio: 0.5,
-      walkSpeed: 2,
+      walkSpeed: 3,
       runSpeed: 6,
    }
    
-   for(let i = 0; i < minotaursCount; i++) {
-      
-      // const minotaurX = 400 + Math.floor(Math.random() * 5) * 400;
-      // const minotaurY = 200 + Math.floor(Math.random() * 5) * 200;
-      
-      const minotaur = new Enemy(800, 600, minotaursSpecs);
-      // const minotaur = new Enemy(minotaurX, minotaurY, minotaursSpecs);
-      minotaursList.push(minotaur);
-      mobList.push(minotaur);
-   }
+   const minotaur_1 = new Enemy(600, 600, minotaursSpecs);
+   const minotaur_2 = new Enemy(1400, 600, minotaursSpecs);
+   const minotaur_3 = new Enemy(1000, 1100, minotaursSpecs);
+
+   minotaursList.push(minotaur_1, minotaur_2, minotaur_3);
+   mobList.push(minotaur_1, minotaur_2, minotaur_3);
 }
 
 
 // =====================================================================
 // Minotaurs Movements
 // =====================================================================
-const maxWanderRange = 100;
-
 const minotaurMovements = (minotaur) => {
-
-   minotaur.wanderingDir(maxWanderRange);
+   minotaur.wandering();
 }
 
 
@@ -64,11 +57,13 @@ exports.minotaurUpdate = () => {
       let minotaur = minotaursList[i];
       
       if(!minotaur.isDead) {
-         // minotaurMovements(minotaur);
+         minotaurMovements(minotaur);
       }
 
       else {
          return;
+         // minotaur.animation(frame, anim.died.index, anim.died.spritesNumber);
+         // minotaur.state = "died";
       }
 
       minotaurData.push(minotaur);

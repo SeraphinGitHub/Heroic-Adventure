@@ -5,6 +5,9 @@
 // {
 //    health: 100,
 //    radius: 50,
+//    wanderBreakTime: 1500,
+//    wanderRange: 200,
+//    chasingRange: 400,
 //    GcD: 50,
 //    respawn: 10000,
 //    damages: 15,
@@ -14,11 +17,20 @@
 // }
 
 class Enemy {
-   constructor(x, y, enemySpecs) {
+   constructor(spawnX, spawnY, enemySpecs) {
 
-      this.x = x;
-      this.y = y;
+      this.x = spawnX;
+      this.y = spawnY;
+      this.spawnX = spawnX;
+      this.spawnY = spawnY;
       this.radius = enemySpecs.radius;
+
+      // State Machine
+      this.calcX = spawnX;
+      this.calcY = spawnY;
+      this.wanderBreakTime = enemySpecs.wanderBreakTime;
+      this.wanderRange = enemySpecs.wanderRange;
+      this.chasingRange = enemySpecs.chasingRange
 
       // Enemy Health
       this.baseHealth = enemySpecs.health;
@@ -38,14 +50,14 @@ class Enemy {
       this.damageRatio = enemySpecs.damageRatio;
 
       // Movements Speed
-      this.walkSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.walkSpeed); // <== WalkSpeed
-      this.baseWalkSpeed = this.walkSpeed;
-      this.runSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.runSpeed); // <== RunSpeed
-      this.baseRunSpeed = this.runSpeed;
+      this.walkSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.walkSpeed) /2; // <== WalkSpeed
+      this.runSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.runSpeed) /2; // <== RunSpeed
 
       // States
       this.isDead = false;
       this.isAttacking = false;
+      this.isCalcPos = false;
+      this.isReCalc = false;
 
       // Anim States
       this.attack_isAnimable = false;
@@ -64,29 +76,40 @@ class Enemy {
       return this.RnG(this.baseDamage, this.damageRatio); // More high => Higher RnG Range => More damage (0 ~ 1)
    }
 
-   wanderingDir(range) {
-      let rng = this.RnG(0, 4);
+   wandering() {
+      
+      // Once
+      if(!this.isCalcPos) {
+         this.isCalcPos = true;
+      
+         let rngX = this.RnG(1, this.wanderRange *2);
+         let rngY = this.RnG(1, this.wanderRange *2);
+         this.calcX = this.spawnX -this.wanderRange + rngX;
+         this.calcY = this.spawnY -this.wanderRange + rngY;
+      }      
+      
+      // Every Frame
+      if(this.calcX > this.x) this.x += this.walkSpeed;
+      if(this.calcX < this.x) this.x -= this.walkSpeed;
+      if(this.calcY > this.y) this.y += this.walkSpeed;
+      if(this.calcY < this.y) this.y -= this.walkSpeed;
 
-      // if(this.x !== this.x + range
-      // || this.x !== this.x - range
-      // || this.y !== this.y + range
-      // || this.y !== this.y - range) {
-         
-      //    if(rng === 0) return this.x += this.walkSpeed;
-      //    if(rng === 1) return this.x -= this.walkSpeed;
-      //    if(rng === 2) return this.y += this.walkSpeed;
-      //    if(rng === 3) return this.y -= this.walkSpeed;
-      // }
+      // Once
+      if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
+         this.isReCalc = true;
 
-      if(this.x !== this.x + range && rng === 0) this.x += this.walkSpeed;
-      if(this.x !== this.x - range && rng === 1) this.x -= this.walkSpeed;
-      if(this.y !== this.y + range && rng === 2) this.y += this.walkSpeed;
-      if(this.y !== this.y - range && rng === 3) this.y -= this.walkSpeed;
+         setTimeout(() => {
+            this.isReCalc = false;
+            this.isCalcPos = false
+         }, this.wanderBreakTime);
+      }
    }
 
    death() {
       this.health = 0;
       this.isDead = true;
+      this.x = this.spawnX;
+      this.y = this.spawnY;
 
       setTimeout(() => {
          this.isDead = false;

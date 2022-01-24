@@ -123,21 +123,7 @@ const playerScore = (data) => {
 
 const initPlayerUI = (socket) => {
 
-   // socket.on("playerID", (hashID) => {
-      
-   //    let players = JSON.parse(localStorage.getItem("PlayersList"));
-
-   //    if(!players) {
-   //       localStorage.setItem("PlayersList", JSON.stringify([hashID]));
-   //       return;
-   //    }
-
-   //    players.push(hashID);
-   //    localStorage.setItem("PlayersList", JSON.stringify(players));
-   // });
-
-   socket.on("playerID", (hashID) => viewport_HTML.id = hashID);
-   
+   socket.on("playerID", (id) => viewport_HTML.id = id);
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
 }
@@ -683,7 +669,7 @@ const deathScreen = (socket) => {
 const playerSync = (player) => {
 
    // if Client Player
-   
+
    if(viewport_HTML.id === String(player.id)) {
       scrollCam(player);
       drawHUD_Mana(player);
