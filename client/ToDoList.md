@@ -1,6 +1,7 @@
 
 <!-- Now -->
 - Draw other players only inside viewport
+- Draw Mobs only inside viewport
 <!-- - Player attack bar skin -->
 <!-- - Recast / Delete GameBar class -->
 - Fix yellow damage number offset bug

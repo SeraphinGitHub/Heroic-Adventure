@@ -68,7 +68,6 @@ const scrollCam = (player) => {
    }
 }
 
-
 const pos = (player, coord) => {
    
    if(viewport_HTML.id === String(player.id)) {
@@ -210,6 +209,8 @@ const onMouseInput = (socket) => {
 // =====================================================================
 const playerFloatingText = (player, textColor, textValue) => {
    
+   const topOffset = 20;
+
    const text = {
       offsetX: -35,
       offsetY: -117,
@@ -217,8 +218,8 @@ const playerFloatingText = (player, textColor, textValue) => {
    };
 
    const newText = new FloatingText(ctxPlayer,
-      pos(player,"x"),
-      pos(player,"y"),
+      viewSize.width/2,
+      viewSize.height/2 + topOffset,
       text.offsetX, text.offsetY, text.textSize, textColor, textValue
    );
 
@@ -429,8 +430,8 @@ const barsCoordinates = () => {
       healthCoord,   // Must be 1st
       manaCoord,     // Must be 2nd
       energyCoord,   // Must be 3rd
+      purpleCoord,   // Must be 4rd
 
-      purpleCoord,
       lowManaCoord,  // Must be before last
       attackCoord,   // Must be last
    ];
@@ -449,7 +450,7 @@ const clientPlayerBar = {
 const drawBars_Client = (player) => {
    
    // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
-   const attackBar = new GameBar(clientPlayerBar, 0, -80, player.GcD, player.speedGcD);
+   const attackBar = new GameBar(clientPlayerBar, 0, 65, player.GcD, player.speedGcD);
    const attackCoord = barCoordArray[ barCoordArray.length -1 ]; // Always get last index
 
    attackBar.draw(
@@ -573,8 +574,8 @@ const drawPlayer = (ctx, player) => {
 
 const drawName = (ctx, player) => {
    
-   let offsetY = 90;
-   let namePos_X = pos(player,"x") - (player.name.length * 6);
+   let offsetY = 95;
+   let namePos_X = pos(player,"x") - (player.name.length * 7);
    let namePos_Y = pos(player,"y") + offsetY;
    
    ctx.fillStyle = "lime";
@@ -668,8 +669,7 @@ const deathScreen = (socket) => {
 // =====================================================================
 const playerSync = (player) => {
 
-   // if Client Player
-
+   // if Client
    if(viewport_HTML.id === String(player.id)) {
       scrollCam(player);
       drawHUD_Mana(player);
@@ -683,6 +683,7 @@ const playerSync = (player) => {
       drawName(ctxPlayer, player);  
    }
    
+   
    // if Other Players
    else {
       drawBars_OtherPlayer(player);
@@ -692,10 +693,8 @@ const playerSync = (player) => {
       drawPlayer(ctxEnemies, player);
       drawName(ctxEnemies, player);   
    }
-
-   // DEBUG_DrawPlayer(player);
-   // DEBUG_DrawAttackArea(player);
-   // DEBUG_DrawHealthNumber(player);
+   
+   // DEBUG_Player(player);
 }
 
 
@@ -718,6 +717,13 @@ const initPlayer = (socket) => {
 // =====================================================================
 // ==>  DEBUG MODE  <==
 // =====================================================================
+const DEBUG_Player = (player) => {
+
+   DEBUG_DrawPlayer(player);
+   DEBUG_DrawAttackArea(player);
+   DEBUG_DrawHealthNumber(player);
+}
+
 const DEBUG_DrawPlayer = (player) => {
    
    ctxPlayer.fillStyle = "darkviolet";

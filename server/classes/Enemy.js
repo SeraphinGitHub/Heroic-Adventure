@@ -9,7 +9,8 @@
 //    wanderRange: 200,
 //    chasingRange: 400,
 //    GcD: 50,
-//    respawn: 10000,
+//    hiddenTime: 3000,
+//    respawnTime: 10000,
 //    damages: 15,
 //    damageRatio: 0.5,
 //    walkSpeed: 2,
@@ -37,7 +38,8 @@ class Enemy {
       this.health = this.baseHealth;
 
       // Respawn Time
-      this.respawnTime = enemySpecs.respawn;
+      this.hiddenTime = enemySpecs.hiddenTime;
+      this.respawnTime = enemySpecs.respawnTime;
 
       // Enemy GcD
       this.baseGcD = enemySpecs.GcD;
@@ -50,11 +52,12 @@ class Enemy {
       this.damageRatio = enemySpecs.damageRatio;
 
       // Movements Speed
-      this.walkSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.walkSpeed) /2; // <== WalkSpeed
-      this.runSpeed = Math.floor(process.env.SYNC_COEFF* enemySpecs.runSpeed) /2; // <== RunSpeed
+      this.walkSpeed = Math.round(process.env.SYNC_COEFF* enemySpecs.walkSpeed) /2; // <== WalkSpeed
+      this.runSpeed = Math.round(process.env.SYNC_COEFF* enemySpecs.runSpeed) /2; // <== RunSpeed
 
       // States
       this.isDead = false;
+      this.isHidden = false;
       this.isAttacking = false;
       this.isCalcPos = false;
       this.isReCalc = false;
@@ -78,23 +81,42 @@ class Enemy {
 
    wandering() {
       
-      // Once
+      // Calculate random position (Run once)
       if(!this.isCalcPos) {
          this.isCalcPos = true;
-      
-         let rngX = this.RnG(1, this.wanderRange *2);
-         let rngY = this.RnG(1, this.wanderRange *2);
-         this.calcX = this.spawnX -this.wanderRange + rngX;
-         this.calcY = this.spawnY -this.wanderRange + rngY;
-      }      
-      
-      // Every Frame
-      if(this.calcX > this.x) this.x += this.walkSpeed;
-      if(this.calcX < this.x) this.x -= this.walkSpeed;
-      if(this.calcY > this.y) this.y += this.walkSpeed;
-      if(this.calcY < this.y) this.y -= this.walkSpeed;
+         
+         let RnG_Distance = this.RnG(1, this.wanderRange);
+         let RnG_Degrees = this.RnG(1, 360);
+         let RnG_Radians = RnG_Degrees * Math.PI / 180;
+         
+         this.calcX = this.spawnX + (RnG_Distance * Math.cos(RnG_Radians));
+         this.calcY = this.spawnY + (RnG_Distance * Math.sin(RnG_Radians));
+      }
 
-      // Once
+
+      // Reach calculated position (Every Frame)
+      if(this.calcX > this.x) {
+         this.x += this.walkSpeed;
+         if(this.x + this.walkSpeed > this.calcX) this.x = this.calcX;
+      }
+
+      if(this.calcX < this.x) {
+         this.x -= this.walkSpeed;
+         if(this.x - this.walkSpeed < this.calcX) this.x = this.calcX;
+      }
+
+      if(this.calcY > this.y) {
+         this.y += this.walkSpeed;
+         if(this.y + this.walkSpeed > this.calcY) this.y = this.calcY;
+      }
+
+      if(this.calcY < this.y) {
+         this.y -= this.walkSpeed;
+         if(this.y - this.walkSpeed < this.calcY) this.y = this.calcY;
+      }
+
+
+      // Stop && Renewal calculation (Run once)
       if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
          this.isReCalc = true;
 
@@ -112,11 +134,16 @@ class Enemy {
       this.y = this.spawnY;
 
       setTimeout(() => {
-         this.isDead = false;
-         this.health = this.baseHealth;
-
-      }, this.respawnTime);
-
+         this.isHidden = true
+         
+         setTimeout(() => {
+            this.isDead = false;
+            this.isHidden = false;
+            this.health = this.baseHealth;
+   
+         }, this.respawnTime);
+      }, this.hiddenTime);
+      
       console.log("Mob is Dead !");
    }
 
