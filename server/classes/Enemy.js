@@ -119,7 +119,8 @@ class Enemy {
       // Stop && Renewal calculation (Run once)
       if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
          this.isReCalc = true;
-
+         this.frameX = 0;
+         
          setTimeout(() => {
             this.isReCalc = false;
             this.isCalcPos = false
@@ -130,8 +131,6 @@ class Enemy {
    death() {
       this.health = 0;
       this.isDead = true;
-      this.x = this.spawnX;
-      this.y = this.spawnY;
 
       setTimeout(() => {
          this.isHidden = true
@@ -140,17 +139,17 @@ class Enemy {
             this.isDead = false;
             this.isHidden = false;
             this.health = this.baseHealth;
+            this.x = this.spawnX;
+            this.y = this.spawnY;
    
          }, this.respawnTime);
       }, this.hiddenTime);
-      
-      console.log("Mob is Dead !");
    }
 
    animation(frame, index, spritesNumber) {
       if(frame % index === 0) {       
          if(this.frameX < spritesNumber) this.frameX++;
-         else this.frameX = 0;
+         else if(!this.isDead) this.frameX = 0;
       }
    }
 }

@@ -6,62 +6,75 @@
 // =====================================================================
 const minotaurSprites = {
    height: 200,
-   width: 200,
-   offsetY: 5,
-   radius: 45,
+   width: 294,
+   sizeRatio: 0.7,
+   offsetX: 45,
+   offsetY: 25,
+   radius: 50,
 }
 
 const drawMinotaur = (minotaur) => {
 
-   if(!minotaur.isHidden) {
-      let animState = minotaurAnimState(minotaur);
+   let animState = minotaurAnimState(minotaur);
 
-      ctxEnemies.drawImage(
-         animState,
-         minotaur.frameX * minotaurSprites.width, minotaur.frameY * minotaurSprites.height, minotaurSprites.width, minotaurSprites.height,      
-         minotaur.x - viewport.x - minotaurSprites.width/2,
-         minotaur.y - viewport.y - minotaurSprites.height/2 - minotaurSprites.offsetY,
-         minotaurSprites.height, minotaurSprites.width
-      );
+   ctxEnemies.drawImage(
+      animState,
+      minotaur.frameX * minotaurSprites.width, minotaur.frameY * minotaurSprites.height, minotaurSprites.width, minotaurSprites.height,      
+      minotaur.x - viewport.x - minotaurSprites.width/2 + minotaurSprites.offsetX,
+      minotaur.y - viewport.y - minotaurSprites.height/2 + minotaurSprites.offsetY,
+      minotaurSprites.width * minotaurSprites.sizeRatio, minotaurSprites.height * minotaurSprites.sizeRatio
+   );
 
 
-      // =====================
-      // --- Temporary ---
-      // =====================
-      const minotaurBar = {
-         ctx: ctxEnemies,
-         x: minotaur.x - viewport.x,
-         y: minotaur.y - viewport.y,
-         width: barWidth,
-         height: barHeight,
-      }
-      
-      const gameBar = new GameBar(minotaurBar, -barWidth/2, -80, minotaur.baseHealth, minotaur.health);
-
-      let index = 0;
-      if(minotaur.health <= minotaur.baseHealth *0.6) index = 2; // yellow bar at 60% Health
-      if(minotaur.health <= minotaur.baseHealth *0.3) index = 5; // red bar at 30% Health
-
-      gameBar.draw(
-         hudImage,
-         barCoordArray[index].x,
-         barCoordArray[index].y,
-         barCoordArray[index].width,
-         barCoordArray[index].height
-      );
+   // =====================
+   // --- Temporary ---
+   // =====================
+   const minotaurBar = {
+      ctx: ctxEnemies,
+      x: minotaur.x - viewport.x,
+      y: minotaur.y - viewport.y,
+      width: barWidth,
+      height: barHeight,
    }
+   
+   const gameBar = new GameBar(minotaurBar, -barWidth/2, -80, minotaur.baseHealth, minotaur.health);
+
+   let index = 0;
+   if(minotaur.health <= minotaur.baseHealth *0.6) index = 2; // yellow bar at 60% Health
+   if(minotaur.health <= minotaur.baseHealth *0.3) index = 5; // red bar at 30% Health
+
+   gameBar.draw(
+      hudImage,
+      barCoordArray[index].x,
+      barCoordArray[index].y,
+      barCoordArray[index].width,
+      barCoordArray[index].height
+   );
+}
+
+const drawMinotaurShadow = (minotaur) => {
+   
+   ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.6)";
+   ctxEnemies.beginPath();
+   ctxEnemies.ellipse(
+      minotaur.x - viewport.x,
+      minotaur.y - viewport.y + minotaurSprites.radius,
+      minotaurSprites.radius * 0.8, minotaurSprites.radius * 0.4, 0, 0, Math.PI * 2
+   );
+   ctxEnemies.fill();
+   ctxEnemies.closePath();
 }
 
 
 // =====================================================================
 // Minotaur Animation State
 // =====================================================================
-const minotaurAnimPath = "client/images/playerAnimation/";
+const minotaurAnimPath = "client/images/enemiesAnim/minotaurs/";
 
 const minotaurAnimSrc = {
-   idle: minotaurAnimPath + "idle_4x.png",
-   walk: minotaurAnimPath + "walk_4x.png",
-   died: minotaurAnimPath + "died_4x.png",
+   idle: minotaurAnimPath + "idle_2x.png",
+   walk: minotaurAnimPath + "walk_2x.png",
+   died: minotaurAnimPath + "died_2x.png",
 }
 
 let minotaurAnimArray = [];
@@ -96,8 +109,11 @@ const minotaurAnimState = (minotaur) => {
 // =====================================================================
 const minotaurSync = (minotaur) => {
    
-   // DEBUG_Minotaur(minotaur);
-   drawMinotaur(minotaur);
+   if(!minotaur.isHidden) {
+      // DEBUG_Minotaur(minotaur);
+      drawMinotaurShadow(minotaur);
+      drawMinotaur(minotaur);
+   }
 }
 
 

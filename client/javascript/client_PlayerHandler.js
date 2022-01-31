@@ -114,10 +114,14 @@ const playerScore = (data) => {
    // Player score
    const kills = playerScore.querySelector(".kills");
    const died = playerScore.querySelector(".died");
+   const fame = playerScore.querySelector(".fame");
+   const fameCount = playerScore.querySelector(".fame-count");
 
    // Set DOM text content
    kills.textContent = `Kills: ${data.kills}`;
    died.textContent = `Died: ${data.died}`;
+   fame.textContent = `Fame: ${data.fame}`;
+   fameCount.textContent = `F_Count: ${data.fameCount}`;
 }
 
 const initPlayerUI = (socket) => {
@@ -208,19 +212,23 @@ const onMouseInput = (socket) => {
 // Player Floating Text
 // =====================================================================
 const playerFloatingText = (player, textColor, textValue) => {
-   
-   const topOffset = 20;
 
    const text = {
       offsetX: -35,
-      offsetY: -117,
+      offsetY: -100,
       textSize: 30,
    };
-
-   const newText = new FloatingText(ctxPlayer,
-      viewSize.width/2,
-      viewSize.height/2 + topOffset,
-      text.offsetX, text.offsetY, text.textSize, textColor, textValue
+   
+   const newText = new FloatingText(
+      
+      ctxPlayer,
+      pos(player, "x"),
+      pos(player, "y"),
+      text.offsetX,
+      text.offsetY,
+      text.textSize,
+      textColor,
+      textValue
    );
 
    floatTextArray.push(newText);
@@ -588,7 +596,7 @@ const drawName = (ctx, player) => {
 // =====================================================================
 // Player Animation State
 // =====================================================================
-const playerAnimPath = "client/images/playerAnimation/";
+const playerAnimPath = "client/images/playerAnim/";
 
 const animSrc = {
    idle: playerAnimPath + "idle_4x.png",
@@ -665,22 +673,52 @@ const deathScreen = (socket) => {
 
 
 // =====================================================================
+// Player Fame
+// =====================================================================
+const playerFame = (player) => {
+
+   const barWidth = 1000;
+
+   const fameBarSpecs = {
+      ctx: ctxUI,
+      x: viewSize.width/2 - barWidth/2,
+      y: 10,
+      width: barWidth,
+      height: 20,
+   }
+
+   const fameBar = new GameBar(fameBarSpecs, 0, 0, player.baseFame, player.fameValue);
+
+   fameBar.draw(
+      hudImage,
+      50, 586, 350, 50
+      // 50, 612, 350, 23
+   );
+}
+
+
+// =====================================================================
 // Player Sync (Every frame)
 // =====================================================================
 const playerSync = (player) => {
 
    // if Client
    if(viewport_HTML.id === String(player.id)) {
+      
+      // Camera 
       scrollCam(player);
+      
+      // UI
+      playerFame(player);
       drawHUD_Mana(player);
       drawHUD_Health(player);
       drawHUD_Energy(player);
-      drawBars_Client(player);
-
+      
       // Player
       drawShadow(ctxPlayer, player);
       drawPlayer(ctxPlayer, player);
       drawName(ctxPlayer, player);  
+      drawBars_Client(player);
    }
    
    

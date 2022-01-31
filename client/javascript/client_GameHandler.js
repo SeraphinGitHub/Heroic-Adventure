@@ -60,7 +60,7 @@ const handleFloatingText = () => {
 
    floatTextArray.forEach(text => {
       text.drawText();
-      
+
       if(text.displayDuration <= 0) {
          let textIndex = floatTextArray.indexOf(text);
          floatTextArray.splice(textIndex, 1);

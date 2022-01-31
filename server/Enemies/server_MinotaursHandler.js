@@ -15,12 +15,18 @@ let minotaursList = [];
 
 exports.initMinotaurs = (mobList) => {
 
+   const minotaursSpawns = [
+      {x: 800, y: 600},
+      {x: 1400, y: 600},
+      {x: 1000, y: 1100},
+   ];
+
    const minotaursSpecs = {
 
       health: 100,
-      radius: 50,
-      wanderBreakTime: 1 *1000,
-      wanderRange: 100,
+      radius: 55,
+      wanderRange: 120,
+      wanderBreakTime: 2 *1000,
       chasingRange: 300,
       GcD: 50,
       hiddenTime: 4 *1000,
@@ -31,15 +37,12 @@ exports.initMinotaurs = (mobList) => {
       runSpeed: 6,
    }
    
-   const minotaur_1 = new Enemy(800, 600, minotaursSpecs);
-   const minotaur_2 = new Enemy(1400, 600, minotaursSpecs);
-   const minotaur_3 = new Enemy(1000, 1100, minotaursSpecs);
+   minotaursSpawns.forEach(position => {
+      const minotaur = new Enemy(position.x, position.y, minotaursSpecs);
+      minotaursList.push(minotaur);
+      mobList.push(minotaur);
+   });
 
-   minotaursList.push(minotaur_1, minotaur_2, minotaur_3);
-   mobList.push(minotaur_1, minotaur_2, minotaur_3);
-
-   // minotaursList.push(minotaur_1);
-   // mobList.push(minotaur_1);
 }
 
 
@@ -50,43 +53,56 @@ const minotaurMovements = (minotaur) => {
 
    minotaur.wandering();
    
-   // Cross Move
-   if(minotaur.y > minotaur.calcY) minotaur.frameY = 0; // Up
-   if(minotaur.y < minotaur.calcY) minotaur.frameY = 1; // Down
-   if(minotaur.x > minotaur.calcX) minotaur.frameY = 2; // Left
-   if(minotaur.x < minotaur.calcX) minotaur.frameY = 3; // Right
+   // ===== 4 Directions Sprites Sheets =====
+      // // Cross Move
+      // if(minotaur.y > minotaur.calcY) minotaur.frameY = 0; // Up
+      // if(minotaur.y < minotaur.calcY) minotaur.frameY = 1; // Down
+      // if(minotaur.x > minotaur.calcX) minotaur.frameY = 2; // Left
+      // if(minotaur.x < minotaur.calcX) minotaur.frameY = 3; // Right
 
-   // Diag Move
-   if(minotaur.y > minotaur.calcY && minotaur.x > minotaur.calcX
-   || minotaur.y > minotaur.calcY && minotaur.x < minotaur.calcX) minotaur.frameY = 0; // Top Left / Top Right
-   if(minotaur.y < minotaur.calcY && minotaur.x > minotaur.calcX
-   || minotaur.y < minotaur.calcY && minotaur.x < minotaur.calcX) minotaur.frameY = 1; // Down Left / Down Right
+      // // Diag Move
+      // if(minotaur.y > minotaur.calcY && minotaur.x > minotaur.calcX
+      // || minotaur.y > minotaur.calcY && minotaur.x < minotaur.calcX) minotaur.frameY = 0; // Top Left / Top Right
+      // if(minotaur.y < minotaur.calcY && minotaur.x > minotaur.calcX
+      // || minotaur.y < minotaur.calcY && minotaur.x < minotaur.calcX) minotaur.frameY = 1; // Down Left / Down Right
+   // ===== 4 Directions Sprites Sheets =====
+
+
+   // ===== 2 Directions Sprites Sheets =====
+      // Cross Move
+      if(minotaur.y > minotaur.calcY || minotaur.x > minotaur.calcX) minotaur.frameY = 0; // Left
+      if(minotaur.y < minotaur.calcY || minotaur.x < minotaur.calcX) minotaur.frameY = 1; // Right
+
+      // Diag Move
+      if(minotaur.y > minotaur.calcY && minotaur.x > minotaur.calcX
+      || minotaur.y < minotaur.calcY && minotaur.x > minotaur.calcX) minotaur.frameY = 0; // Top / Down Left
+      if(minotaur.y > minotaur.calcY && minotaur.x < minotaur.calcX
+      || minotaur.y < minotaur.calcY && minotaur.x < minotaur.calcX) minotaur.frameY = 1; // Top / Down Right
+   // ===== 2 Directions Sprites Sheets =====
 }
 
 
-
-
 // =====================================================================
-// Handle Player State
+// Handle Minotaur State
 // =====================================================================
 const anim = {
    idle: {
-      index: 2,
-      spritesNumber: 29,
+      index: 3,
+      spritesNumber: 11,
    },
 
    walk: {
-      index: 1,
-      spritesNumber: 29,
+      index: 2,
+      spritesNumber: 17,
    },
 
    died: {
-      index: 3,
-      spritesNumber: 29,
+      index: 2,
+      spritesNumber: 14,
    },
 }
 
-const handlePlayerState = (minotaur) => {
+const handleMinotaurState = (minotaur) => {
    
    // Idle State
    if(minotaur.x === minotaur.calcX && minotaur.y === minotaur.calcY) {
@@ -102,7 +118,6 @@ const handlePlayerState = (minotaur) => {
 }
 
 
-
 // =====================================================================
 // Minotaur Update (Every frame)
 // =====================================================================
@@ -115,7 +130,7 @@ exports.minotaurUpdate = () => {
       let minotaur = minotaursList[i];
       
       if(!minotaur.isDead) {
-         handlePlayerState(minotaur);
+         handleMinotaurState(minotaur);
          minotaurMovements(minotaur);
       }
 

@@ -47,6 +47,8 @@ exports.onConnect = (socket, socketList) => {
       socket.emit("playerScore", {
          kills: player.kills,
          died: player.died,
+         fame: player.fame,
+         fameCount: player.fameCount,
       });
 
       // General Chat
@@ -333,6 +335,8 @@ const playerHealing = (player, socketList) => {
 // =====================================================================
 // Damaging Other Players
 // =====================================================================
+const PvPfameCost = 500;
+
 const damagingOtherPlayers = (player, socketList) => {
 
    for(let i in playerList) {
@@ -347,13 +351,18 @@ const damagingOtherPlayers = (player, socketList) => {
          
          let socket = socketList[player.id];
 
+         // Other player's Death
          if(otherPlayer.health <= 0) {
+            
             player.kills++;
-            playerDeath(otherPlayer);
+            playerDeath(otherPlayer, PvPfameCost);
+            handlePlayerFame(player, PvPfameCost);
 
             socket.emit("playerScore", {
                kills: player.kills,
                died: player.died,
+               fame: player.fame,
+               fameCount: player.fameCount,
             });
          }
 
@@ -375,6 +384,8 @@ const damagingOtherPlayers = (player, socketList) => {
 // =====================================================================
 // Damaging Mobs
 // =====================================================================
+const PvEfameCost = 100;
+
 const damagingMobs = (player, socketList, mobList) => {
 
    for(let i in mobList) {
@@ -383,10 +394,24 @@ const damagingMobs = (player, socketList, mobList) => {
       if(!mob.isDead
       && collision.circle_toCircle(player, mob)) {
          
-         mob.calcDamage = mob.damageRnG();
+         mob.calcDamage = player.damageRnG();
          mob.health -= mob.calcDamage;
+
+         let socket = socketList[player.id];
          
-         if(mob.health <= 0) mob.death();
+         // Mob's Death
+         if(mob.health <= 0) {
+            
+            mob.death();
+            handlePlayerFame(player, PvEfameCost);
+
+            socket.emit("playerScore", {
+               kills: player.kills,
+               died: player.died,
+               fame: player.fame,
+               fameCount: player.fameCount,
+            });
+         }
          
          const mobData = {
             x: mob.x,
@@ -394,7 +419,6 @@ const damagingMobs = (player, socketList, mobList) => {
             calcDamage: mob.calcDamage,
          };
          
-         let socket = socketList[player.id];
          socket.emit("giveDamage", mobData);
       }
    }
@@ -404,13 +428,15 @@ const damagingMobs = (player, socketList, mobList) => {
 // =====================================================================
 // Player Death
 // =====================================================================
-const playerDeath = (player) => {
+const playerDeath = (player, fameCost) => {
 
    player.health = 0;
    player.isDead = true;
+   player.fame -= fameCost;
    player.died++;
    player.deathCounts++;
    
+   if(player.fame <= 0) player.fame = 0;
    if(player.deathCounts === 10) player.deathCounts = 0;
    
    const respawnCooldown = setInterval(() => {
@@ -432,8 +458,8 @@ const playerDeath = (player) => {
          player.color = "darkviolet"; // <== Debug Mode
 
          // ================  Temporary  ================
-         player.x = Math.floor(Math.random() * 2200) + 100; // <== Randomize position on respawn
-         player.y = Math.floor(Math.random() * 1700) + 100;
+         player.x = Math.floor(Math.random() * 2050) +50; // <== Randomize position on respawn
+         player.y = Math.floor(Math.random() * 1550);
          // ================  Temporary  ================
 
          clearInterval(respawnCooldown);
@@ -520,6 +546,21 @@ const handlePlayerState = (player) => {
    else {
       player.animation(frame, anim.idle.index, anim.idle.spritesNumber);
       return player.state = "idle";
+   }
+}
+
+
+// =====================================================================
+// Handle Player Fame
+// =====================================================================
+const handlePlayerFame = (player, fameCost) => {
+
+   player.fame += fameCost;
+   player.fameValue += fameCost;
+
+   if(player.fame / player.baseFame >= 1) {
+      player.fameCount += Math.floor(player.fameValue / player.baseFame);
+      player.fameValue = player.fame - (player.baseFame * player.fameCount);
    }
 }
 

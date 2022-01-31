@@ -12,7 +12,6 @@ class Player {
       
       this.x = 1080;
       this.y = 800;
-
       this.radius = 42;
 
       // Attack Hitbox
@@ -46,6 +45,12 @@ class Player {
       this.mana = this.baseMana;
       this.baseRegenMana = 0.12;
       this.regenMana = process.env.SYNC_COEFF* this.baseRegenMana;
+
+      // Fame
+      this.baseFame = 10000;
+      this.fame = 0;
+      this.fameValue = this.fame;
+      this.fameCount = 0;
 
       // Spells cast
       this.cast_Heal = false;

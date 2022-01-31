@@ -39,6 +39,15 @@ class FloatingText {
 // Game Bar
 // =====================================================================
 class GameBar {
+
+   // const barObj = {
+   //    ctx: ctxUI,
+   //    x: viewSize.width/2 - barWidth/2,
+   //    y: viewSize.height/2,
+   //    width: barWidth,
+   //    height: barHeight,
+   // }
+
    constructor(barObj, offsetX, offsetY, maxValue, value) {
       this.ctx = barObj.ctx;
       
