@@ -25,6 +25,7 @@ setTimeout(() => {
 const scripts = [
    
    // Scripts
+   // "client_Player.js",
    "client_Classes.js",
    "client_Chat.js",
 

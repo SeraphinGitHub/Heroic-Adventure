@@ -14,7 +14,7 @@ const io = new Server(server);
 // Scrips import
 // =====================================================================
 const playerHandler = require("./server/server_PlayerHandler.js");
-const minotaursHandler = require("./server/Enemies/server_MinotaursHandler.js");
+const enemiesHandler = require("./server/Enemies/server_EnemiesHandler.js");
 
 
 // =====================================================================
@@ -38,7 +38,7 @@ const playerMax = 300;
 let socketList = {};
 let mobList = [];
 
-minotaursHandler.initMinotaurs(mobList);
+enemiesHandler.initEnemies(mobList);
 
 
 // =====================================================================
@@ -73,14 +73,16 @@ io.on("connection", (socket) => {
 // =====================================================================
 // Server Sync
 // =====================================================================
+let frame = 0
+
 setInterval(() => {
-   let playerData = playerHandler.playerUpdate(socketList, mobList);
-   let minotaurData = minotaursHandler.minotaurUpdate();
+   let playerData = playerHandler.playerUpdate(frame, socketList, mobList);
+   let enemiesData = enemiesHandler.enemiesUpdate(frame, mobList);
    
    playerData.forEach(player => {
 
       let socket = socketList[player.id];
-      socket.emit("newSituation", playerData, minotaurData);
+      socket.emit("newSituation", playerData, enemiesData);
 
       // Death Screen Event
       if(player.isDead && !player.isRespawning) {
@@ -88,6 +90,8 @@ setInterval(() => {
          socket.emit("playerScore", {
             kills: player.kills,
             died: player.died,
+            fame: player.fame,
+            fameCount: player.fameCount,
          });
 
          socket.emit("playerDeath", {
@@ -101,4 +105,7 @@ setInterval(() => {
          socket.emit("playerRespawn");
       }
    });
+
+   frame++;
+
 }, 1000/process.env.FRAME_RATE);

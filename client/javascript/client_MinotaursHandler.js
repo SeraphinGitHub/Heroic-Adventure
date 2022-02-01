@@ -25,7 +25,6 @@ const drawMinotaur = (minotaur) => {
       minotaurSprites.width * minotaurSprites.sizeRatio, minotaurSprites.height * minotaurSprites.sizeRatio
    );
 
-
    // =====================
    // --- Temporary ---
    // =====================

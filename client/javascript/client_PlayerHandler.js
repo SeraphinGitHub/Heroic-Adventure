@@ -2,30 +2,6 @@
 "use strict"
 
 // =====================================================================
-// Map Settings
-// =====================================================================
-const mapTiles = new Image();
-mapTiles.src = "client/images/map/map_tile_3_lands.png";
-
-const cellSize = 180;
-const spriteSize = 256;
-const columns = 12;
-const rows = 9;
-
-const mapScheme = [
-   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
-   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
-   2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2,
-   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
-   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
-   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-];
-
-
-// =====================================================================
 // Scroll Camera
 // =====================================================================
 const scrollCam = (player) => {
@@ -59,7 +35,7 @@ const scrollCam = (player) => {
          let tile_Y = y * cellSize - viewport.y + centerVp_Y;
          
          ctxMap.drawImage(mapTiles,
-            (tileToDraw -1) * spriteSize, 0, spriteSize, spriteSize,
+            (tileToDraw -1) * mapSpriteSize, 0, mapSpriteSize, mapSpriteSize,
             tile_X, tile_Y, cellSize, cellSize
          );
 
@@ -211,34 +187,87 @@ const onMouseInput = (socket) => {
 // =====================================================================
 // Player Floating Text
 // =====================================================================
-const playerFloatingText = (player, textColor, textValue) => {
-
-   const text = {
-      offsetX: -35,
-      offsetY: -100,
-      textSize: 30,
-   };
+const playerFloatingText = (player, textObj) => {
    
    const newText = new FloatingText(
-      
       ctxPlayer,
       pos(player, "x"),
       pos(player, "y"),
-      text.offsetX,
-      text.offsetY,
-      text.textSize,
-      textColor,
-      textValue
+      textObj.x,
+      textObj.y,
+      textObj.size,
+      textObj.color,
+      textObj.value
    );
 
    floatTextArray.push(newText);
 }
 
 const floatingText = (socket) => {
+   
+   const mainTexSize = 34;
 
-   socket.on("getHeal", (player) => playerFloatingText(player, "lime", `+${player.calcHealing}`));
-   socket.on("giveDamage", (player) => playerFloatingText(player, "yellow", `-${player.calcDamage}`));
-   socket.on("getDamage", (player) => playerFloatingText(player, "red", `-${player.calcDamage}`));
+   socket.on("getHeal", (player) => {
+
+      const text = {
+         x: -35,
+         y: -100,
+         size: mainTexSize,
+         color: "lime",
+         value: `+${player.calcHealing}`,
+      }
+      
+      playerFloatingText(player, text);
+   });
+
+   socket.on("giveDamage", (player) => {
+
+      const text = {
+         x: -35,
+         y: -100,
+         size: mainTexSize,
+         color: "yellow",
+         value: `-${player.calcDamage}`,
+      }
+      
+      playerFloatingText(player, text);
+   });
+
+   socket.on("getDamage", (player) => {
+      const text = {
+         x: -35,
+         y: -100,
+         size: mainTexSize,
+         color: "red",
+         value: `-${player.calcDamage}`,
+      }
+      
+      playerFloatingText(player, text);
+   });
+   
+   socket.on("getFame", (player, fameCost) => {
+      const text = {
+         x: -105,
+         y: 180,
+         size: mainTexSize,
+         color: "darkviolet",
+         value: `+${fameCost} Fame`,
+      }
+      
+      playerFloatingText(player, text);
+   });
+   
+   socket.on("looseFame", (player, fameCost) => {
+      const text = {
+         x: -105,
+         y: 180,
+         size: mainTexSize,
+         color: "red",
+         value: `-${fameCost} Fame`,
+      }
+      
+      playerFloatingText(player, text);
+   });
 }
 
 
@@ -367,97 +396,22 @@ const drawHUD_Energy = (player) => {
       4, 536, 461, 45,
       82, 65, 165, 8
    );
-
-   // Purple Bar
-   // drawHUD_BaseBar(
-   //    energyRatio,
-   //    4, 586, 461, 50,
-   //    82, 65, 165, 8
-   // );
 }
 
 
 // =====================================================================
 // Player Bars
 // =====================================================================
-const barWidth = 110;
-const barHeight = 8;
-
-const barsCoordinates = () => {
-   // Coordinates PNG file
-
-   // Health
-   const healthCoord = {
-      x: 498,
-      y: 560,
-      width: 49,
-      height: 25,
-   };
-
-   // Mana
-   const manaCoord = {
-      x: 563,
-      y: 561,
-      width: 49,
-      height: 25,
-   };
-   
-   // Low Mana
-   const lowManaCoord = {
-      x: 627,
-      y: 562,
-      width: 50,
-      height: 25,
-   };
-
-   // Energy
-   const energyCoord = {
-      x: 498,
-      y: 591,
-      width: 49,
-      height: 25,
-   };
-   
-   // Purple Bar
-   const purpleCoord = {
-      x: 563,
-      y: 591,
-      width: 49,
-      height: 25,
-   };
-   
-   // GcD
-   const attackCoord = {
-      x: 627,
-      y: 591,
-      width: 50,
-      height: 25,
-   };
-   
-   return [
-      healthCoord,   // Must be 1st
-      manaCoord,     // Must be 2nd
-      energyCoord,   // Must be 3rd
-      purpleCoord,   // Must be 4rd
-
-      lowManaCoord,  // Must be before last
-      attackCoord,   // Must be last
-   ];
-}
-
-const barCoordArray = barsCoordinates();
-
-const clientPlayerBar = {
-   ctx: ctxUI,
-   x: viewSize.width/2 - barWidth/2,
-   y: viewSize.height/2,
-   width: barWidth,
-   height: barHeight,
-}
-
 const drawBars_Client = (player) => {
    
-   // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
+   const clientPlayerBar = {
+      ctx: ctxUI,
+      x: viewSize.width/2 - barWidth/2,
+      y: viewSize.height/2,
+      width: barWidth,
+      height: barHeight,
+   }
+
    const attackBar = new GameBar(clientPlayerBar, 0, 65, player.GcD, player.speedGcD);
    const attackCoord = barCoordArray[ barCoordArray.length -1 ]; // Always get last index
 
@@ -513,9 +467,7 @@ const drawBars_OtherPlayer = (player) => {
       let bar = barValueArray[i];
       if(player.isDead) bar.value = 0;
       
-      // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
       const gameBar = new GameBar(otherPlayerBar, -barWidth/2, -95 +barGap, bar.maxValue, bar.value);
-      
       let index = i;
 
       // Mana Bar
@@ -547,7 +499,7 @@ const drawBars_OtherPlayer = (player) => {
 // =====================================================================
 // Draw Player, Shadow, Name
 // =====================================================================
-const sprites = {
+const playerSprites = {
    height: 200,
    width: 200,
    offsetY: 5,
@@ -560,8 +512,8 @@ const drawShadow = (ctx, player) => {
    ctx.beginPath();
    ctx.ellipse(
       pos(player,"x"),
-      pos(player,"y") + sprites.radius,
-      sprites.radius * 0.8, sprites.radius * 0.4, 0, 0, Math.PI * 2
+      pos(player,"y") + playerSprites.radius,
+      playerSprites.radius * 0.8, playerSprites.radius * 0.4, 0, 0, Math.PI * 2
    );
    ctx.fill();
    ctx.closePath();
@@ -573,10 +525,10 @@ const drawPlayer = (ctx, player) => {
 
    ctx.drawImage(
       animState,
-      player.frameX * sprites.width, player.frameY * sprites.height, sprites.width, sprites.height,      
-      pos(player,"x") - sprites.width/2,
-      pos(player,"y") - sprites.height/2 - sprites.offsetY,
-      sprites.height, sprites.width,
+      player.frameX * playerSprites.width, player.frameY * playerSprites.height, playerSprites.width, playerSprites.height,      
+      pos(player,"x") - playerSprites.width/2,
+      pos(player,"y") - playerSprites.height/2 - playerSprites.offsetY,
+      playerSprites.height, playerSprites.width,
    );
 }
 
@@ -709,10 +661,10 @@ const playerSync = (player) => {
       scrollCam(player);
       
       // UI
-      playerFame(player);
       drawHUD_Mana(player);
       drawHUD_Health(player);
       drawHUD_Energy(player);
+      playerFame(player);
       
       // Player
       drawShadow(ctxPlayer, player);
@@ -748,8 +700,6 @@ const initPlayer = (socket) => {
    onKeyboardInput(socket);
    onMouseInput(socket);
 }
-
-
 
 
 // =====================================================================

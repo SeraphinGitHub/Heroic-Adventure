@@ -340,7 +340,10 @@ const PvPfameCost = 500;
 const damagingOtherPlayers = (player, socketList) => {
 
    for(let i in playerList) {
+
       let otherPlayer = playerList[i];
+      let socket = socketList[player.id];
+      let otherSocket = socketList[otherPlayer.id];
 
       if(player !== otherPlayer
       && !otherPlayer.isDead
@@ -349,21 +352,23 @@ const damagingOtherPlayers = (player, socketList) => {
          otherPlayer.calcDamage = player.damageRnG();
          otherPlayer.health -= otherPlayer.calcDamage;
          
-         let socket = socketList[player.id];
-
          // Other player's Death
          if(otherPlayer.health <= 0) {
             
             player.kills++;
             playerDeath(otherPlayer, PvPfameCost);
             handlePlayerFame(player, PvPfameCost);
-
+            
+            // Player Score
             socket.emit("playerScore", {
                kills: player.kills,
                died: player.died,
                fame: player.fame,
                fameCount: player.fameCount,
             });
+
+            socket.emit("getFame", player, PvPfameCost);
+            otherSocket.emit("looseFame", otherPlayer, PvPfameCost);
          }
 
          const otherPlayerData = {
@@ -373,9 +378,8 @@ const damagingOtherPlayers = (player, socketList) => {
             calcDamage: otherPlayer.calcDamage,
          };
          
-         let otherSocket = socketList[otherPlayer.id];
-         otherSocket.emit("getDamage", otherPlayerData);
          socket.emit("giveDamage", otherPlayerData);
+         otherSocket.emit("getDamage", otherPlayerData);
       }
    }
 }
@@ -411,6 +415,8 @@ const damagingMobs = (player, socketList, mobList) => {
                fame: player.fame,
                fameCount: player.fameCount,
             });
+            
+            socket.emit("getFame", player, PvEfameCost);
          }
          
          const mobData = {
@@ -426,18 +432,37 @@ const damagingMobs = (player, socketList, mobList) => {
 
 
 // =====================================================================
+// Handle Player Fame
+// =====================================================================
+const handlePlayerFame = (player, fameCost) => {
+
+   player.fame += fameCost;
+   player.fameValue += fameCost;
+
+   if(player.fame / player.baseFame >= 1) {
+      player.fameCount += Math.floor(player.fameValue / player.baseFame);
+      player.fameValue = player.fame - (player.baseFame * player.fameCount);
+   }
+}
+
+
+// =====================================================================
 // Player Death
 // =====================================================================
 const playerDeath = (player, fameCost) => {
 
    player.health = 0;
    player.isDead = true;
-   player.fame -= fameCost;
    player.died++;
+
    player.deathCounts++;
-   
-   if(player.fame <= 0) player.fame = 0;
    if(player.deathCounts === 10) player.deathCounts = 0;
+
+   player.fame -= fameCost;
+   if(player.fame <= 0) player.fame = 0;
+   
+   player.fameValue -= fameCost;
+   if(player.fameValue <= 0) player.fameValue = 0;
    
    const respawnCooldown = setInterval(() => {
       player.respawnTimer --;
@@ -507,7 +532,7 @@ const animTimeOut = (index, spritesNumber) => {
    return process.env.FRAME_RATE * process.env.SYNC_COEFF * index * spritesNumber / 4;
 }
 
-const handlePlayerState = (player) => {
+const handlePlayerState = (frame, player) => {
    
    // Attack State
    if(player.attack_isAnimable) {
@@ -551,26 +576,9 @@ const handlePlayerState = (player) => {
 
 
 // =====================================================================
-// Handle Player Fame
-// =====================================================================
-const handlePlayerFame = (player, fameCost) => {
-
-   player.fame += fameCost;
-   player.fameValue += fameCost;
-
-   if(player.fame / player.baseFame >= 1) {
-      player.fameCount += Math.floor(player.fameValue / player.baseFame);
-      player.fameValue = player.fame - (player.baseFame * player.fameCount);
-   }
-}
-
-
-// =====================================================================
 // Player Update (Every frame)
 // =====================================================================
-let frame = 0;
-
-exports.playerUpdate = (socketList, mobList) => {
+exports.playerUpdate = (frame, socketList, mobList) => {
    let playerData = [];
    
    for(let i in playerList) {
@@ -580,7 +588,7 @@ exports.playerUpdate = (socketList, mobList) => {
          playerGcD(player, socketList, mobList);
          playerMovements(player);
          playerRunning(player);
-         handlePlayerState(player);
+         handlePlayerState(frame, player);
       }
 
       else {
@@ -590,7 +598,6 @@ exports.playerUpdate = (socketList, mobList) => {
 
       playerData.push(player);
    }
-
-   frame++;
+   
    return playerData;
 }

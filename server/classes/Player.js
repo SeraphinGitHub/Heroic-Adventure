@@ -3,15 +3,17 @@
 
 class Player {
    constructor(id) {
+      
       this.id = id;
       this.name = "";
-
-      // Player Hitbox
+      
       // this.x = Math.floor(Math.random() * 2200) +100; // <== Randomize position on load
       // this.y = Math.floor(Math.random() * 1600) +100; // map size - sprite.size (200x200) + half sprite.size
       
       this.x = 1080;
       this.y = 800;
+
+      // Player Hitbox
       this.radius = 42;
 
       // Attack Hitbox

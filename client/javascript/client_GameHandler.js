@@ -52,6 +52,30 @@ viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
+// Map Settings
+// =====================================================================
+const mapTiles = new Image();
+mapTiles.src = "client/images/map/map_tile_3_lands.png";
+
+const cellSize = 180;
+const mapSpriteSize = 256;
+const columns = 12;
+const rows = 9;
+
+const mapScheme = [
+   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
+   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
+   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
+   2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2,
+   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
+   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
+   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
+];
+
+
+// =====================================================================
 // Floating Text
 // =====================================================================
 let floatTextArray = [];
@@ -71,13 +95,85 @@ const handleFloatingText = () => {
 
 
 // =====================================================================
+// Mini Bars Coordinates
+// =====================================================================
+const barWidth = 110;
+const barHeight = 8;
+
+const barsCoordinates = () => {
+   // Coordinates PNG file
+
+   // Health
+   const healthCoord = {
+      x: 498,
+      y: 560,
+      width: 49,
+      height: 25,
+   };
+
+   // Mana
+   const manaCoord = {
+      x: 563,
+      y: 561,
+      width: 49,
+      height: 25,
+   };
+   
+   // Low Mana
+   const lowManaCoord = {
+      x: 627,
+      y: 562,
+      width: 50,
+      height: 25,
+   };
+
+   // Energy
+   const energyCoord = {
+      x: 498,
+      y: 591,
+      width: 49,
+      height: 25,
+   };
+   
+   // Purple Bar
+   const purpleCoord = {
+      x: 563,
+      y: 591,
+      width: 49,
+      height: 25,
+   };
+   
+   // GcD
+   const attackCoord = {
+      x: 627,
+      y: 591,
+      width: 50,
+      height: 25,
+   };
+   
+   return [
+      healthCoord,
+      manaCoord,
+      energyCoord,
+      purpleCoord,
+
+      lowManaCoord,
+      attackCoord,
+   ];
+}
+
+const barCoordArray = barsCoordinates();
+
+
+// =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
 const clientSync = (socket) => {
+
+   let ctxFixedBack_index = ctxArray.length -3;
+   let ctxFixedFront_index = ctxArray.length -1;
+
    socket.on("newSituation", (playerData, minotaurData) => {
-      
-      let ctxFixedBack_index = ctxArray.length -3;
-      let ctxFixedFront_index = ctxArray.length -1;
 
       // Canvas Clearing
       for(let i = 0; i < ctxArray.length; i++) {
