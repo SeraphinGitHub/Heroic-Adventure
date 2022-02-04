@@ -29,8 +29,8 @@ exports.onConnect = (socket, socketList) => {
       let receiverID;
       let receiverName;
       
-      // Send player ID
       socket.emit("playerID", player.id);
+      socket.emit("fameCount+1", player.fameCount);
 
       // Init Player Stats
       socket.emit("playerStats", {
@@ -345,41 +345,48 @@ const damagingOtherPlayers = (player, socketList) => {
       let socket = socketList[player.id];
       let otherSocket = socketList[otherPlayer.id];
 
-      if(player !== otherPlayer
-      && !otherPlayer.isDead
-      && collision.circle_toCircle_withOffset(player, player.attkOffset_X, player.attkOffset_Y, player.attkRadius, otherPlayer)) {
-         
-         otherPlayer.calcDamage = player.damageRnG();
-         otherPlayer.health -= otherPlayer.calcDamage;
-         
-         // Other player's Death
-         if(otherPlayer.health <= 0) {
-            
-            player.kills++;
-            playerDeath(otherPlayer, PvPfameCost);
-            handlePlayerFame(player, PvPfameCost);
-            
-            // Player Score
-            socket.emit("playerScore", {
-               kills: player.kills,
-               died: player.died,
-               fame: player.fame,
-               fameCount: player.fameCount,
-            });
+      if(collision.circle_toCircle_withOffset(
+      player,
+      player.attkOffset_X,
+      player.attkOffset_Y,
+      player.attkRadius,
+      otherPlayer)) {
 
-            socket.emit("getFame", player, PvPfameCost);
-            otherSocket.emit("looseFame", otherPlayer, PvPfameCost);
+         if(player !== otherPlayer
+         && !otherPlayer.isDead) {
+            
+            otherPlayer.calcDamage = player.damageRnG();
+            otherPlayer.health -= otherPlayer.calcDamage;
+            
+            // Other player's Death
+            if(otherPlayer.health <= 0) {
+               
+               player.kills++;
+               playerDeath(otherPlayer, PvPfameCost);
+               playerFame(player, PvPfameCost, socket);
+               
+               // Player Score
+               socket.emit("playerScore", {
+                  kills: player.kills,
+                  died: player.died,
+                  fame: player.fame,
+                  fameCount: player.fameCount,
+               });
+   
+               socket.emit("getFame", player, PvPfameCost);
+               otherSocket.emit("looseFame", otherPlayer, PvPfameCost);
+            }
+   
+            const otherPlayerData = {
+               id: otherPlayer.id,
+               x: otherPlayer.x,
+               y: otherPlayer.y,
+               calcDamage: otherPlayer.calcDamage,
+            };
+            
+            socket.emit("giveDamage", otherPlayerData);
+            otherSocket.emit("getDamage", otherPlayerData);
          }
-
-         const otherPlayerData = {
-            id: otherPlayer.id,
-            x: otherPlayer.x,
-            y: otherPlayer.y,
-            calcDamage: otherPlayer.calcDamage,
-         };
-         
-         socket.emit("giveDamage", otherPlayerData);
-         otherSocket.emit("getDamage", otherPlayerData);
       }
    }
 }
@@ -407,7 +414,7 @@ const damagingMobs = (player, socketList, mobList) => {
          if(mob.health <= 0) {
             
             mob.death();
-            handlePlayerFame(player, PvEfameCost);
+            playerFame(player, PvEfameCost, socket);
 
             socket.emit("playerScore", {
                kills: player.kills,
@@ -432,9 +439,9 @@ const damagingMobs = (player, socketList, mobList) => {
 
 
 // =====================================================================
-// Handle Player Fame
+// Player Fame
 // =====================================================================
-const handlePlayerFame = (player, fameCost) => {
+const playerFame = (player, fameCost, socket) => {
 
    player.fame += fameCost;
    player.fameValue += fameCost;
@@ -442,6 +449,8 @@ const handlePlayerFame = (player, fameCost) => {
    if(player.fame / player.baseFame >= 1) {
       player.fameCount += Math.floor(player.fameValue / player.baseFame);
       player.fameValue = player.fame - (player.baseFame * player.fameCount);
+
+      socket.emit("fameCount+1", player.fameCount);
    }
 }
 

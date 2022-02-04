@@ -16,6 +16,13 @@ const minotaurSprites = {
 const drawMinotaur = (minotaur) => {
 
    let animState = minotaurAnimState(minotaur);
+   
+   const colorBar = {
+      
+      yellow: 0.7,   // 70%
+      orange: 0.5,   // 50%
+      red: 0.3,      // 30%
+   }
 
    ctxEnemies.drawImage(
       animState,
@@ -39,11 +46,12 @@ const drawMinotaur = (minotaur) => {
    const gameBar = new GameBar(minotaurBar, -barWidth/2, -80, minotaur.baseHealth, minotaur.health);
 
    let index = 0;
-   if(minotaur.health <= minotaur.baseHealth *0.6) index = 2; // yellow bar at 60% Health
-   if(minotaur.health <= minotaur.baseHealth *0.3) index = 5; // red bar at 30% Health
+   if(minotaur.health <= minotaur.baseHealth * colorBar.yellow) index = 1;
+   if(minotaur.health <= minotaur.baseHealth * colorBar.orange) index = 2;
+   if(minotaur.health <= minotaur.baseHealth * colorBar.red) index = 3;
 
    gameBar.draw(
-      hudImage,
+      gameUIimage,
       barCoordArray[index].x,
       barCoordArray[index].y,
       barCoordArray[index].width,

@@ -274,49 +274,51 @@ const floatingText = (socket) => {
 // =====================================================================
 // Player HUD
 // =====================================================================
-const hudImage = new Image();
-hudImage.src = "client/images/playerUI/HUD.png";
+const gameUIimage = new Image();
+gameUIimage.src = "client/images/playerUI/Game UI.png";
 
-const scale_X = 1.2;
-const scale_Y = 1;
+const hudScale_X = 1.2;
+const hudScale_Y = 1;
+
+// Healing bar Coord : 6, 376, 729, 45,
 
 const minHealthRatio = 0.3; // Min Health before flash (%)
 const flashingSpeed = 6;
 let flashFrame = 0;
 
 const hud = {
-   x: viewport.width/2 -400/2 *scale_X,
-   y: viewport.height -110 *scale_Y,
-   width: 400 *scale_X,
-   height: 100 *scale_Y,
+   x: viewport.width/2 -400/2 *hudScale_X,
+   y: viewport.height -110 *hudScale_Y,
+   width: 400 *hudScale_X,
+   height: 100 *hudScale_Y,
 }
 
 const drawHUD_Frame = () => {
    
    // Background
-   ctxFixedBack.drawImage(hudImage,
-      4, 179, 729, 141,
-      hud.x + (15 *scale_X), // Pos X
-      hud.y + (10 *scale_Y), // Pos Y
-      hud.width - (30 *scale_X), // Width
-      hud.height - (20 *scale_Y) // Height
+   ctxFixedBack.drawImage(gameUIimage,
+      5, 181, 729, 141,
+      hud.x + (15 *hudScale_X), // Pos X
+      hud.y + (10 *hudScale_Y), // Pos Y
+      hud.width - (30 *hudScale_X), // Width
+      hud.height - (20 *hudScale_Y) // Height
    );
 
    // HUD Sprite
-   ctxFixedFront.drawImage(hudImage,
-      3, 4, 782, 172,
+   ctxFixedFront.drawImage(gameUIimage,
+      5, 4, 782, 173,
       hud.x, hud.y, hud.width, hud.height
    );
 }
 
 const drawHUD_BaseBar = (ratio, sx, sy, sw, sh, offX, offY, offW, offH) => {
 
-   ctxUI.drawImage(hudImage,
+   ctxUI.drawImage(gameUIimage,
       sx, sy, sw *ratio, sh,
-      hud.x + (offX *scale_X), // Pos X
-      hud.y + (offY *scale_Y), // Pos Y
-      ( hud.width - (offW *scale_X) ) *ratio, // Width
-      hud.height/3 - (offH *scale_Y) // Height
+      hud.x + (offX *hudScale_X),
+      hud.y + (offY *hudScale_Y),
+      ( hud.width - (offW *hudScale_X) ) *ratio,
+      hud.height/3 - (offH *hudScale_Y)
    );
 }
 
@@ -328,7 +330,7 @@ const drawHUD_Mana = (player) => {
    if(player.mana >= player.healCost) {
       drawHUD_BaseBar(
          manaRatio,
-         4, 382, 460, 47,
+         6, 528, 460, 47,
          82, 10, 165, 8
       );
    }
@@ -337,7 +339,7 @@ const drawHUD_Mana = (player) => {
    else {
       drawHUD_BaseBar(
          manaRatio,
-         3, 328, 462, 47,
+         5, 475, 461, 47,
          82, 10, 165, 8
       );
    }
@@ -353,7 +355,7 @@ const drawHUD_Health = (player) => {
       // Normal Bar
       drawHUD_BaseBar(
          healthRatio,
-         5, 486, 729, 45,
+         5, 327, 729, 45,
          15, 39, 30, 9
       );
    }
@@ -364,7 +366,7 @@ const drawHUD_Health = (player) => {
       // Flashing Bar
       drawHUD_BaseBar(
          healthRatio,
-         4, 435, 729, 45,
+         6, 424, 729, 45,
          15, 39, 30, 9
       );
 
@@ -375,7 +377,7 @@ const drawHUD_Health = (player) => {
          // Normal Bar
          drawHUD_BaseBar(
             healthRatio,
-            5, 486, 729, 45,
+            5, 327, 729, 45,
             15, 39, 30, 9
          );
       }
@@ -393,7 +395,7 @@ const drawHUD_Energy = (player) => {
    // Yellow Bar
    drawHUD_BaseBar(
       energyRatio,
-      4, 536, 461, 45,
+      6, 582, 460, 46,
       82, 65, 165, 8
    );
 }
@@ -413,10 +415,10 @@ const drawBars_Client = (player) => {
    }
 
    const attackBar = new GameBar(clientPlayerBar, 0, 65, player.GcD, player.speedGcD);
-   const attackCoord = barCoordArray[ barCoordArray.length -1 ]; // Always get last index
+   const attackCoord = barCoordArray[3]; // Always get last index
 
    attackBar.draw(
-      hudImage,
+      gameUIimage,
       attackCoord.x,
       attackCoord.y,
       attackCoord.width,
@@ -425,30 +427,26 @@ const drawBars_Client = (player) => {
 }
 
 const drawBars_OtherPlayer = (player) => {
-      
-   const healthBar = {
-      name: "health",
-      maxValue: player.baseHealth,
-      value: player.health,
-   };
-
-   const manaBar = {
-      name: "mana",
-      maxValue: player.baseMana,
-      value: player.mana,
-   };
-
-   const energyBar = {
-      name: "energy",
-      maxValue: player.baseEnergy,
-      value: player.energy,
-   };
 
    // Bar Value Array
    const barValueArray = [
-      healthBar,
-      manaBar,
-      energyBar,
+      {
+         name: "health",
+         maxValue: player.baseHealth,
+         value: player.health,
+      },
+
+      {
+         name: "mana",
+         maxValue: player.baseMana,
+         value: player.mana,
+      },
+
+      {
+         name: "energy",
+         maxValue: player.baseEnergy,
+         value: player.energy,
+      }
    ];
 
    const otherPlayerBar = {
@@ -468,23 +466,27 @@ const drawBars_OtherPlayer = (player) => {
       if(player.isDead) bar.value = 0;
       
       const gameBar = new GameBar(otherPlayerBar, -barWidth/2, -95 +barGap, bar.maxValue, bar.value);
-      let index = i;
-
-      // Mana Bar
-      if(bar.name === "mana") {
-         if(player.mana >= player.healCost) index = i;
-         else index = barCoordArray.length -2;
-      }
+      
+      let index;      
       
       // Health Bar
       if(bar.name === "health") {
-         if(player.health > player.baseHealth * minHealthRatio) index = i;
-         else index = barCoordArray.length -1;
+         index = 0;
+         if(player.health <= player.baseHealth * minHealthRatio) index = 3;
       }
+
+      // Mana Bar
+      if(bar.name === "mana") {
+         index = 5;
+         if(player.mana < player.healCost) index = 6;
+      }
+
+      // Energy Bar
+      if(bar.name === "energy") index = 1;
       
-      // Other Bar
+      // Draw Bar
       gameBar.draw(
-         hudImage,
+         gameUIimage,
          barCoordArray[index].x,
          barCoordArray[index].y,
          barCoordArray[index].width,
@@ -627,25 +629,57 @@ const deathScreen = (socket) => {
 // =====================================================================
 // Player Fame
 // =====================================================================
-const playerFame = (player) => {
+const fameScale_X = 1.2;
 
-   const barWidth = 1000;
+const fame = {
+   x: viewSize.width/2 -900/2 *fameScale_X,
+   y: viewport.height -805,
+   width: 900 *fameScale_X,
+   height: 53,
+}
 
-   const fameBarSpecs = {
-      ctx: ctxUI,
-      x: viewSize.width/2 - barWidth/2,
-      y: 10,
-      width: barWidth,
-      height: 20,
-   }
+// Fame - GetFame : 791, 192, 1973, 48,
+// Fame - LooseFame : 552, 529, 26, 48,
 
-   const fameBar = new GameBar(fameBarSpecs, 0, 0, player.baseFame, player.fameValue);
+const drawFame_Frame = () => {
 
-   fameBar.draw(
-      hudImage,
-      50, 586, 350, 50
-      // 50, 612, 350, 23
+   // Background
+   ctxFixedBack.drawImage(gameUIimage,
+      522, 477, 26, 48,
+      fame.x + (41 *fameScale_X),
+      fame.y + 19,
+      fame.width - (83 *fameScale_X),
+      fame.height - 27
    );
+
+   // HUD Sprite
+   ctxFixedFront.drawImage(gameUIimage,
+      5, 633, 2177, 105,
+      fame.x, fame.y, fame.width, fame.height
+   );
+}
+
+const drawFame = (player) => {
+
+   let fameBarWidth = (player.fameValue / player.baseFame) * (fame.width - (83 *fameScale_X));
+
+   // Fame Bar
+   ctxUI.drawImage(gameUIimage,
+      522, 529, 26, 48,
+      fame.x + (41 *fameScale_X),
+      fame.y + 19,
+      fameBarWidth,
+      fame.height - 27
+   );
+}
+
+const drawFameCount = (fameCount) => {
+
+   // Fame Count   
+   ctxFixedFront.fillStyle = "darkviolet";
+   ctxFixedFront.font = "30px Orbitron-ExtraBold";
+   ctxFixedFront.fillText(fameCount, fame.x +fame.width -10, fame.y +53);
+   ctxFixedFront.strokeText(fameCount, fame.x +fame.width -10, fame.y +53);
 }
 
 
@@ -664,7 +698,7 @@ const playerSync = (player) => {
       drawHUD_Mana(player);
       drawHUD_Health(player);
       drawHUD_Energy(player);
-      playerFame(player);
+      drawFame(player);
       
       // Player
       drawShadow(ctxPlayer, player);
@@ -694,11 +728,22 @@ const playerSync = (player) => {
 const initPlayer = (socket) => {
 
    drawHUD_Frame();
+   drawFame_Frame();
    initPlayerUI(socket);
    floatingText(socket)
    deathScreen(socket);
    onKeyboardInput(socket);
    onMouseInput(socket);
+
+   socket.on("fameCount+1", (fameCount) => {
+
+      ctxFixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
+      ctxFixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
+
+      drawHUD_Frame();
+      drawFame_Frame();
+      drawFameCount(fameCount);
+   });
 }
 
 
