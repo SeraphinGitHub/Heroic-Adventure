@@ -81,6 +81,7 @@ const minotaurAnimPath = "client/images/enemiesAnim/minotaurs/";
 const minotaurAnimSrc = {
    idle: minotaurAnimPath + "idle_2x.png",
    walk: minotaurAnimPath + "walk_2x.png",
+   attack: minotaurAnimPath + "attack_2x.png",
    died: minotaurAnimPath + "died_2x.png",
 }
 
@@ -100,7 +101,10 @@ const minotaurAnimState = (minotaur) => {
       case "walk": animState = minotaurAnimArray[1];
       break;
 
-      case "died": animState = minotaurAnimArray[2];
+      case "attack": animState = minotaurAnimArray[2];
+      break;
+
+      case "died": animState = minotaurAnimArray[3];
       break;
 
       default: animState = minotaurAnimArray[0];
@@ -117,7 +121,7 @@ const minotaurAnimState = (minotaur) => {
 const minotaurSync = (minotaur) => {
    
    if(!minotaur.isHidden) {
-      DEBUG_Minotaur(minotaur);
+      // DEBUG_Minotaur(minotaur);
       drawMinotaurShadow(minotaur);
       drawMinotaur(minotaur);
    }

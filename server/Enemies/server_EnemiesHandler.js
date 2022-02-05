@@ -9,9 +9,9 @@ const collision = require("../collisions.js");
 
 
 // =====================================================================
-// Init Minotaurs
+// Set Minotaurs
 // =====================================================================
-const initMinotaurs = (mobList) => {
+const set_Minotaurs = (mobList) => {
 
    const minotaursSpawns = [
       {x: 700, y: 600},
@@ -26,10 +26,11 @@ const initMinotaurs = (mobList) => {
       wanderRange: 120,
       wanderBreakTime: 2 *1000,
       chasingRange: 200,
-      GcD: 50,
+      GcD: 60,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
       damages: 15,
+      attackDelay: 0.5,
       damageRatio: 0.5,
       walkSpeed: 3,
       runSpeed: 6,
@@ -56,7 +57,7 @@ const cycleEnemiesPos = (mobList, enemySpawnObj, enemySpecs) => {
 // =====================================================================
 exports.initEnemies = (mobList) => {
 
-   initMinotaurs(mobList);   
+   set_Minotaurs(mobList);   
 }
 
 
@@ -80,38 +81,126 @@ const enemiesMovements = (enemy) => {
 
 
 // =====================================================================
+// Enemies Global Count Down
+// =====================================================================
+const enemiesGcD = (enemy) => {
+   
+   // Regen GcD
+   if(enemy.speedGcD < enemy.GcD) {
+      enemy.speedGcD +=process.env.SYNC_COEFF* 1;
+      if(enemy.isAttacking) enemy.isAttacking = false;
+   }
+   
+   // GcD Up
+   if(enemy.speedGcD >= enemy.GcD) enemiesAttack(enemy);
+}
+
+
+// =====================================================================
+// Enemies Attack
+// =====================================================================
+const enemiesAttack = (enemy) => {
+   
+   // Enemy Attack
+   if(enemy.isAttacking && !enemy.attack_isAnimable) {
+      
+      enemy.frameX = 0;
+      enemy.speedGcD = 0;
+      enemy.isAttacking = false;
+      enemy.attack_isAnimable = true;
+      
+      setTimeout(() => enemy.attack_isAnimable = false, enemyiesAnimTimeOut(enemy));
+      damagingPlayers(enemy, playerList);
+   }
+}
+
+
+// =====================================================================
+// Damaging Players
+// =====================================================================
+const looseFameCost_PvE = 200;
+
+const damagingPlayers = (enemy) => {
+
+   for(let i in playerList) {
+      let player = playerList[i];
+
+      if(!player.isDead
+      && collision.circle_toCircle(enemy, player, 0, 0, enemy.radius)) {
+
+         setTimeout(() => {     
+            player.calcDamage = enemy.damageRnG();
+            player.health -= player.calcDamage;
+
+            let socket = socketList[player.id];
+
+            // Player's Death
+            if(player.health <= 0) {
+               
+               player.death(looseFameCost_PvE);
+
+               socket.emit("playerScore", {
+                  kills: player.kills,
+                  died: player.died,
+                  fame: player.fame,
+                  fameCount: player.fameCount,
+               });
+               
+               socket.emit("looseFame", player, looseFameCost_PvE);
+            }
+            
+            const playerData = {
+               x: player.x,
+               y: player.y,
+               calcDamage: player.calcDamage,
+            };
+            
+            socket.emit("getDamage", playerData);
+         }, enemyiesAnimTimeOut(enemy) * enemy.attackDelay);
+      }
+   }
+}
+
+
+// =====================================================================
 // Enemies Sate Machine
 // =====================================================================
-const enemiesSateMachine = (enemy, playerList) => {
+const enemiesSateMachine = (enemy) => {
    
    for(let i in playerList) {
       let player = playerList[i];
-      
+
       // Chasing
-      if(collision.circle_toCircle_withRange(enemy, player, enemy.chasingRange)) {
-
-         enemy.isWandering = false;
-         enemy.moveToPosition(player.x, player.y, enemy.runSpeed);
+      if(collision.circle_toCircle(enemy, player, 0, 0, enemy.chasingRange)) {
          
+         enemy.isWandering = false;
+         enemy.isChasing = true;
+
+         if(!player.isDead) enemy.moveToPosition(player.x, player.y, enemy.runSpeed);
+         else enemy.isWandering = true;
+
          // Attacking
-         // if(collision.circle_toCircle(enemy, player)) {
+         if(collision.circle_toCircle(enemy, player, 0, 0, enemy.radius)) {
 
-            // enemy.isChasing = false;
-            // enemy.walkSpeed = 0;
+            enemy.isChasing = false;
+            enemy.isAttacking = true;
+            enemy.runSpeed = 0;
+         }
 
-            // player.calcDamage = enemy.damageRnG();
-            // player.health -= player.calcDamage;
-         // }
+         // Back to Chasing
+         else {
+            enemy.isChasing = true;
+            enemy.isAttacking = false;
+            enemy.runSpeed = enemy.baseRunSpeed;
+         }
       }
 
-      else enemy.isWandering = true;
+      // Back to Spawn
+      else enemy.backToSpawn();
    }
    
    // Wandering
    enemy.wandering();
-
-   // Back to Spawn
-   enemy.backToSpawn();
 }
 
 
@@ -128,6 +217,11 @@ const minotaursAnim = {
    walk: {
       index: 2,
       spritesNumber: 17,
+   },
+
+   attack: {
+      index: 2,
+      spritesNumber: 11,
    },
 
    died: {
@@ -148,6 +242,11 @@ const golemsAnim = {
       spritesNumber: 17,
    },
 
+   attack: {
+      index: 2,
+      spritesNumber: 11,
+   },
+
    died: {
       index: 2,
       spritesNumber: 14,
@@ -164,6 +263,11 @@ const orcsAnim = {
    walk: {
       index: 2,
       spritesNumber: 17,
+   },
+
+   attack: {
+      index: 2,
+      spritesNumber: 11,
    },
 
    died: {
@@ -188,8 +292,14 @@ const handleEnemiesState = (frame, enemy) => {
    enemiesAnimType.forEach(animType => {
       if(!enemy.isDead) {
 
+         // Attack State
+         if(enemy.attack_isAnimable) {
+            enemy.animation(frame, animType.attack.index, animType.attack.spritesNumber);
+            return enemy.state = "attack";
+         }
+
          // Idle State
-         if(enemy.x === enemy.calcX && enemy.y === enemy.calcY) {
+         if(enemy.x === enemy.calcX && enemy.y === enemy.calcY || enemy.runSpeed === 0) {
             enemy.animation(frame, animType.idle.index, animType.idle.spritesNumber);
             return enemy.state = "idle";
          }
@@ -208,19 +318,40 @@ const handleEnemiesState = (frame, enemy) => {
    });
 }
 
+const enemyiesAnimTimeOut = (enemy) => {
+   let timeOut;
+
+   enemiesAnimType.forEach(animType => {
+      if(!enemy.isDead) timeOut = Math.round(process.env.FRAME_RATE * process.env.SYNC_COEFF * animType.attack.index * animType.attack.spritesNumber / 4);
+   });
+
+   return timeOut;
+}
+
 
 // =====================================================================
 // Enemies Update (Every frame)
 // =====================================================================
-exports.enemiesUpdate = (frame, playerList, mobList) => {
+let socketList;
+let playerList;
+let mobList;
+
+exports.enemiesUpdate = (frame, G_SocketList, G_PlayerList, G_mobList) => {
+   
+   socketList = G_SocketList;
+   playerList = G_PlayerList;
+   mobList = G_mobList;
+
    let enemiesData = [];
    
    for(let i in mobList) {
       let enemy = mobList[i];
       
       if(!enemy.isDead) {
+
+         enemiesGcD(enemy);
          enemiesMovements(enemy);
-         enemiesSateMachine(enemy, playerList);
+         enemiesSateMachine(enemy);
       }
       
       handleEnemiesState(frame, enemy);

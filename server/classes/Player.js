@@ -113,6 +113,50 @@ class Player {
       return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
    }
 
+   death(fameCost) {
+      
+      const respawnRange = 600;
+
+      this.health = 0;
+      this.isDead = true;
+      this.died++;
+
+      this.deathCounts++;
+      if(this.deathCounts === 10) this.deathCounts = 0;
+
+      this.fame -= fameCost;
+      if(this.fame <= 0) this.fame = 0;
+      
+      this.fameValue -= fameCost;
+      if(this.fameValue <= 0) this.fameValue = 0;
+      
+      const respawnCooldown = setInterval(() => {
+         this.respawnTimer --;
+         
+         if(this.respawnTimer <= 0) {
+
+            this.isDead = false;
+            this.isRespawning = true;
+
+            // Reset Player Bars
+            this.health = this.baseHealth;
+            this.mana = this.baseMana;
+            this.energy = this.baseEnergy;
+            this.speedGcD = this.GcD;
+
+            // Reset Respawn Timer
+            this.respawnTimer = this.baseRespawnTimer;
+            this.color = "darkviolet"; // <== Debug Mode
+            
+            // Randomize position on respawn
+            this.x = (this.x -respawnRange/2) + Math.round(Math.random() * respawnRange);
+            this.y = (this.y -respawnRange/2) + Math.round(Math.random() * respawnRange);
+
+            clearInterval(respawnCooldown);
+         }
+      }, 1000);
+   }
+
    animation(frame, index, spritesNumber) {
       if(frame % index === 0) {       
          if(this.frameX < spritesNumber) this.frameX++;

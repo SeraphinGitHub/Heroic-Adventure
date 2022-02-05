@@ -12,7 +12,7 @@ const bcrypt = require("bcrypt");
 // =====================================================================
 // Player connection
 // =====================================================================
-exports.onConnect = (socket, socketList) => {
+exports.onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
    
@@ -236,7 +236,7 @@ const playerRunning = (player) => {
 // =====================================================================
 // Player Global Count Down
 // =====================================================================
-const playerGcD = (player, socketList, mobList) => {
+const playerGcD = (player) => {
    
    // Regen Mana
    if(player.mana < player.baseMana) player.mana += player.regenMana;
@@ -258,7 +258,7 @@ const playerGcD = (player, socketList, mobList) => {
 // =====================================================================
 // Player Attack
 // =====================================================================
-const playerAttack = (player, socketList, mobList) => {
+const playerAttack = (player) => {
 
    // Player Attack
    if(player.isAttacking && !player.attack_isAnimable) {
@@ -281,7 +281,7 @@ const playerAttack = (player, socketList, mobList) => {
 // =====================================================================
 // Player Cast
 // =====================================================================
-const playerCast = (player, socketList) => {
+const playerCast = (player) => {
    
    if(player.isCasting) {
       player.isCasting = false;
@@ -294,7 +294,7 @@ const playerCast = (player, socketList) => {
 // =====================================================================
 // Player Healing
 // =====================================================================
-const playerHealing = (player, socketList) => {
+const playerHealing = (player) => {
 
    if(player.cast_Heal
    && player.mana >= player.healCost
@@ -329,9 +329,10 @@ const playerHealing = (player, socketList) => {
 // =====================================================================
 // Damaging Other Players
 // =====================================================================
-const PvPfameCost = 500;
+const getFameCost_PvP = 500;
+const looseFameCost_PvP = 300;
 
-const damagingOtherPlayers = (player, socketList) => {
+const damagingOtherPlayers = (player) => {
 
    for(let i in playerList) {
 
@@ -339,12 +340,12 @@ const damagingOtherPlayers = (player, socketList) => {
       let socket = socketList[player.id];
       let otherSocket = socketList[otherPlayer.id];
 
-      if(collision.circle_toCircle_withOffset(
+      if(collision.circle_toCircle(
       player,
+      otherPlayer,
       player.attkOffset_X,
       player.attkOffset_Y,
-      player.attkRadius,
-      otherPlayer)) {
+      player.attkRadius)) {
 
          if(player !== otherPlayer
          && !otherPlayer.isDead) {
@@ -356,8 +357,8 @@ const damagingOtherPlayers = (player, socketList) => {
             if(otherPlayer.health <= 0) {
                
                player.kills++;
-               playerDeath(otherPlayer, PvPfameCost);
-               playerFame(player, PvPfameCost, socket);
+               playerFame(player, getFameCost_PvP, socket);
+               otherPlayer.death(looseFameCost_PvP);
                
                // Player Score
                socket.emit("playerScore", {
@@ -367,8 +368,8 @@ const damagingOtherPlayers = (player, socketList) => {
                   fameCount: player.fameCount,
                });
    
-               socket.emit("getFame", player, PvPfameCost);
-               otherSocket.emit("looseFame", otherPlayer, PvPfameCost);
+               socket.emit("getFame", player, getFameCost_PvP);
+               otherSocket.emit("looseFame", otherPlayer, looseFameCost_PvP);
             }
    
             const otherPlayerData = {
@@ -389,15 +390,15 @@ const damagingOtherPlayers = (player, socketList) => {
 // =====================================================================
 // Damaging Mobs
 // =====================================================================
-const PvEfameCost = 100;
+const getFameCost_PvE = 100;
 
-const damagingMobs = (player, socketList, mobList) => {
+const damagingMobs = (player) => {
 
    for(let i in mobList) {
       let mob = mobList[i];
 
       if(!mob.isDead
-      && collision.circle_toCircle(player, mob)) {
+      && collision.circle_toCircle(player, mob, 0, 0, player.radius)) {
          
          mob.calcDamage = player.damageRnG();
          mob.health -= mob.calcDamage;
@@ -408,7 +409,7 @@ const damagingMobs = (player, socketList, mobList) => {
          if(mob.health <= 0) {
             
             mob.death();
-            playerFame(player, PvEfameCost, socket);
+            playerFame(player, getFameCost_PvE, socket);
 
             socket.emit("playerScore", {
                kills: player.kills,
@@ -417,7 +418,7 @@ const damagingMobs = (player, socketList, mobList) => {
                fameCount: player.fameCount,
             });
             
-            socket.emit("getFame", player, PvEfameCost);
+            socket.emit("getFame", player, getFameCost_PvE);
          }
          
          const mobData = {
@@ -446,53 +447,6 @@ const playerFame = (player, fameCost, socket) => {
 
       socket.emit("fameCount+1", player.fameCount);
    }
-}
-
-
-// =====================================================================
-// Player Death
-// =====================================================================
-const playerDeath = (player, fameCost) => {
-
-   player.health = 0;
-   player.isDead = true;
-   player.died++;
-
-   player.deathCounts++;
-   if(player.deathCounts === 10) player.deathCounts = 0;
-
-   player.fame -= fameCost;
-   if(player.fame <= 0) player.fame = 0;
-   
-   player.fameValue -= fameCost;
-   if(player.fameValue <= 0) player.fameValue = 0;
-   
-   const respawnCooldown = setInterval(() => {
-      player.respawnTimer --;
-      
-      if(player.respawnTimer <= 0) {
-
-         player.isDead = false;
-         player.isRespawning = true;
-
-         // Reset Player Bars
-         player.health = player.baseHealth;
-         player.mana = player.baseMana;
-         player.energy = player.baseEnergy;
-         player.speedGcD = player.GcD;
-
-         // Reset Respawn Timer
-         player.respawnTimer = player.baseRespawnTimer;
-         player.color = "darkviolet"; // <== Debug Mode
-
-         // ================  Temporary  ================
-         player.x = Math.floor(Math.random() * 2050) +50; // <== Randomize position on respawn
-         player.y = Math.floor(Math.random() * 1550);
-         // ================  Temporary  ================
-
-         clearInterval(respawnCooldown);
-      }
-   }, 1000);
 }
 
 
@@ -581,18 +535,23 @@ const handlePlayerState = (frame, player) => {
 // =====================================================================
 // Player Update (Every frame)
 // =====================================================================
+let socketList;
 let playerList;
+let mobList;
 
-exports.playerUpdate = (frame, socketList, globalPlayerList, mobList) => {
+exports.playerUpdate = (frame, G_SocketList, G_PlayerList, G_mobList) => {
    
-   playerList = globalPlayerList;
+   socketList = G_SocketList;
+   playerList = G_PlayerList;
+   mobList = G_mobList;
+
    let playerData = [];
    
    for(let i in playerList) {
       let player = playerList[i];
       
       if(!player.isDead) {
-         playerGcD(player, socketList, mobList);
+         playerGcD(player, mobList);
          playerMovements(player);
          playerRunning(player);
          handlePlayerState(frame, player);

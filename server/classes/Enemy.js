@@ -50,10 +50,12 @@ class Enemy {
       this.baseDamage = enemySpecs.damages;
       this.calcDamage;
       this.damageRatio = enemySpecs.damageRatio;
+      this.attackDelay = enemySpecs.attackDelay;
 
       // Movements Speed
       this.walkSpeed = Math.round(process.env.SYNC_COEFF* enemySpecs.walkSpeed) /2; // <== WalkSpeed
-      this.runSpeed = Math.round(process.env.SYNC_COEFF* enemySpecs.runSpeed) /2; // <== RunSpeed
+      this.baseRunSpeed = Math.round(process.env.SYNC_COEFF* enemySpecs.runSpeed) /2; // <== RunSpeed
+      this.runSpeed = this.baseRunSpeed;
 
       // States
       this.isDead = false;
@@ -98,8 +100,8 @@ class Enemy {
 
    moveToPosition(x, y, speed) {
 
-      this.calcX = x;
-      this.calcY = y;
+      this.calcX = Math.round(x);
+      this.calcY = Math.round(y);
       
       // Reach calculated position (Every Frame)
       if(this.calcX > this.x) {
@@ -143,13 +145,13 @@ class Enemy {
    }
 
    backToSpawn() {
-      
-      if(this.x > this.x + this.wanderRange
-      || this.x < this.x - this.wanderRange
-      || this.y > this.y + this.wanderRange
-      || this.y < this.y - this.wanderRange ) {
+      if(this.isChasing) {      
 
-         this.moveToPosition(this.spawnX, this.spawnY, this.walkSpeed);
+         this.isChasing = false;
+         this.isWandering = true;
+
+         this.calcX = this.spawnX;
+         this.calcY = this.spawnY;
       }
    }
 
@@ -164,8 +166,11 @@ class Enemy {
             this.isDead = false;
             this.isHidden = false;
             this.health = this.baseHealth;
+
             this.x = this.spawnX;
             this.y = this.spawnY;
+
+            this.isWandering = true;
    
          }, this.respawnTime);
       }, this.hiddenTime);

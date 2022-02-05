@@ -78,7 +78,7 @@ let frame = 0
 
 setInterval(() => {
    let playerData = playerHandler.playerUpdate(frame, socketList, playerList, mobList);
-   let enemiesData = enemiesHandler.enemiesUpdate(frame, playerList, mobList);
+   let enemiesData = enemiesHandler.enemiesUpdate(frame, socketList, playerList, mobList);
    
    playerData.forEach(player => {
 
