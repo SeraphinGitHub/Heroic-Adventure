@@ -187,6 +187,15 @@ const onMouseInput = (socket) => {
 // =====================================================================
 // Player Floating Text
 // =====================================================================
+let isGettingFame = false;
+let isLoosingFame = false;
+let fameCost = 0;
+let getFameFluid = 0;
+let looseFameFluid = 0;
+
+// ==> create Globales Variables Section in GameHandler.js 
+
+
 const playerFloatingText = (player, textObj) => {
    
    const newText = new FloatingText(
@@ -245,28 +254,33 @@ const floatingText = (socket) => {
       playerFloatingText(player, text);
    });
    
-   socket.on("getFame", (player, fameCost) => {
+   socket.on("getFame", (player, serverfameCost) => {
       const text = {
          x: -105,
          y: 180,
          size: mainTexSize,
          color: "darkviolet",
-         value: `+${fameCost} Fame`,
+         value: `+${serverfameCost} Fame`,
       }
       
       playerFloatingText(player, text);
+      isGettingFame = true;
+      fameCost = serverfameCost;
    });
    
-   socket.on("looseFame", (player, fameCost) => {
+   socket.on("looseFame", (player, serverfameCost) => {
       const text = {
          x: -105,
          y: 180,
          size: mainTexSize,
          color: "red",
-         value: `-${fameCost} Fame`,
+         value: `-${serverfameCost} Fame`,
       }
       
       playerFloatingText(player, text);
+      isLoosingFame = true;
+      fameCost = serverfameCost;
+      looseFameFluid = serverfameCost;
    });
 }
 
@@ -638,7 +652,7 @@ const fame = {
    height: 53,
 }
 
-// Fame - GetFame : 791, 192, 1973, 48,
+// Fame - GetFame : 552, 477, 26, 48,,
 // Fame - LooseFame : 552, 529, 26, 48,
 
 const drawFame_Frame = () => {
@@ -682,6 +696,50 @@ const drawFameCount = (fameCount) => {
    ctxFixedFront.strokeText(fameCount, fame.x +fame.width -10, fame.y +53);
 }
 
+const fameFluidity = (player, fameFluid, state, stateName) => {
+
+   if(state) {
+
+      let origin_X;
+      const fluidSpeed = 15;
+
+      let fullBarWidth = fame.width - (83 *fameScale_X);
+      let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+      let calcWidth = (fameFluid / fameCost) * miniBarWidth;
+      
+      if(calcWidth <= 0) calcWidth = 0;
+
+      if(stateName === "get") {
+         fameFluid += fluidSpeed;
+         origin_X = player.fameValue / player.baseFame * fullBarWidth;
+
+         if(fameFluid >= fameCost) {
+            fameFluid = 0;
+            state = false;
+         }
+      }
+
+      if(stateName === "loose") {
+         fameFluid -= fluidSpeed;
+         origin_X = player.fameValue / player.baseFame * fullBarWidth;
+
+         if(fameFluid <= -fameCost) {
+            fameFluid = 0;
+            state = false;
+         }
+      }
+
+      ctxUI.drawImage(
+         gameUIimage,
+         522, 529, 26, 48,
+         origin_X,
+         fame.y +19 +50,
+         calcWidth,
+         fame.height - 27
+      );
+   }
+}
+
 
 // =====================================================================
 // Player Sync (Every frame)
@@ -699,12 +757,74 @@ const playerSync = (player) => {
       drawHUD_Health(player);
       drawHUD_Energy(player);
       drawFame(player);
+      // fameFluidity(player, getFameFluid, isGettingFame, "get");
+      // fameFluidity(player, looseFameFluid, isLoosingFame, "loose");
       
       // Player
       drawShadow(ctxPlayer, player);
       drawPlayer(ctxPlayer, player);
       drawName(ctxPlayer, player);  
       drawBars_Client(player);
+
+      if(isGettingFame) {
+   
+         let fullBarWidth = fame.width - (83 *fameScale_X);
+         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+         let fameBarWidth = player.fameValue / player.baseFame * fullBarWidth;
+         let origin_X = fame.x + (41 *fameScale_X) + fameBarWidth;
+
+         let calcWidth = (getFameFluid / fameCost) * miniBarWidth;
+         if(calcWidth <= 0) calcWidth = 0;
+
+         // Value Bar
+         ctxUI.drawImage(
+            gameUIimage,
+            // 522, 529, 26, 48,
+            552, 477, 26, 48,
+            origin_X,
+            fame.y +19 +20,
+            calcWidth,
+            fame.height - 27
+         );
+
+         const ratio = 3;
+         getFameFluid += ratio;
+         
+         if(getFameFluid >= fameCost) {
+            getFameFluid = fameCost;
+            // getFameFluid = 0;
+            // isGettingFame = false;
+         }
+      }
+
+
+      if(isLoosingFame) {
+
+         let fullBarWidth = fame.width - (83 *fameScale_X);
+         let origin_X = player.fameValue / player.baseFame * fullBarWidth;
+         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+
+         let calcWidth = (looseFameFluid / fameCost) * miniBarWidth;
+         if(calcWidth <= 0) calcWidth = 0;
+
+         // Value Bar
+         ctxUI.drawImage(
+            gameUIimage,
+            522, 529, 26, 48,
+            origin_X,
+            fame.y +19 +30,
+            calcWidth,
+            fame.height - 27
+         );
+
+         const ratio = 15;
+         looseFameFluid -= ratio;
+         
+         if(looseFameFluid <= -fameCost) {
+            looseFameFluid = 0;
+            isLoosingFame = false;
+         }
+      }
    }
    
    

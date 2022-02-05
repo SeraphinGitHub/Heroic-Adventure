@@ -58,6 +58,8 @@ class Enemy {
       // States
       this.isDead = false;
       this.isHidden = false;
+      this.isWandering = true;
+      this.isChasing = true;
       this.isAttacking = false;
       this.isCalcPos = false;
       this.isReCalc = false;
@@ -79,8 +81,8 @@ class Enemy {
       return this.RnG(this.baseDamage, this.damageRatio); // More high => Higher RnG Range => More damage (0 ~ 1)
    }
 
-   wandering() {
-      
+   calcPosition() {
+
       // Calculate random position (Run once)
       if(!this.isCalcPos) {
          this.isCalcPos = true;
@@ -92,39 +94,62 @@ class Enemy {
          this.calcX = this.spawnX + (RnG_Distance * Math.cos(RnG_Radians));
          this.calcY = this.spawnY + (RnG_Distance * Math.sin(RnG_Radians));
       }
+   }
 
+   moveToPosition(x, y, speed) {
 
+      this.calcX = x;
+      this.calcY = y;
+      
       // Reach calculated position (Every Frame)
       if(this.calcX > this.x) {
-         this.x += this.walkSpeed;
-         if(this.x + this.walkSpeed > this.calcX) this.x = this.calcX;
+         this.x += speed;
+         if(this.x + speed > this.calcX) this.x = this.calcX;
       }
 
       if(this.calcX < this.x) {
-         this.x -= this.walkSpeed;
-         if(this.x - this.walkSpeed < this.calcX) this.x = this.calcX;
+         this.x -= speed;
+         if(this.x - speed < this.calcX) this.x = this.calcX;
       }
 
       if(this.calcY > this.y) {
-         this.y += this.walkSpeed;
-         if(this.y + this.walkSpeed > this.calcY) this.y = this.calcY;
+         this.y += speed;
+         if(this.y + speed > this.calcY) this.y = this.calcY;
       }
 
       if(this.calcY < this.y) {
-         this.y -= this.walkSpeed;
-         if(this.y - this.walkSpeed < this.calcY) this.y = this.calcY;
+         this.y -= speed;
+         if(this.y - speed < this.calcY) this.y = this.calcY;
       }
+   }
 
+   wandering() {
+      if(this.isWandering) {
 
-      // Stop && Renewal calculation (Run once)
-      if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
-         this.isReCalc = true;
-         this.frameX = 0;
-         
-         setTimeout(() => {
-            this.isReCalc = false;
-            this.isCalcPos = false
-         }, this.wanderBreakTime);
+         this.calcPosition();
+         this.moveToPosition(this.calcX, this.calcY, this.walkSpeed);
+   
+         // Stop && Renewal calculation (Run once)
+         if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
+            this.isReCalc = true;
+            this.frameX = 0;
+            
+            setTimeout(() => {
+               this.isReCalc = false;
+               this.isCalcPos = false
+            }, this.wanderBreakTime);
+         }
+      }
+   }
+
+   backToSpawn() {
+      
+      if(this.x > this.x + this.wanderRange
+      || this.x < this.x - this.wanderRange
+      || this.y > this.y + this.wanderRange
+      || this.y < this.y - this.wanderRange ) {
+
+         this.moveToPosition(this.spawnX, this.spawnY, this.walkSpeed);
       }
    }
 

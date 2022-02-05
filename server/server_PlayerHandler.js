@@ -10,12 +10,6 @@ const bcrypt = require("bcrypt");
 
 
 // =====================================================================
-// Global Variables
-// =====================================================================
-let playerList = {};
-
-
-// =====================================================================
 // Player connection
 // =====================================================================
 exports.onConnect = (socket, socketList) => {
@@ -587,7 +581,11 @@ const handlePlayerState = (frame, player) => {
 // =====================================================================
 // Player Update (Every frame)
 // =====================================================================
-exports.playerUpdate = (frame, socketList, mobList) => {
+let playerList;
+
+exports.playerUpdate = (frame, socketList, globalPlayerList, mobList) => {
+   
+   playerList = globalPlayerList;
    let playerData = [];
    
    for(let i in playerList) {

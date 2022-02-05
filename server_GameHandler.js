@@ -36,6 +36,7 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 const playerMax = 300;
 let socketList = {};
+let playerList = {};
 let mobList = [];
 
 enemiesHandler.initEnemies(mobList);
@@ -50,7 +51,7 @@ io.on("connection", (socket) => {
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
-   playerHandler.onConnect(socket, socketList);
+   playerHandler.onConnect(socket, socketList, playerList);
 
 
    // ==========  Debugging  ==========
@@ -64,7 +65,7 @@ io.on("connection", (socket) => {
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
       // console.log("User disconnected !");
-      playerHandler.onDisconnect(socket);
+      playerHandler.onDisconnect(socket, playerList);
       delete socketList[socket.id];
    });
 });
@@ -76,8 +77,8 @@ io.on("connection", (socket) => {
 let frame = 0
 
 setInterval(() => {
-   let playerData = playerHandler.playerUpdate(frame, socketList, mobList);
-   let enemiesData = enemiesHandler.enemiesUpdate(frame, mobList);
+   let playerData = playerHandler.playerUpdate(frame, socketList, playerList, mobList);
+   let enemiesData = enemiesHandler.enemiesUpdate(frame, playerList, mobList);
    
    playerData.forEach(player => {
 

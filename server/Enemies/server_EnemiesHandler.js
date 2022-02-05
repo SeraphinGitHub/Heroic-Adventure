@@ -14,9 +14,9 @@ const collision = require("../collisions.js");
 const initMinotaurs = (mobList) => {
 
    const minotaursSpawns = [
-      {x: 800, y: 600},
-      {x: 1400, y: 600},
-      {x: 1000, y: 1100},
+      {x: 700, y: 600},
+      {x: 1500, y: 600},
+      {x: 1000, y: 1200},
    ];
 
    const minotaursSpecs = {
@@ -25,7 +25,7 @@ const initMinotaurs = (mobList) => {
       radius: 55,
       wanderRange: 120,
       wanderBreakTime: 2 *1000,
-      chasingRange: 300,
+      chasingRange: 200,
       GcD: 50,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
@@ -65,23 +65,6 @@ exports.initEnemies = (mobList) => {
 // =====================================================================
 const enemiesMovements = (enemy) => {
 
-   enemy.wandering();
-   
-   // ===== 4 Directions Sprites Sheets =====
-      // // Cross Move
-      // if(enemy.y > enemy.calcY) enemy.frameY = 0; // Up
-      // if(enemy.y < enemy.calcY) enemy.frameY = 1; // Down
-      // if(enemy.x > enemy.calcX) enemy.frameY = 2; // Left
-      // if(enemy.x < enemy.calcX) enemy.frameY = 3; // Right
-
-      // // Diag Move
-      // if(enemy.y > enemy.calcY && enemy.x > enemy.calcX
-      // || enemy.y > enemy.calcY && enemy.x < enemy.calcX) enemy.frameY = 0; // Top Left / Top Right
-      // if(enemy.y < enemy.calcY && enemy.x > enemy.calcX
-      // || enemy.y < enemy.calcY && enemy.x < enemy.calcX) enemy.frameY = 1; // Down Left / Down Right
-   // ===== 4 Directions Sprites Sheets =====
-
-
    // ===== 2 Directions Sprites Sheets =====
       // Cross Move
       if(enemy.y > enemy.calcY || enemy.x > enemy.calcX) enemy.frameY = 0; // Left
@@ -93,6 +76,42 @@ const enemiesMovements = (enemy) => {
       if(enemy.y > enemy.calcY && enemy.x < enemy.calcX
       || enemy.y < enemy.calcY && enemy.x < enemy.calcX) enemy.frameY = 1; // Top / Down Right
    // ===== 2 Directions Sprites Sheets =====
+}
+
+
+// =====================================================================
+// Enemies Sate Machine
+// =====================================================================
+const enemiesSateMachine = (enemy, playerList) => {
+   
+   for(let i in playerList) {
+      let player = playerList[i];
+      
+      // Chasing
+      if(collision.circle_toCircle_withRange(enemy, player, enemy.chasingRange)) {
+
+         enemy.isWandering = false;
+         enemy.moveToPosition(player.x, player.y, enemy.runSpeed);
+         
+         // Attacking
+         // if(collision.circle_toCircle(enemy, player)) {
+
+            // enemy.isChasing = false;
+            // enemy.walkSpeed = 0;
+
+            // player.calcDamage = enemy.damageRnG();
+            // player.health -= player.calcDamage;
+         // }
+      }
+
+      else enemy.isWandering = true;
+   }
+   
+   // Wandering
+   enemy.wandering();
+
+   // Back to Spawn
+   enemy.backToSpawn();
 }
 
 
@@ -193,7 +212,7 @@ const handleEnemiesState = (frame, enemy) => {
 // =====================================================================
 // Enemies Update (Every frame)
 // =====================================================================
-exports.enemiesUpdate = (frame, mobList) => {
+exports.enemiesUpdate = (frame, playerList, mobList) => {
    let enemiesData = [];
    
    for(let i in mobList) {
@@ -201,6 +220,7 @@ exports.enemiesUpdate = (frame, mobList) => {
       
       if(!enemy.isDead) {
          enemiesMovements(enemy);
+         enemiesSateMachine(enemy, playerList);
       }
       
       handleEnemiesState(frame, enemy);

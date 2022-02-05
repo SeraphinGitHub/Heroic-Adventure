@@ -182,6 +182,13 @@ const barsCoordinates = () => {
 const barCoordArray = barsCoordinates();
 
 
+// const barFluidity = (value, maxValue, width) => {
+
+//    (value / maxValue) * width
+// }
+
+
+
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================

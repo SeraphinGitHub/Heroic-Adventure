@@ -117,7 +117,7 @@ const minotaurAnimState = (minotaur) => {
 const minotaurSync = (minotaur) => {
    
    if(!minotaur.isHidden) {
-      // DEBUG_Minotaur(minotaur);
+      DEBUG_Minotaur(minotaur);
       drawMinotaurShadow(minotaur);
       drawMinotaur(minotaur);
    }
@@ -131,6 +131,7 @@ const DEBUG_Minotaur = (minotaur) => {
 
    if(!minotaur.isDead) {
       DEBUG_WanderRange(minotaur);
+      DEBUG_ChasingRange(minotaur);
       DEBUG_DrawMinotaur(minotaur);
       DEBUG_PathLine(minotaur);
       DEBUG_ReachPoint(minotaur);
@@ -147,10 +148,22 @@ const DEBUG_WanderRange = (minotaur) => {
    ctxEnemies.closePath();
 }
 
+const DEBUG_ChasingRange = (minotaur) => {
+
+   // Circle
+   ctxEnemies.globalAlpha = 0.6;
+   ctxEnemies.fillStyle = "red";
+   ctxEnemies.beginPath();
+   ctxEnemies.arc(minotaur.x -viewport.x, minotaur.y -viewport.y, minotaur.chasingRange, 0, Math.PI * 2);
+   ctxEnemies.fill();
+   ctxEnemies.closePath();
+   ctxEnemies.globalAlpha = 1;
+}
+
 const DEBUG_DrawMinotaur = (minotaur) => {
    
    // Mob Radius
-   ctxEnemies.fillStyle = "red";
+   ctxEnemies.fillStyle = "blue";
    ctxEnemies.beginPath();
    ctxEnemies.arc(minotaur.x - viewport.x, minotaur.y - viewport.y, minotaur.radius, 0, Math.PI * 2);
    ctxEnemies.fill();

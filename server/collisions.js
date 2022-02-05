@@ -38,3 +38,16 @@ exports.circle_toCircle_withOffset = (first, firstOffsetX, firstOffsetY, firstRa
 
    if(distance <= sumRadius) return true;
 }
+
+
+// =====================================================================
+// Collision Circle to Circle Range
+// =====================================================================
+exports.circle_toCircle_withRange = (first, second, range) => {
+   let dx = second.x - first.x;
+   let dy = second.y - first.y;
+   let distance = Math.sqrt(dx * dx + dy * dy);
+   let sumRadius = range + second.radius;
+
+   if(distance <= sumRadius) return true;
+}

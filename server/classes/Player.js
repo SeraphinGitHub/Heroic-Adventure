@@ -63,6 +63,7 @@ class Player {
       this.calcHealing;
 
       // Damages
+      // this.baseDamage = 4000;
       this.baseDamage = 23;
       this.calcDamage;
       
