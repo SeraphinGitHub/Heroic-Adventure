@@ -121,7 +121,7 @@ const minotaurAnimState = (minotaur) => {
 const minotaurSync = (minotaur) => {
    
    if(!minotaur.isHidden) {
-      // DEBUG_Minotaur(minotaur);
+      DEBUG_Minotaur(minotaur);
       drawMinotaurShadow(minotaur);
       drawMinotaur(minotaur);
    }

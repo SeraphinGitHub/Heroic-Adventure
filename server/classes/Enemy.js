@@ -144,21 +144,43 @@ class Enemy {
       }
    }
 
+   chasing(player) {
+
+      this.isWandering = false;
+      this.isChasing = true;
+      this.isAttacking = false;
+      this.runSpeed = this.baseRunSpeed;
+
+      this.moveToPosition(player.x, player.y, this.runSpeed);
+   }
+
+   attacking() {
+      this.isWandering = false;
+      this.isChasing = false;
+      this.isAttacking = true;
+      this.runSpeed = 0;
+   }
+
    backToSpawn() {
-      if(this.isChasing) {      
+      if(this.isChasing) {
 
-         this.isChasing = false;
          this.isWandering = true;
+         this.isChasing = false;
+         this.isAttacking = false;
 
-         this.calcX = this.spawnX;
-         this.calcY = this.spawnY;
+         this.isCalcPos = false;
+         this.calcPosition();
       }
    }
 
    death() {
       this.health = 0;
       this.isDead = true;
-
+      this.isChasing = true;
+      
+      this.runSpeed = this.baseRunSpeed;
+      this.backToSpawn();
+      
       setTimeout(() => {
          this.isHidden = true
          
@@ -166,11 +188,9 @@ class Enemy {
             this.isDead = false;
             this.isHidden = false;
             this.health = this.baseHealth;
-
+            
             this.x = this.spawnX;
             this.y = this.spawnY;
-
-            this.isWandering = true;
    
          }, this.respawnTime);
       }, this.hiddenTime);

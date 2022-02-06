@@ -15,8 +15,8 @@ const set_Minotaurs = (mobList) => {
 
    const minotaursSpawns = [
       {x: 700, y: 600},
-      {x: 1500, y: 600},
-      {x: 1000, y: 1200},
+      // {x: 1500, y: 600},
+      // {x: 1000, y: 1200},
    ];
 
    const minotaursSpecs = {
@@ -28,7 +28,7 @@ const set_Minotaurs = (mobList) => {
       chasingRange: 200,
       GcD: 60,
       hiddenTime: 4 *1000,
-      respawnTime: 10 *1000,
+      respawnTime: 1 *1000,
       damages: 15,
       attackDelay: 0.5,
       damageRatio: 0.5,
@@ -137,6 +137,11 @@ const damagingPlayers = (enemy) => {
             // Player's Death
             if(player.health <= 0) {
                
+               // *********************
+               enemy.isChasing = true;
+               enemy.runSpeed = enemy.baseRunSpeed;
+               // *********************
+
                player.death(looseFameCost_PvE);
 
                socket.emit("playerScore", {
@@ -170,36 +175,15 @@ const enemiesSateMachine = (enemy) => {
    for(let i in playerList) {
       let player = playerList[i];
 
-      // Chasing
-      if(collision.circle_toCircle(enemy, player, 0, 0, enemy.chasingRange)) {
-         
-         enemy.isWandering = false;
-         enemy.isChasing = true;
+      // if player enter chasing range
+      if(collision.circle_toCircle(enemy, player, 0, 0, enemy.chasingRange) && !player.isDead) {
 
-         if(!player.isDead) enemy.moveToPosition(player.x, player.y, enemy.runSpeed);
-         else enemy.isWandering = true;
-
-         // Attacking
-         if(collision.circle_toCircle(enemy, player, 0, 0, enemy.radius)) {
-
-            enemy.isChasing = false;
-            enemy.isAttacking = true;
-            enemy.runSpeed = 0;
-         }
-
-         // Back to Chasing
-         else {
-            enemy.isChasing = true;
-            enemy.isAttacking = false;
-            enemy.runSpeed = enemy.baseRunSpeed;
-         }
+         // if enemy collide with player
+         if(collision.circle_toCircle(enemy, player, 0, 0, enemy.radius)) enemy.attacking();
+         else enemy.chasing(player);
       }
-
-      // Back to Spawn
       else enemy.backToSpawn();
    }
-   
-   // Wandering
    enemy.wandering();
 }
 
@@ -278,7 +262,7 @@ const orcsAnim = {
 
 
 // =====================================================================
-// Handle Enemies State
+// Enemies Anim State
 // =====================================================================
 const enemiesAnimType = [
 
@@ -287,7 +271,7 @@ const enemiesAnimType = [
    // orcsAnim,
 ];
 
-const handleEnemiesState = (frame, enemy) => {
+const enemiesAnimState = (frame, enemy) => {
    
    enemiesAnimType.forEach(animType => {
       if(!enemy.isDead) {
@@ -299,7 +283,7 @@ const handleEnemiesState = (frame, enemy) => {
          }
 
          // Idle State
-         if(enemy.x === enemy.calcX && enemy.y === enemy.calcY || enemy.runSpeed === 0) {
+         if((enemy.x === enemy.calcX && enemy.y === enemy.calcY) || enemy.runSpeed === 0) {
             enemy.animation(frame, animType.idle.index, animType.idle.spritesNumber);
             return enemy.state = "idle";
          }
@@ -354,7 +338,7 @@ exports.enemiesUpdate = (frame, G_SocketList, G_PlayerList, G_mobList) => {
          enemiesSateMachine(enemy);
       }
       
-      handleEnemiesState(frame, enemy);
+      enemiesAnimState(frame, enemy);
       enemiesData.push(enemy);
    }
    
