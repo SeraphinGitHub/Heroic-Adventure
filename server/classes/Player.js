@@ -130,6 +130,7 @@ class Player {
       this.fameValue -= fameCost;
       if(this.fameValue <= 0) this.fameValue = 0;
       
+      // Respawn Timer
       const respawnCooldown = setInterval(() => {
          this.respawnTimer --;
          
