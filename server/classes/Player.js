@@ -7,11 +7,12 @@ class Player {
       this.id = id;
       this.name = "";
       
-      // this.x = Math.floor(Math.random() * 2200) +100; // <== Randomize position on load
-      // this.y = Math.floor(Math.random() * 1600) +100; // map size - sprite.size (200x200) + half sprite.size
-      
       this.x = 1080;
       this.y = 800;
+      
+      // Env Variables
+      this.frameRate = process.env.FRAME_RATE;
+      this.syncCoeff = process.env.SYNC_COEFF;
 
       // Player Hitbox
       this.radius = 42;
@@ -28,7 +29,7 @@ class Player {
       
       // GcD
       this.baseGcD = 30;
-      this.GcD = process.env.SYNC_COEFF* this.baseGcD; // More high ==> more slow
+      this.GcD = this.syncCoeff * this.baseGcD; // More high ==> more slow
       this.speedGcD = this.GcD;
 
       // Player Health
@@ -40,13 +41,13 @@ class Player {
       this.energy = this.baseEnergy;
       this.energyCost = 0.7;
       this.baseRegenEnergy = 0.15;
-      this.regenEnergy = process.env.SYNC_COEFF* this.baseRegenEnergy;
+      this.regenEnergy = this.syncCoeff * this.baseRegenEnergy;
 
       // Player Mana
       this.baseMana = 150;
       this.mana = this.baseMana;
       this.baseRegenMana = 0.12;
-      this.regenMana = process.env.SYNC_COEFF* this.baseRegenMana;
+      this.regenMana = this.syncCoeff * this.baseRegenMana;
 
       // Fame
       this.baseFame = 10000;
@@ -68,9 +69,9 @@ class Player {
       this.calcDamage;
       
       // Movements Speed
-      this.walkSpeed = Math.round(process.env.SYNC_COEFF* 3); // <== WalkSpeed
+      this.walkSpeed = Math.round(this.syncCoeff * 3); // <== WalkSpeed
       this.baseWalkSpeed = this.walkSpeed;
-      this.runSpeed = Math.round(process.env.SYNC_COEFF* 7); // <== RunSpeed
+      this.runSpeed = Math.round(this.syncCoeff * 7); // <== RunSpeed
       this.baseRunSpeed = this.runSpeed;
       
       // Movements Axis
@@ -113,6 +114,15 @@ class Player {
       return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
    }
 
+   circle_toCircle = (first, second, offsetX, offsetY, radius) => {
+      let dx = second.x - (first.x + offsetX);
+      let dy = second.y - (first.y + offsetY);
+      let distance = Math.sqrt(dx * dx + dy * dy);
+      let sumRadius = radius + second.radius;
+   
+      if(distance <= sumRadius) return true;
+   }
+
    death(fameCost) {
       
       const respawnRange = 600;
@@ -130,7 +140,6 @@ class Player {
       this.fameValue -= fameCost;
       if(this.fameValue <= 0) this.fameValue = 0;
       
-      // Respawn Timer
       const respawnCooldown = setInterval(() => {
          this.respawnTimer --;
          

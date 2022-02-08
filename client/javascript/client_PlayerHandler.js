@@ -196,12 +196,12 @@ let looseFameFluid = 0;
 // ==> create Globales Variables Section in GameHandler.js 
 
 
-const playerFloatingText = (playerPos, textObj) => {
+const playerFloatingText = (player, textObj) => {
    
    const newText = new FloatingText(
       ctxPlayer,
-      pos(playerPos, "x"),
-      pos(playerPos, "y"),
+      pos(player, "x"),
+      pos(player, "y"),
       textObj.x,
       textObj.y,
       textObj.size,
@@ -216,17 +216,17 @@ const floatingText = (socket) => {
    
    const mainTexSize = 34;
 
-   socket.on("getHeal", (playerPos, calcHealing) => {
+   socket.on("getHeal", (player) => {
 
       const text = {
          x: -35,
          y: -100,
          size: mainTexSize,
          color: "lime",
-         value: `+${calcHealing}`,
+         value: `+${player.calcHealing}`,
       }
       
-      playerFloatingText(playerPos, text);
+      playerFloatingText(player, text);
    });
 
    socket.on("giveDamage", (playerPos, calcDamage) => {
@@ -254,7 +254,7 @@ const floatingText = (socket) => {
       playerFloatingText(playerPos, text);
    });
    
-   socket.on("getFame", (player, serverfameCost) => {
+   socket.on("getFame", (playerPos, serverfameCost) => {
       const text = {
          x: -105,
          y: 180,
@@ -263,12 +263,12 @@ const floatingText = (socket) => {
          value: `+${serverfameCost} Fame`,
       }
       
-      playerFloatingText(player, text);
+      playerFloatingText(playerPos, text);
       isGettingFame = true;
       fameCost = serverfameCost;
    });
    
-   socket.on("looseFame", (player, serverfameCost) => {
+   socket.on("looseFame", (playerPos, serverfameCost) => {
       const text = {
          x: -105,
          y: 180,
@@ -277,7 +277,7 @@ const floatingText = (socket) => {
          value: `-${serverfameCost} Fame`,
       }
       
-      playerFloatingText(player, text);
+      playerFloatingText(playerPos, text);
       isLoosingFame = true;
       fameCost = serverfameCost;
       looseFameFluid = serverfameCost;

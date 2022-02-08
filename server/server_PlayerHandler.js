@@ -6,7 +6,6 @@
 // =====================================================================
 const Player = require("./classes/Player.js");
 const collision = require("./collisions.js");
-const bcrypt = require("bcrypt");
 
 
 // =====================================================================
@@ -243,7 +242,7 @@ const playerGcD = (player) => {
    
    // Regen GcD
    if(player.speedGcD < player.GcD) {
-      player.speedGcD += process.env.SYNC_COEFF *1;
+      player.speedGcD +=process.env.SYNC_COEFF* 1;
       if(player.isAttacking) player.isAttacking = false;
    }
    
@@ -314,15 +313,14 @@ const playerHealing = (player) => {
       player.mana -= player.healCost;
 
       if(player.health > player.baseHealth) player.health = player.baseHealth;
-      
       let socket = socketList[player.id];
-      
-      const playerPos = {
+
+      socket.emit("getHeal", {
+         id: player.id,
          x: player.x,
          y: player.y,
-      }
-
-      socket.emit("getHeal", playerPos, player.calcHealing);
+         calcHealing: player.calcHealing,
+      });
    }
 }
 
@@ -336,15 +334,10 @@ const looseFameCost_PvP = 300;
 const damagingOtherPlayers = (player) => {
 
    for(let i in playerList) {
+
       let otherPlayer = playerList[i];
-      
       let socket = socketList[player.id];
       let otherSocket = socketList[otherPlayer.id];
-
-      const otherPlayerPos = {
-         x: otherPlayer.x,
-         y: otherPlayer.y,
-      };
 
       if(collision.circle_toCircle(
       player,
@@ -358,7 +351,19 @@ const damagingOtherPlayers = (player) => {
             
             otherPlayer.calcDamage = player.damageRnG();
             otherPlayer.health -= otherPlayer.calcDamage;
+            
+            const playerPos = {
+               id: player.id,
+               x: player.x,
+               y: player.y,
+            };
 
+            const otherPlayerPos = {
+               id: otherPlayer.id,
+               x: otherPlayer.x,
+               y: otherPlayer.y,
+            };
+            
             socket.emit("giveDamage", otherPlayerPos, otherPlayer.calcDamage);
             otherSocket.emit("getDamage", otherPlayerPos, otherPlayer.calcDamage);
 
@@ -368,10 +373,18 @@ const damagingOtherPlayers = (player) => {
                player.kills++;
                playerFame(player, getFameCost_PvP, socket);
                otherPlayer.death(looseFameCost_PvP);
+               
+               // Player Score
+               socket.emit("playerScore", {
+                  kills: player.kills,
+                  died: player.died,
+                  fame: player.fame,
+                  fameCount: player.fameCount,
+               });
    
-               socket.emit("getFame", player, getFameCost_PvP);
-               otherSocket.emit("looseFame", otherPlayer, looseFameCost_PvP);
-            }            
+               socket.emit("getFame", playerPos, getFameCost_PvP);
+               otherSocket.emit("looseFame", otherPlayerPos, looseFameCost_PvP);
+            }
          }
       }
    }
@@ -383,18 +396,7 @@ const damagingOtherPlayers = (player) => {
 // =====================================================================
 const damagingMobs = (player) => {
 
-   for(let i in mobList) {
-      let mob = mobList[i];
-      
-      const mobPos = {
-         x: mob.x,
-         y: mob.y,
-      };
-
-      const playerPos = {
-         x: player.x,
-         y: player.y,
-      };
+   mobList.forEach(mob => {
 
       if(!mob.isDead
       && collision.circle_toCircle(player, mob, 0, 0, player.radius)) {
@@ -404,6 +406,19 @@ const damagingMobs = (player) => {
 
          let socket = socketList[player.id];
          
+         const playerPos = {
+            id: player.id,
+            x: player.x,
+            y: player.y,
+         };
+         
+         const mobPos = {
+            x: mob.x,
+            y: mob.y,
+         };
+         
+         socket.emit("giveDamage", mobPos, mob.calcDamage);
+
          // Mob's Death
          if(mob.health <= 0) {
             
@@ -419,10 +434,8 @@ const damagingMobs = (player) => {
             
             socket.emit("getFame", playerPos, mob.getFameCost);
          }
-         
-         socket.emit("giveDamage", mobPos, mob.calcDamage);
       }
-   }
+   });
 }
 
 

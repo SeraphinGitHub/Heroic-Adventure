@@ -13,7 +13,6 @@ const io = new Server(server);
 // =====================================================================
 // Scrips import
 // =====================================================================
-// const Player = require("./server/classes/Player.js");
 const Enemy = require("./server/classes/Enemy.js");
 const playerHandler = require("./server/server_PlayerHandler.js");
 
@@ -52,7 +51,6 @@ io.on("connection", (socket) => {
    socketList[socket.id] = socket;
    playerHandler.onConnect(socket, socketList, playerList);
 
-
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
       if(process.env.DEBUG_MODE === "false") return;
@@ -71,28 +69,7 @@ io.on("connection", (socket) => {
 
 
 // =====================================================================
-// Cycle Enemies Positions
-// =====================================================================
-const G_Variables = {
-
-   frameRate: process.env.FRAME_RATE,
-   synCoeff: process.env.SYNC_COEFF,
-   socketList: socketList,
-   playerList: playerList,
-   mobList: mobList,
-}
-
-const cycleEnemiesPos = (enemySpawnObj, enemySpecs) => {
-
-   enemySpawnObj.forEach(position => {
-      const enemy = new Enemy(position.x, position.y, enemySpecs, G_Variables);
-      mobList.push(enemy);
-   });
-}
-
-
-// =====================================================================
-// Set Minotaurs
+// Set Enemies
 // =====================================================================
 const set_Minotaurs = () => {
 
@@ -135,7 +112,7 @@ const set_Minotaurs = () => {
       getFameCost: 100,
       looseFameCost: 200,
       hiddenTime: 4 *1000,
-      respawnTime: 1 *1000,
+      respawnTime: 10 *1000,
       damages: 15,
       attackDelay: 0.5,
       damageRatio: 0.5,
@@ -151,6 +128,14 @@ const set_Minotaurs = () => {
 // =====================================================================
 // Init Enemies
 // =====================================================================
+const cycleEnemiesPos = (enemySpawnObj, enemySpecs) => {
+
+   enemySpawnObj.forEach(position => {
+      const enemy = new Enemy(position.x, position.y, enemySpecs);
+      mobList.push(enemy);
+   });
+}
+
 const initEnemies = () => {
 
    set_Minotaurs();   
@@ -159,36 +144,17 @@ const initEnemies = () => {
 initEnemies();
 
 
-const enemyUpdate = (frame) => {
-
-   let enemyData = [];
-
-   for(let i in mobList) {
-      let enemy = mobList[i];
-
-      if(!enemy.isDead) {
-
-         enemy.calcGcD();
-         enemy.movements();
-         enemy.sateMachine();
-      }
-      
-      enemy.animState(frame);
-      enemyData.push(enemy);
-   }
-   
-   return enemyData;
-}
-
 // =====================================================================
 // Server Sync
 // =====================================================================
 let frame = 0
 
 setInterval(() => {
-   let playerData = playerHandler.playerUpdate(frame, socketList, playerList, mobList);
-   let enemiesData = enemyUpdate(frame);
+   let enemiesData = [];
+   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, enemiesData));
 
+   let playerData = playerHandler.playerUpdate(frame, socketList, playerList, mobList);
+   
    playerData.forEach(player => {
 
       let socket = socketList[player.id];

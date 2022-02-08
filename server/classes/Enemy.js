@@ -1,6 +1,7 @@
 
 "use strict"
 
+
 // Enemy Obj ==> Exemple
 // {
 //    health: 150,
@@ -23,7 +24,7 @@
 
 
 class Enemy {
-   constructor(spawnX, spawnY, enemySpecs, G_Variables) {
+   constructor(spawnX, spawnY, enemySpecs) {
 
       this.x = spawnX;
       this.y = spawnY;
@@ -31,12 +32,9 @@ class Enemy {
       this.spawnY = spawnY;
       this.radius = enemySpecs.radius;
 
-      // G_Variables
-      this.socketList = G_Variables.socketList;
-      this.playerList = G_Variables.playerList;
-      this.mobList = G_Variables.mobList;
-      this.frameRate = G_Variables.frameRate;
-      this.syncCoeff = G_Variables.syncCoeff;
+      // Env Variables
+      this.frameRate = process.env.FRAME_RATE;
+      this.syncCoeff = process.env.SYNC_COEFF;
 
       // State Machine
       this.calcX = spawnX;
@@ -92,7 +90,7 @@ class Enemy {
       this.frameY = 1;
    }
 
-   RnG = (baseSpec, coeff) => {
+   RnG(baseSpec, coeff) {
       return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));
    }
 
@@ -180,13 +178,6 @@ class Enemy {
       this.moveToPosition(player.x, player.y, this.runSpeed);
    }
 
-   attacking() {
-      this.isWandering = false;
-      this.isChasing = false;
-      this.isAttacking = true;
-      this.runSpeed = 0;
-   }
-
    backToSpawn() {
       if(this.isChasing) {
 
@@ -194,11 +185,11 @@ class Enemy {
          this.isChasing = false;
          this.isAttacking = false;
 
-         this.isCalcPos = false;
-         this.calcPosition();
+         this.calcX = this.spawnX;
+         this.calcY = this.spawnY;
       }
    }
-   
+
    movements() {
       // For 2 Directions Sprites Sheets
 
@@ -212,7 +203,7 @@ class Enemy {
       if(this.y > this.calcY && this.x < this.calcX
       || this.y < this.calcY && this.x < this.calcX) this.frameY = 1; // Top / Down Right
    }
-   
+
    calcGcD() {
       
       // Regen GcD
@@ -220,79 +211,82 @@ class Enemy {
          this.speedGcD += this.syncCoeff *1;
          if(this.isAttacking) this.isAttacking = false;
       }
-      
-      // GcD Up
-      if(this.speedGcD >= this.GcD) this.attack();
    }
-   
-   attack() {
-      if(this.isAttacking && !this.attack_isAnimable) {
-         
-         this.frameX = 0;
-         this.speedGcD = 0;
-         this.isAttacking = false;
+
+   attacking(socket, player) {
+      
+      if(!this.isAttacking
+      && !this.attack_isAnimable
+      && this.speedGcD >= this.GcD) {
+
+         this.isWandering = false;
+         this.isChasing = false;
+         this.isAttacking = true;
          this.attack_isAnimable = true;
          
+         this.runSpeed = 0;
+         this.frameX = 0;
+         this.speedGcD = 0;
+         
          setTimeout(() => this.attack_isAnimable = false, this.animTimeOut());
-         this.damagingPlayers();
+
+         this.damagingPlayers(socket, player);
       }
    }
-   
-   damagingPlayers() {
-      
-      for(let i in this.playerList) {
+
+   damagingPlayers(socket, player) {
+
+      const playerPos = {
+         id: player.id,
+         x: player.x,
+         y: player.y,
+      };
+
+      if(!player.isDead
+      && this.circle_toCircle(this, player, 0, 0, this.radius)) {
+
+         // Delay logic to match animation
+         setTimeout(() => {
+
+            player.calcDamage = this.damageRnG();
+            player.health -= player.calcDamage;
+            socket.emit("getDamage", playerPos, player.calcDamage);
+
+            // Player's Death
+            if(player.health <= 0) {
+               
+               this.isChasing = true;
+               this.runSpeed = this.baseRunSpeed;
+               player.death(socket, this.looseFameCost);
          
-         let player = this.playerList[i];
-         let socket = this.socketList[player.id];
+               // Player Score
+               socket.emit("playerScore", {
+                  kills: player.kills,
+                  died: player.died,
+                  fame: player.fame,
+                  fameCount: player.fameCount,
+               });
          
-         const playerPos = {
-            x: player.x,
-            y: player.y,
-         };
+               // Toggle Fame Text
+               socket.emit("looseFame", playerPos, this.looseFameCost);
+            }
 
-         if(!player.isDead
-         && this.circle_toCircle(this, player, 0, 0, this.radius)) {
-
-            // Delay logic to match animation
-            setTimeout(() => {
-
-               player.calcDamage = this.damageRnG();
-               player.health -= player.calcDamage;
-               socket.emit("getDamage", playerPos, player.calcDamage);
-
-               // Player's Death
-               if(player.health <= 0) {
-                  
-                  this.isChasing = true;
-                  this.runSpeed = this.baseRunSpeed;
-                  player.death(socket, this.looseFameCost);
-            
-                  // Player Score
-                  socket.emit("playerScore", {
-                     kills: player.kills,
-                     died: player.died,
-                     fame: player.fame,
-                     fameCount: player.fameCount,
-                  });
-            
-                  // Toggle Fame Text
-                  socket.emit("looseFame", playerPos, this.looseFameCost);
-               }
-            }, this.animTimeOut() * this.attackDelay);
-         }
+         }, this.animTimeOut() * this.attackDelay);
       }
    }
-   
-   sateMachine() {
+
+   sateMachine(socketList, playerList) {
       
-      for(let i in this.playerList) {
-         let player = this.playerList[i];
+      for(let i in playerList) {
+
+         let player = playerList[i];
+         let socket = socketList[player.id];
 
          // if player enter chasing range
          if(this.circle_toCircle(this, player, 0, 0, this.chasingRange) && !player.isDead) {
 
             // if enemy collide with player
-            if(this.circle_toCircle(this, player, 0, 0, this.radius)) this.attacking();
+            if(this.circle_toCircle(this, player, 0, 0, this.radius)) this.attacking(socket, player);
             else this.chasing(player);
          }
          
@@ -374,17 +368,18 @@ class Enemy {
    }
 
    // Update (Sync)
-   update(frame) {
+   update(frame, socketList, playerList, enemiesData) {
 
+      this.animState(frame);
+      
       if(!this.isDead) {
 
          this.calcGcD();
          this.movements();
-         this.sateMachine();
+         this.sateMachine(socketList, playerList);
       }
-      
-      this.animState(frame);
-      return this;
+
+      enemiesData.push(this);
    }
 }
 
