@@ -50,6 +50,8 @@ class Player {
       this.regenMana = this.syncCoeff * this.baseRegenMana;
 
       // Fame
+      this.getFameCost = 500;
+      this.looseFameCost = 300;
       this.baseFame = 10000;
       this.fame = 0;
       this.fameValue = this.fame;
@@ -64,7 +66,6 @@ class Player {
       this.calcHealing;
 
       // Damages
-      // this.baseDamage = 4000;
       this.baseDamage = 23;
       this.calcDamage;
       
@@ -98,10 +99,10 @@ class Player {
 
       // Animation
       this.state;
-      this.frameX = 0;
       this.frameY = 1;
    }
 
+   // RnG
    RnG(baseSpec, coeff) {
       return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));
    }
@@ -114,7 +115,8 @@ class Player {
       return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
    }
 
-   circle_toCircle = (first, second, offsetX, offsetY, radius) => {
+   // Collision
+   circle_toCircle(first, second, offsetX, offsetY, radius) {
       let dx = second.x - (first.x + offsetX);
       let dy = second.y - (first.y + offsetY);
       let distance = Math.sqrt(dx * dx + dy * dy);
@@ -123,6 +125,334 @@ class Player {
       if(distance <= sumRadius) return true;
    }
 
+   // Movements
+   movements() {
+
+      let moveSpeed = this.walkSpeed;
+      if(this.isRunning && this.isRunnable) moveSpeed = this.runSpeed;
+   
+      // Map Border Reached ==> Temporary (Await for Unwalkable Tiles)
+      if(this.up && this.y < -15
+      || this.down && this.y > 1550
+      || this.left && this.x < 45
+      || this.right && this.x > 2120) {
+         return;
+      }
+   
+      const axisOffset = {
+         yAxis_x: 0,
+         yAxis_y: 45,
+         xAxis_x: 30,
+         xAxis_y: 10,
+      }
+      
+      this.crossMove(moveSpeed, axisOffset);
+      this.diagMove(moveSpeed, axisOffset);
+   }
+   
+   crossMove(moveSpeed, axisOffset) {
+   
+      // Up & Down or Left & Right at the Same Time
+      if(this.up && this.down || this.left && this.right) {
+
+         this.frameY = 1;
+         this.attkOffset_X = axisOffset.yAxis_x;
+         this.attkOffset_Y = axisOffset.yAxis_y;
+      }
+   
+      else {
+         // Up (yAxis)
+         if(this.up) {
+
+            this.frameY = 0;
+            this.y -= moveSpeed;
+            this.attkOffset_X = axisOffset.yAxis_x;
+            this.attkOffset_Y = -axisOffset.yAxis_y;
+         }
+         
+         // Down (yAxis)
+         if(this.down) {
+
+            this.frameY = 1;
+            this.y += moveSpeed;
+            this.attkOffset_X = axisOffset.yAxis_x;
+            this.attkOffset_Y = axisOffset.yAxis_y;
+         }
+         
+         // Left (xAxis)
+         if(this.left) {
+
+            this.frameY = 2;
+            this.x -= moveSpeed;
+            this.attkOffset_X = -axisOffset.xAxis_x;
+            this.attkOffset_Y = axisOffset.xAxis_y;
+         }
+         
+         // Right (xAxis)
+         if(this.right) {  
+
+            this.frameY = 3;
+            this.x += moveSpeed;
+            this.attkOffset_X = axisOffset.xAxis_x;
+            this.attkOffset_Y = axisOffset.xAxis_y;
+         }
+      }
+   }
+   
+   diagMove(moveSpeed, axisOffset) {
+      
+      // Attack circle position
+      let offset = ((axisOffset.yAxis_y + axisOffset.xAxis_x) / 2) * 0.7;
+   
+      // Up & Left
+      if(this.up && this.left) {
+
+         this.frameY = 0;
+         this.attkOffset_X = -offset;
+         this.attkOffset_Y = -offset; 
+      }
+   
+      // Up & Right
+      if(this.up && this.right) {
+
+         this.frameY = 0;
+         this.attkOffset_X = offset;
+         this.attkOffset_Y = -offset;
+      }
+   
+      // Down & Left
+      if(this.down && this.left) {
+
+         this.frameY = 1;
+         this.attkOffset_X = -offset;
+         this.attkOffset_Y = offset;
+      }
+   
+      // Down & Right
+      if(this.down && this.right) {
+
+         this.frameY = 1;
+         this.attkOffset_X = offset;
+         this.attkOffset_Y = offset;
+      }
+   
+      
+      // Fix diag Speed
+      if(this.up && this.left
+      ||this.up && this.right
+      ||this.down && this.left
+      ||this.down && this.right) {
+         moveSpeed = Math.sqrt(moveSpeed);
+      }
+   }
+
+   running() {
+
+      if(this.energy < this.baseEnergy) this.energy += this.regenEnergy;
+      if(this.energy >= this.baseEnergy) this.energy = this.baseEnergy;
+   
+      if(this.isRunning && this.isRunnable) {
+         
+         this.energy -= this.energyCost;
+         if(this.energy <= 0) this.energy = 0;
+         if(this.energy < this.energyCost) this.isRunnable = false;
+      }
+   
+      if(!this.isRunning) this.isRunnable = true;
+   }
+
+   // GcD / Attack / Cast
+   calcGcD() {
+   
+      // Regen Mana
+      if(this.mana < this.baseMana) this.mana += this.regenMana;
+      
+      // Regen GcD
+      if(this.speedGcD < this.GcD) {
+         this.speedGcD += this.syncCoeff * 1;
+         if(this.isAttacking) this.isAttacking = false;
+      }
+   }
+   
+   attacking(socketList, playerList, mobList) {
+   
+      // Player Attack
+      if(this.isAttacking
+      && !this.attack_isAnimable
+      && this.speedGcD >= this.GcD) {
+
+         let socket = socketList[this.id];
+         
+         this.frameX = 0;
+         this.speedGcD = 0;
+         this.isAttacking = false;
+         this.attack_isAnimable = true;
+
+         setTimeout(() => {
+            this.attack_isAnimable = false
+         // }, this.animTimeOut(this.animSpecsObj.attack.index, this.animSpecsObj.attack.spritesNumber));
+         }, this.animTimeOut(1, 14));
+
+         this.damagingOtherPlayers(socket, socketList, playerList);
+         this.damagingMobs(socketList, mobList);
+      }
+   }
+   
+   casting(socketList) {
+      
+      if(this.isCasting && this.speedGcD >= this.GcD) {
+         
+         this.isCasting = false;
+         this.healing(socketList);
+      }
+   }
+   
+   healing(socketList) {
+      
+      if(this.cast_Heal
+      && this.mana >= this.healCost
+      && this.health < this.baseHealth) {
+
+         let socket = socketList[this.id];
+         
+         this.frameX = 0;
+         this.speedGcD = 0;
+         this.cast_Heal = false;
+         this.heal_isAnimable = true;
+         
+         setTimeout(() => {
+            this.attack_isAnimable = false
+         // }, this.animTimeOut(this.animSpecsObj.heal.index, this.animSpecsObj.heal.spritesNumber));
+         }, this.animTimeOut(2, 14));
+   
+         this.calcHealing = this.healRnG();
+         this.health += this.calcHealing;
+         this.mana -= this.healCost;
+   
+         if(this.health > this.baseHealth) this.health = this.baseHealth;
+   
+         socket.emit("getHeal", {
+            id: this.id,
+            x: this.x,
+            y: this.y,
+            calcHealing: this.calcHealing,
+         });
+      }
+   }
+   
+   // Damaging
+   damagingOtherPlayers(socket, socketList, playerList) {
+
+      for(let i in playerList) {
+   
+         let otherPlayer = playerList[i];
+         let otherSocket = socketList[otherPlayer.id];
+   
+         if(this.circle_toCircle(this, otherPlayer, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
+   
+            if(this !== otherPlayer
+            && !otherPlayer.isDead) {
+               
+               otherPlayer.calcDamage = this.damageRnG();
+               otherPlayer.health -= otherPlayer.calcDamage;
+               
+               const playerPos = {
+                  id: this.id,
+                  x: this.x,
+                  y: this.y,
+               };
+   
+               const otherPlayerPos = {
+                  id: otherPlayer.id,
+                  x: otherPlayer.x,
+                  y: otherPlayer.y,
+               };
+               
+               socket.emit("giveDamage", otherPlayerPos, otherPlayer.calcDamage);
+               otherSocket.emit("getDamage", otherPlayerPos, otherPlayer.calcDamage);
+   
+               // Other player's Death
+               if(otherPlayer.health <= 0) {
+                  
+                  this.kills++;
+                  this.calcfame(this, this.getFameCost, socket);
+                  otherPlayer.death(this.looseFameCost);
+                  
+                  // Player Score
+                  socket.emit("playerScore", {
+                     kills: this.kills,
+                     died: this.died,
+                     fame: this.fame,
+                     fameCount: this.fameCount,
+                  });
+      
+                  socket.emit("getFame", playerPos, this.getFameCost);
+                  otherSocket.emit("looseFame", otherPlayerPos, this.looseFameCost);
+               }
+            }
+         }
+      }
+   }
+   
+   damagingMobs(socketList, mobList) {
+   
+      let socket = socketList[this.id];
+      
+      mobList.forEach(mob => {
+   
+         if(!mob.isDead
+         && this.circle_toCircle(this, mob, 0, 0, this.radius)) {
+            
+            mob.calcDamage = this.damageRnG();
+            mob.health -= mob.calcDamage;
+            
+            const playerPos = {
+               id: this.id,
+               x: this.x,
+               y: this.y,
+            };
+            
+            const mobPos = {
+               x: mob.x,
+               y: mob.y,
+            };
+            
+            socket.emit("giveDamage", mobPos, mob.calcDamage);
+   
+            // Mob's Death
+            if(mob.health <= 0) {
+               
+               mob.death();
+               this.calcfame(this, mob.getFameCost, socket);
+   
+               socket.emit("playerScore", {
+                  kills: this.kills,
+                  died: this.died,
+                  fame: this.fame,
+                  fameCount: this.fameCount,
+               });
+               
+               socket.emit("getFame", playerPos, mob.getFameCost);
+            }
+         }
+      });
+   }
+   
+   // Fame
+   calcfame(fameCost, socket) {
+   
+      this.fame += fameCost;
+      this.fameValue += fameCost;
+   
+      if(this.fame / this.baseFame >= 1) {
+         this.fameCount += Math.floor(this.fameValue / this.baseFame);
+         this.fameValue = this.fame - (this.baseFame * this.fameCount);
+   
+         socket.emit("fameCount+1", this.fameCount);
+      }
+   }
+
+   // Death
    death(fameCost) {
       
       const respawnRange = 600;
@@ -166,12 +496,52 @@ class Player {
          }
       }, 1000);
    }
-
-   animation(frame, index, spritesNumber) {
-      if(frame % index === 0) {       
-         if(this.frameX < spritesNumber) this.frameX++;
-         else this.frameX = 0;
+   
+   animTimeOut(index, spritesNumber) {
+      return this.frameRate * this.syncCoeff * index * spritesNumber / 4;
+   }
+   
+   // Animation State
+   animState = () => {
+      
+      // Attack State
+      if(this.attack_isAnimable) return this.state = "attack";
+   
+      // Heal State
+      if(this.heal_isAnimable) return this.state = "heal";
+      
+      // Moving State
+      if(this.up || this.down || this.left || this.right) {
+   
+         if(this.up && this.down || this.left && this.right) return this.state = "idle";
+   
+         // Run State
+         else if(this.isRunning && this.isRunnable) return this.state = "run";
+   
+         // Walk State
+         else return this.state = "walk";
       }
+   
+      // Idle State
+      else return this.state = "idle";
+   }
+
+   // Update (Sync)
+   update(socketList, playerList, mobList, playerData) {
+
+      if(!this.isDead) {
+
+         this.movements();
+         this.running();
+         this.calcGcD();
+         this.attacking(socketList, playerList, mobList);
+         this.casting(socketList);
+         this.animState();
+      }
+
+      else this.state = "died";
+
+      playerData.push(this);
    }
 }
 

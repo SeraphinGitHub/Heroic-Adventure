@@ -13,8 +13,9 @@ const io = new Server(server);
 // =====================================================================
 // Scrips import
 // =====================================================================
+const Player = require("./server/classes/Player.js");
 const Enemy = require("./server/classes/Enemy.js");
-const playerHandler = require("./server/server_PlayerHandler.js");
+const map = require("./client/javascript/client_Map.js");
 
 
 // =====================================================================
@@ -41,15 +42,17 @@ let mobList = [];
 
 
 // =====================================================================
-// Handle sockets connections
+// Players connections
 // =====================================================================
+
+// Handle sockets connections
 io.on("connection", (socket) => {
    // console.log("User connected !");
    
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
-   playerHandler.onConnect(socket, socketList, playerList);
+   onConnect(socket, socketList, playerList);
 
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
@@ -62,14 +65,107 @@ io.on("connection", (socket) => {
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
       // console.log("User disconnected !");
-      playerHandler.onDisconnect(socket, playerList);
+      onDisconnect(socket, playerList);
       delete socketList[socket.id];
    });
 });
 
+// Player connection
+const onConnect = (socket) => {
+   const player = new Player(socket.id);
+   playerList[socket.id] = player;
+   
+   // ================================
+   // Init Player
+   // ================================
+   socket.on("playerName", (data) =>  {
+      
+      player.name = data;
+
+      socket.emit("playerStats", {
+   
+         playerID: player.id,
+         name: data,
+         health: player.baseHealth,
+         mana: player.baseMana,
+         regenMana: player.baseRegenMana,
+         energy: player.baseEnergy,
+         regenEnergy: player.baseRegenEnergy,
+         GcD: player.baseGcD,
+      });
+      
+      socket.emit("playerScore", {
+         
+         kills: player.kills,
+         died: player.died,
+         fame: player.fame,
+         fameCount: player.fameCount,
+      });
+      
+      socket.emit("fameCount+1", player.fameCount);
+   });
+   
+
+   // ================================
+   // Receive Chat
+   // ================================
+   let receiverID;
+   let receiverName;
+
+   // General Chat
+   socket.on("generalMessage", (textMessage) => {
+      for(let i in socketList) socketList[i].emit("addMessage_General", `${player.name}: ${textMessage}`);
+   });
+   
+   // Private Chat
+   socket.on("privateMessage", (textMessage) => {
+      const prefix = "To >";
+      let receiver = socketList[receiverID];
+      
+      if(receiver) {
+         receiver.emit("addMessage_Private", `${player.name}: ${textMessage}`);
+         socket.emit("addMessage_Private", `${prefix}${receiverName}: ${textMessage}`);
+      }
+      else socket.emit("addMessage_Private", `>${receiverName}< Has gone offline !`);
+   });
+   
+   // Get reveiver ID for private chat 
+   socket.on("chatReceiverName", (name) => {
+      receiverName = name;
+      
+      for(let i in playerList) {
+         let receiver = playerList[i];
+         if(receiver.name === name) receiverID = receiver.id;
+      }
+   });
+
+
+   // ================================
+   // Receive Player States
+   // ================================
+   // Movements
+   socket.on("up", (state) => player.up = state);
+   socket.on("down", (state) => player.down = state);
+   socket.on("left", (state) => player.left = state);
+   socket.on("right", (state) => player.right = state);
+
+   // Spells cast
+   socket.on("heal", (state) => player.cast_Heal = state);
+   
+   // States
+   socket.on("run", (state) => player.isRunning = state);
+   socket.on("attack", (state) => player.isAttacking = state);
+   socket.on("casting", (state) => player.isCasting = state);
+}
+
+// Player disconnection
+const onDisconnect = (socket) => {
+   delete playerList[socket.id];
+}
+
 
 // =====================================================================
-// Set Enemies
+// Enemies
 // =====================================================================
 const set_Minotaurs = () => {
 
@@ -124,10 +220,7 @@ const set_Minotaurs = () => {
    cycleEnemiesPos(minotaursSpawns, minotaursSpecs);
 }
 
-
-// =====================================================================
 // Init Enemies
-// =====================================================================
 const cycleEnemiesPos = (enemySpawnObj, enemySpecs) => {
 
    enemySpawnObj.forEach(position => {
@@ -150,13 +243,18 @@ initEnemies();
 let frame = 0
 
 setInterval(() => {
+   let playerData = [];
    let enemiesData = [];
+
    mobList.forEach(enemy => enemy.update(frame, socketList, playerList, enemiesData));
 
-   let playerData = playerHandler.playerUpdate(frame, socketList, playerList, mobList);
+   for(let i in playerList) {
+      let player = playerList[i];
+      player.update(socketList, playerList, mobList, playerData);
+   }
    
    playerData.forEach(player => {
-
+      
       let socket = socketList[player.id];
       socket.emit("newSituation", playerData, enemiesData);
 

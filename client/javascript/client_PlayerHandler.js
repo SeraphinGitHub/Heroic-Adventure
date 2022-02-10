@@ -100,7 +100,7 @@ const playerScore = (data) => {
    fameCount.textContent = `F_Count: ${data.fameCount}`;
 }
 
-const initPlayerUI = (socket) => {
+const initGameUI = (socket) => {
 
    socket.on("playerID", (id) => viewport_HTML.id = id);
    socket.on("playerStats", (data) => playerStats(data));
@@ -127,7 +127,7 @@ const controls = {
 
 
 // =====================================================================
-// Movements & Abilities
+// Movements & Casting
 // =====================================================================
 let isCasting = false;
 
@@ -144,6 +144,7 @@ const playerCommand = (socket, event, ctrlObj, state) => {
          if(ctrlObj === controls.spells && isCasting !== state) {
             isCasting = state;
             socket.emit("casting", state);
+            socket.on("animTimeOut", animSpecsObj.heal);
          }
       }
    });
@@ -152,7 +153,7 @@ const playerCommand = (socket, event, ctrlObj, state) => {
 const onKeyboardInput = (socket) => {
 
    window.addEventListener("keydown", (event) => {
-      if(insideCanvas && !isChatting) {
+      if(insideCanvas) {
    
          const state = true;
          playerCommand(socket, event, controls.movements, state);
@@ -172,8 +173,9 @@ const onKeyboardInput = (socket) => {
 // Attack
 // =====================================================================
 const playerAttackCommand = (socket, event, state) => {
-   if(event.which === 1 && insideCanvas && !isChatting) {
+   if(event.which === 1 && insideCanvas) {
       socket.emit("attack", state);
+      socket.emit("animTimeOut", animSpecsObj.attack);
    }
 }
 
@@ -196,7 +198,7 @@ let looseFameFluid = 0;
 // ==> create Globales Variables Section in GameHandler.js 
 
 
-const playerFloatingText = (player, textObj) => {
+const toggleFloatingText = (player, textObj) => {
    
    const newText = new FloatingText(
       ctxPlayer,
@@ -212,7 +214,7 @@ const playerFloatingText = (player, textObj) => {
    floatTextArray.push(newText);
 }
 
-const floatingText = (socket) => {
+const initFloatingText = (socket) => {
    
    const mainTexSize = 34;
 
@@ -226,7 +228,7 @@ const floatingText = (socket) => {
          value: `+${player.calcHealing}`,
       }
       
-      playerFloatingText(player, text);
+      toggleFloatingText(player, text);
    });
 
    socket.on("giveDamage", (playerPos, calcDamage) => {
@@ -239,7 +241,7 @@ const floatingText = (socket) => {
          value: `-${calcDamage}`,
       }
       
-      playerFloatingText(playerPos, text);
+      toggleFloatingText(playerPos, text);
    });
 
    socket.on("getDamage", (playerPos, calcDamage) => {
@@ -251,7 +253,7 @@ const floatingText = (socket) => {
          value: `-${calcDamage}`,
       }
       
-      playerFloatingText(playerPos, text);
+      toggleFloatingText(playerPos, text);
    });
    
    socket.on("getFame", (playerPos, serverfameCost) => {
@@ -263,7 +265,7 @@ const floatingText = (socket) => {
          value: `+${serverfameCost} Fame`,
       }
       
-      playerFloatingText(playerPos, text);
+      toggleFloatingText(playerPos, text);
       isGettingFame = true;
       fameCost = serverfameCost;
    });
@@ -277,7 +279,7 @@ const floatingText = (socket) => {
          value: `-${serverfameCost} Fame`,
       }
       
-      playerFloatingText(playerPos, text);
+      toggleFloatingText(playerPos, text);
       isLoosingFame = true;
       fameCost = serverfameCost;
       looseFameFluid = serverfameCost;
@@ -535,13 +537,13 @@ const drawShadow = (ctx, player) => {
    ctx.closePath();
 }
 
-const drawPlayer = (ctx, player) => {
+const drawPlayer = (ctx, player, frame) => {
 
-   let animState = playerAnimState(player);
+   let animState = playerAnimState(player, frame);
 
    ctx.drawImage(
       animState,
-      player.frameX * playerSprites.width, player.frameY * playerSprites.height, playerSprites.width, playerSprites.height,      
+      frameX * playerSprites.width, player.frameY * playerSprites.height, playerSprites.width, playerSprites.height,      
       pos(player,"x") - playerSprites.width/2,
       pos(player,"y") - playerSprites.height/2 - playerSprites.offsetY,
       playerSprites.height, playerSprites.width,
@@ -562,7 +564,7 @@ const drawName = (ctx, player) => {
 
 
 // =====================================================================
-// Player Animation State
+// Player Animation
 // =====================================================================
 const playerAnimPath = "client/images/playerAnim/";
 
@@ -575,35 +577,64 @@ const animSrc = {
    died: playerAnimPath + "died_4x.png",
 }
 
-let animArray = [];
+let animSrcArray = [];
 for(let state in animSrc) {
 
    const animation = new Image();
    animation.src = animSrc[state];
-   animArray.push(animation);
+   animSrcArray.push(animation);
 }
 
-const playerAnimState = (player) => {
-   
+let frameX = 0;
+let animSpecs;
+
+const playerAnimation = (frame, index, spritesNumber) => {
+
+   if(frame % index === 0) {       
+      if(frameX < spritesNumber) frameX++;
+      else frameX = 0;
+   }
+}
+
+const playerAnimState = (player, frame) => {
+
    let animState;
 
    switch(player.state) {
-      case "walk": animState = animArray[1];
+      case "walk": {
+         animState = animSrcArray[1];
+         playerAnimation(frame, animSpecsObj.walk.index, animSpecsObj.walk.spritesNumber);
+      };
       break;
 
-      case "run": animState = animArray[2];
+      case "run": {
+         animState = animSrcArray[2];
+         playerAnimation(frame, animSpecsObj.run.index, animSpecsObj.run.spritesNumber);
+      };
       break;
 
-      case "attack": animState = animArray[3];
+      case "attack": {
+         animState = animSrcArray[3];
+         playerAnimation(frame, animSpecsObj.attack.index, animSpecsObj.attack.spritesNumber);
+      }
       break;
 
-      case "heal": animState = animArray[4];
+      case "heal": {
+         animState = animSrcArray[4];
+         playerAnimation(frame, animSpecsObj.heal.index, animSpecsObj.heal.spritesNumber);
+      }
       break;
 
-      case "died": animState = animArray[5];
+      case "died": {
+         animState = animSrcArray[5];
+         playerAnimation(frame, animSpecsObj.died.index, animSpecsObj.died.spritesNumber);
+      }
       break;
 
-      default: animState = animArray[0];
+      default: {
+         animState = animSrcArray[0];
+         playerAnimation(frame, animSpecsObj.idle.index, animSpecsObj.idle.spritesNumber);
+      }
       break;
    }
 
@@ -804,9 +835,11 @@ const fameFluidity = (player, fameFluid, state, stateName) => {
 // =====================================================================
 // Player Sync (Every frame)
 // =====================================================================
-const playerSync = (player) => {
+let isClientName = false;
 
-   // if Client
+const playerSync = (player, frame) => {
+
+   // Client
    if(viewport_HTML.id === String(player.id)) {
       
       // Camera 
@@ -822,19 +855,21 @@ const playerSync = (player) => {
       
       // Player
       drawShadow(ctxPlayer, player);
-      drawPlayer(ctxPlayer, player);
-      drawName(ctxPlayer, player);  
+      drawPlayer(ctxPlayer, player, frame);
       drawBars_Client(player);
+      
+      if(!isClientName) {
+         isClientName = true;
+         drawName(ctxFixedBack, player);  
+      }
    }
    
    
-   // if Other Players
+   // Other Players
    else {
       drawBars_OtherPlayer(player);
-
-      // Player
       drawShadow(ctxEnemies, player);
-      drawPlayer(ctxEnemies, player);
+      drawPlayer(ctxEnemies, player, frame);
       drawName(ctxEnemies, player);   
    }
    
@@ -845,26 +880,28 @@ const playerSync = (player) => {
 // =====================================================================
 // Init Player
 // =====================================================================
-const initPlayer = (socket) => {
+// const initPlayer = (socket) => {
 
-   drawHUD_Frame();
-   drawFame_Frame();
-   initPlayerUI(socket);
-   floatingText(socket)
-   deathScreen(socket);
-   onKeyboardInput(socket);
-   onMouseInput(socket);
+//    drawHUD_Frame();
+//    drawFame_Frame();
+//    initGameUI(socket);
+//    initFloatingText(socket)
+//    deathScreen(socket);
+//    onKeyboardInput(socket);
+//    onMouseInput(socket);
 
-   socket.on("fameCount+1", (fameCount) => {
+   
+//    socket.on("animSpecs", (data) => animSpecs = data);
+//    socket.on("fameCount+1", (fameCount) => {
 
-      ctxFixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
-      ctxFixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
+//       ctxFixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
+//       ctxFixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
 
-      drawHUD_Frame();
-      drawFame_Frame();
-      drawFameCount(fameCount);
-   });
-}
+//       drawHUD_Frame();
+//       drawFame_Frame();
+//       drawFameCount(fameCount);
+//    });
+// }
 
 
 // =====================================================================

@@ -24,11 +24,11 @@ const drawMinotaur = (minotaur) => {
       red: 0.3,      // 30%
    }
 
-   ctxEnemies.drawImage(
+   contexts.ctxEnemies.drawImage(
       animState,
       minotaur.frameX * minotaurSprites.width, minotaur.frameY * minotaurSprites.height, minotaurSprites.width, minotaurSprites.height,      
-      minotaur.x - viewport.x - minotaurSprites.width/2 + minotaurSprites.offsetX,
-      minotaur.y - viewport.y - minotaurSprites.height/2 + minotaurSprites.offsetY,
+      minotaur.x - viewportSpecs.viewport.x - minotaurSprites.width/2 + minotaurSprites.offsetX,
+      minotaur.y - viewportSpecs.viewport.y - minotaurSprites.height/2 + minotaurSprites.offsetY,
       minotaurSprites.width * minotaurSprites.sizeRatio, minotaurSprites.height * minotaurSprites.sizeRatio
    );
 
@@ -36,14 +36,14 @@ const drawMinotaur = (minotaur) => {
    // --- Temporary ---
    // =====================
    const minotaurBar = {
-      ctx: ctxEnemies,
-      x: minotaur.x - viewport.x,
-      y: minotaur.y - viewport.y,
-      width: barWidth,
-      height: barHeight,
+      ctx: contexts.ctxEnemies,
+      x: minotaur.x - viewportSpecs.viewport.x,
+      y: minotaur.y - viewportSpecs.viewport.y,
+      width: miniBarSpecs.barWidth,
+      height: miniBarSpecs.barHeight,
    }
    
-   const gameBar = new GameBar(minotaurBar, -barWidth/2, -80, minotaur.baseHealth, minotaur.health);
+   const gameBar = new GameBar(minotaurBar, -miniBarSpecs.barWidth/2, -80, minotaur.baseHealth, minotaur.health);
 
    let index = 0;
    if(minotaur.health <= minotaur.baseHealth * colorBar.yellow) index = 1;
@@ -51,7 +51,7 @@ const drawMinotaur = (minotaur) => {
    if(minotaur.health <= minotaur.baseHealth * colorBar.red) index = 3;
 
    gameBar.draw(
-      gameUIimage,
+      gameUI_Img,
       barCoordArray[index].x,
       barCoordArray[index].y,
       barCoordArray[index].width,
@@ -61,15 +61,15 @@ const drawMinotaur = (minotaur) => {
 
 const drawMinotaurShadow = (minotaur) => {
    
-   ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.6)";
-   ctxEnemies.beginPath();
-   ctxEnemies.ellipse(
-      minotaur.x - viewport.x,
-      minotaur.y - viewport.y + minotaurSprites.radius,
+   contexts.ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.6)";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.ellipse(
+      minotaur.x - viewportSpecs.viewport.x,
+      minotaur.y - viewportSpecs.viewport.y + minotaurSprites.radius,
       minotaurSprites.radius * 0.8, minotaurSprites.radius * 0.4, 0, 0, Math.PI * 2
    );
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 }
 
 
@@ -145,71 +145,71 @@ const DEBUG_Minotaur = (minotaur) => {
 const DEBUG_WanderRange = (minotaur) => {
 
    // Circle
-   ctxEnemies.fillStyle = "darkviolet";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.spawnX -viewport.x, minotaur.spawnY -viewport.y, minotaur.wanderRange+minotaur.radius, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fillStyle = "darkviolet";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.spawnX -viewportSpecs.viewport.x, minotaur.spawnY -viewportSpecs.viewport.y, minotaur.wanderRange+minotaur.radius, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 }
 
 const DEBUG_ChasingRange = (minotaur) => {
 
    // Circle
-   ctxEnemies.globalAlpha = 0.6;
-   ctxEnemies.fillStyle = "red";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.x -viewport.x, minotaur.y -viewport.y, minotaur.chasingRange, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
-   ctxEnemies.globalAlpha = 1;
+   contexts.ctxEnemies.globalAlpha = 0.6;
+   contexts.ctxEnemies.fillStyle = "red";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.x -viewportSpecs.viewport.x, minotaur.y -viewportSpecs.viewport.y, minotaur.chasingRange, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
+   contexts.ctxEnemies.globalAlpha = 1;
 }
 
 const DEBUG_DrawMinotaur = (minotaur) => {
    
    // Mob Radius
-   ctxEnemies.fillStyle = "blue";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.x - viewport.x, minotaur.y - viewport.y, minotaur.radius, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fillStyle = "blue";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.x - viewportSpecs.viewport.x, minotaur.y - viewportSpecs.viewport.y, minotaur.radius, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 
    // Health
-   ctxEnemies.fillStyle = "black";
-   ctxEnemies.font = "26px Orbitron-Regular";
-   ctxEnemies.fillText(minotaur.health, minotaur.x -viewport.x -25, minotaur.y -viewport.y);
+   contexts.ctxEnemies.fillStyle = "black";
+   contexts.ctxEnemies.font = "26px Orbitron-Regular";
+   contexts.ctxEnemies.fillText(minotaur.health, minotaur.x -viewportSpecs.viewport.x -25, minotaur.y -viewportSpecs.viewport.y);
 
    // Center
-   ctxEnemies.fillStyle = "yellow";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.x - viewport.x, minotaur.y - viewport.y, 6, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fillStyle = "yellow";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.x - viewportSpecs.viewport.x, minotaur.y - viewportSpecs.viewport.y, 6, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 }
 
 const DEBUG_PathLine = (minotaur) => {
 
    // Point
-   ctxEnemies.fillStyle = "lime";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.spawnX -viewport.x, minotaur.spawnY -viewport.y, 4, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fillStyle = "lime";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.spawnX -viewportSpecs.viewport.x, minotaur.spawnY -viewportSpecs.viewport.y, 4, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 
    // Path Line
-   ctxEnemies.strokeStyle = "lime";
-   ctxEnemies.beginPath();
-   ctxEnemies.moveTo(minotaur.spawnX -viewport.x, minotaur.spawnY -viewport.y);
-   ctxEnemies.lineTo(minotaur.calcX -viewport.x, minotaur.calcY -viewport.y);
-   ctxEnemies.lineWidth = 4;
-   ctxEnemies.stroke();
+   contexts.ctxEnemies.strokeStyle = "lime";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.moveTo(minotaur.spawnX -viewportSpecs.viewport.x, minotaur.spawnY -viewportSpecs.viewport.y);
+   contexts.ctxEnemies.lineTo(minotaur.calcX -viewportSpecs.viewport.x, minotaur.calcY -viewportSpecs.viewport.y);
+   contexts.ctxEnemies.lineWidth = 4;
+   contexts.ctxEnemies.stroke();
 }
 
 const DEBUG_ReachPoint = (minotaur) => {
 
    // Point
-   ctxEnemies.fillStyle = "blue";
-   ctxEnemies.beginPath();
-   ctxEnemies.arc(minotaur.calcX -viewport.x, minotaur.calcY -viewport.y, 4, 0, Math.PI * 2);
-   ctxEnemies.fill();
-   ctxEnemies.closePath();
+   contexts.ctxEnemies.fillStyle = "blue";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(minotaur.calcX -viewportSpecs.viewport.x, minotaur.calcY -viewportSpecs.viewport.y, 4, 0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
 }

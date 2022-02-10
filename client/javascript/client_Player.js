@@ -2,70 +2,44 @@
 "use strict"
 
 // =====================================================================
-// Init Player
-// =====================================================================
-// const client = new ClientPlayer(
-//    viewport,
-//    viewport_HTML,
-//    viewSize,
-//    controls,
-//    ctxUI,
-//    ctxPlayer,
-//    ctxEnemies,
-//    ctxFixedBack,
-//    ctxFixedFront,
-//    hudImage,
-//    barWidth,
-//    barHeight,
-//    barCoordArray,
-//    animArray
-// );
-
-// playerData.forEach(servPlayer => client.playerSync(servPlayer, viewport, mapTiles, cellSize));
-
-
-
-// =====================================================================
 // Client Player
 // =====================================================================
 class ClientPlayer {
-   constructor(
-         viewport,
-         viewport_HTML,
-         viewSize,
-         ctxUI,
-         ctxMap,
-         ctxPlayer,
-         ctxEnemies,
-         ctxFixedBack,
-         ctxFixedFront,
-         hudImage,
-         barWidth,
-         barHeight,
-         barCoordArray,
-         animArray
-      ) {
-      
-      // Viewport
-      this.viewport = viewport;
-      this.viewport_HTML = viewport_HTML;
-      this.viewSize = viewSize;
+   constructor(clientSpecs) {
 
-      // Contexts
-      this.ctxUI = ctxUI;
-      this.ctxMap = ctxMap;
-      this.ctxPlayer = ctxPlayer;
-      this.ctxEnemies = ctxEnemies;
-      this.ctxFixedBack = ctxFixedBack;
-      this.ctxFixedFront = ctxFixedFront;
+      // Viewport
+      this.viewport = clientSpecs.viewport;
+      this.viewport_HTML = clientSpecs.viewport_HTML;
+      this.viewSize = clientSpecs.viewSize;
+      this.centerVp_X = clientSpecs.centerVp_X;
+      this.centerVp_Y = clientSpecs.centerVp_Y;
+     
+      // Canvas
+      this.ctxUI = clientSpecs.ctxUI;
+      this.ctxMap = clientSpecs.ctxMap;
+      this.ctxPlayer = clientSpecs.ctxPlayer;
+      this.ctxEnemies = clientSpecs.ctxEnemies;
+      this.ctxFixedBack = clientSpecs.ctxFixedBack;
+      this.ctxFixedFront = clientSpecs.ctxFixedFront;
+
+      // PNG Files
+      this.mapTile_Img = clientSpecs.mapTile_Img;
+      this.gameUI_Img = clientSpecs.gameUI_Img;
+      this.character_Img = clientSpecs.character_Img;
+
+      // Map
+      this.mapSpriteSize = clientSpecs.mapSpecs.mapSpriteSize;
+      this.cellSize = clientSpecs.mapSpecs.cellSize;
+      this.columns = clientSpecs.mapSpecs.columns;
+      this.rows = clientSpecs.mapSpecs.rows;      
+      this.mapScheme = clientSpecs.mapSpecs.mapScheme;
       
-      // HUD
-      this.hudImage = hudImage;
+      // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
       this.HUD_scale_Y = 1;
       this.HUD = {
-         x: viewport.width/2 -400/2 * this.HUD_scale_X,
-         y: viewport.height -110 * this.HUD_scale_Y,
+         x: this.viewport.width/2 -400/2 * this.HUD_scale_X,
+         y: this.viewport.height -110 * this.HUD_scale_Y,
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
@@ -73,28 +47,76 @@ class ClientPlayer {
       this.flashingSpeed = 6;
       this.flashFrame = 0;
 
-      // Mini Bars
-      this.barWidth = barWidth;
-      this.barHeight = barHeight;
-      this.barCoordArray = barCoordArray;
+      // Game UI ==> Mini Bars
+      this.barWidth = clientSpecs.barWidth;
+      this.barHeight = clientSpecs.barHeight;
+      this.barCoordArray = clientSpecs.barCoordArray;
 
-      // Sprites
+      // Game UI ==> Fame Bar
+      this.fameScale_X = 1.25;
+      this.fameScale_Y = 1;
+      this.fame = {
+         x: this.viewSize.width/2 -900/2 * this.fameScale_X,
+         y: this.viewport.height -805,
+         width: 900 * this.fameScale_X,
+         height: 53 * this.fameScale_Y,
+      }
+      this.fameCost = 0;
+      this.getFameFluid = 0;
+      this.looseFameFluid = 0;
+      this.isGettingFame = false;
+      this.isLoosingFame = false;
+
+      // Player Sprites
       this.sprites = {
          height: 200,
          width: 200,
          offsetY: 5,
          radius: 45,
       }
-      this.animArray = animArray;
-   }
 
-
-   // =====================================================================
-   // Client check
-   // =====================================================================
-   pos(servPlayer, coord) {
+      // Animation
+      this.animState;
+      this.frameX = 0;
+      this.animSpecs = {
+         idle: {
+            index: 2,
+            spritesNumber: 29,
+         },
       
-      if(this.viewport_HTML.id === String(servPlayer.id)) {
+         walk: {
+            index: 1,
+            spritesNumber: 29,
+         },
+      
+         run: {
+            index: 1,
+            spritesNumber: 14,
+         },
+      
+         attack: {
+            index: 1,
+            spritesNumber: 14,
+         },
+      
+         heal: {
+            index: 2,
+            spritesNumber: 14,
+         },
+      
+         died: {
+            index: 3,
+            spritesNumber: 29,
+         },
+      }
+
+      // General Vars
+      this.isClientName = false;
+   }
+   
+   pos(serverPlayer, coord) {
+      
+      if(this.viewport_HTML.id === String(serverPlayer.id)) {
          if(coord === "x") return this.viewSize.width/2;
          if(coord === "y") return this.viewSize.height/2;
       }
@@ -105,121 +127,303 @@ class ClientPlayer {
       }
    }
 
+   initMapSpecs(socket) {
+      
+      socket.on("initMap", (data) => {
+         this.mapSpriteSize = data.mapSpriteSize;
+         this.cellSize = data.cellSize;
+         this.columns = data.columns;
+         this.rows = data.rows;
+      });
+   }
+   
+   // Camera
+   scrollCam(serverPlayer) {
 
-   // =====================================================================
-   // Scroll Camera
-   // =====================================================================
-   scrollCam(servPlayer, viewport, mapTiles, cellSize) {
-
-      viewport.scrollTo(servPlayer.x, servPlayer.y);
+      this.viewport.scrollTo(serverPlayer.x, serverPlayer.y);
       
       // Viewport bounderies
-      let vpLeftCol_Nbr = Math.floor(viewport.x / cellSize);
-      let vpRightCol_Nbr = Math.ceil((viewport.x + viewport.width) / cellSize);
-      let vpTopRow_Nbr = Math.floor(viewport.y / cellSize);
-      let vpBottomRow_Nbr = Math.ceil((viewport.y + viewport.height) / cellSize);
+      let vpLeftCol_Nbr = Math.floor(this.viewport.x / this.cellSize);
+      let vpRightCol_Nbr = Math.ceil((this.viewport.x + this.viewport.width) / this.cellSize);
+      let vpTopRow_Nbr = Math.floor(this.viewport.y / this.cellSize);
+      let vpBottomRow_Nbr = Math.ceil((this.viewport.y + this.viewport.height) / this.cellSize);
 
       // Map bounderies ==> no repeat
       if(vpLeftCol_Nbr < 0) vpLeftCol_Nbr = 0;
       if(vpTopRow_Nbr < 0) vpTopRow_Nbr = 0;
-      if(vpRightCol_Nbr > columns) vpRightCol_Nbr = columns;
-      if(vpBottomRow_Nbr > rows) vpBottomRow_Nbr = rows;
+      if(vpRightCol_Nbr > this.columns) vpRightCol_Nbr = this.columns;
+      if(vpBottomRow_Nbr > this.rows) vpBottomRow_Nbr = this.rows;
       
       // ======== Temporary ========
       // this.ctxPlayer.strokeStyle = "black";
-      // this.ctxPlayer.strokeRect(centerVp_X, centerVp_Y, viewport.width, viewport.height);
+      // this.ctxPlayer.strokeRect(this.centerVp_X, this.centerVp_Y, viewport.width, viewport.height);
       // ======== Temporary ========
 
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
          for(let y = vpTopRow_Nbr; y < vpBottomRow_Nbr; y++) {
             
-            let tileIndex = y * columns + x;
-            let tileToDraw = mapScheme[tileIndex];
+            let tileIndex = y * this.columns + x;
+            let tileToDraw = this.mapScheme[tileIndex];
             
-            let tile_X = x * cellSize - viewport.x + centerVp_X;
-            let tile_Y = y * cellSize - viewport.y + centerVp_Y;
+            let tile_X = x * this.cellSize - this.viewport.x + this.centerVp_X;
+            let tile_Y = y * this.cellSize - this.viewport.y + this.centerVp_Y;
             
             this.ctxMap.drawImage(
-               mapTiles,
-               (tileToDraw -1) * spriteSize, 0, spriteSize, spriteSize,
-               tile_X, tile_Y, cellSize, cellSize
+               this.mapTile_Img,
+               (tileToDraw -1) * this.mapSpriteSize, 0, this.mapSpriteSize, this.mapSpriteSize,
+               tile_X, tile_Y, this.cellSize, this.cellSize
             );
 
             // ==> Still need to hide other players and enemies when leave viewport
          }
       }
    }
+   
+   // Floating Text
+   toggleFloatingText(floatTextArray, serverPlayer, textObj) {
 
-
-   // =====================================================================
-   // Player Floating Text
-   // =====================================================================
-   playerFloatingText(floatTextArray, servPlayer, ctx, offsetX, offsetY, textColor, textValue) {
-
-      const textSize = 30;
-      
       const newText = new FloatingText(
-         ctx,
-         this.pos(servPlayer, "x"),
-         this.pos(servPlayer, "y"),
-         offsetX,
-         offsetY,
-         textSize,
-         textColor,
-         textValue
+         this.ctxPlayer,
+         this.pos(serverPlayer, "x"),
+         this.pos(serverPlayer, "y"),
+         textObj.x,
+         textObj.y,
+         textObj.size,
+         textObj.color,
+         textObj.value
       );
-
+   
       floatTextArray.push(newText);
    }
 
-
-   // =====================================================================
-   // Init Floating Text
-   // =====================================================================
-   initFloatingText(floatTextArray, socket) {
-
-      socket.on("getHeal", (servPlayer) => this.playerFloatingText(floatTextArray, servPlayer, -35, -100, "lime", `+${servPlayer.calcHealing}`));
-      socket.on("giveDamage", (servPlayer) => this.playerFloatingText(floatTextArray, servPlayer, -35, -100, "yellow", `-${servPlayer.calcDamage}`));
-      socket.on("getDamage", (servPlayer) => this.playerFloatingText(floatTextArray, servPlayer, -35, -100, "red", `-${servPlayer.calcDamage}`));
-      socket.on("getFame", (servPlayer, fameCost) => this.playerFloatingText(floatTextArray, servPlayer, -85, 180, "darkviolet", `+${fameCost} Fame`));
-      socket.on("looseFame", (servPlayer, fameCost) => this.playerFloatingText(floatTextArray, servPlayer, -85, 180, "red", `-${fameCost} Fame`));
+   initFloatingText(socket) {
+   
+      const mainTexSize = 34;
+   
+      socket.on("getHeal", (serverPlayer) => {
+   
+         const text = {
+            x: -35,
+            y: -100,
+            size: mainTexSize,
+            color: "lime",
+            value: `+${serverPlayer.calcHealing}`,
+         }
+         
+         this.toggleFloatingText(player, text);
+      });
+   
+      socket.on("giveDamage", (playerPos, calcDamage) => {
+   
+         const text = {
+            x: -35,
+            y: -100,
+            size: mainTexSize,
+            color: "yellow",
+            value: `-${calcDamage}`,
+         }
+         
+         this.toggleFloatingText(playerPos, text);
+      });
+   
+      socket.on("getDamage", (playerPos, calcDamage) => {
+         const text = {
+            x: -35,
+            y: -100,
+            size: mainTexSize,
+            color: "red",
+            value: `-${calcDamage}`,
+         }
+         
+         this.toggleFloatingText(playerPos, text);
+      });
+      
+      socket.on("getFame", (playerPos, serverfameCost) => {
+         const text = {
+            x: -105,
+            y: 180,
+            size: mainTexSize,
+            color: "darkviolet",
+            value: `+${serverfameCost} Fame`,
+         }
+         
+         this.toggleFloatingText(playerPos, text);
+         this.isGettingFame = true;
+         this.fameCost = serverfameCost;
+      });
+      
+      socket.on("looseFame", (playerPos, serverfameCost) => {
+         const text = {
+            x: -105,
+            y: 180,
+            size: mainTexSize,
+            color: "red",
+            value: `-${serverfameCost} Fame`,
+         }
+         
+         this.toggleFloatingText(playerPos, text);
+         this.isLoosingFame = true;
+         this.fameCost = serverfameCost;
+         this.looseFameFluid = serverfameCost;
+      });
    }
 
+   // Draw Fame
+   drawFame_Frame() {
 
-   // =====================================================================
-   // Player Fame
-   // =====================================================================
-   playerFame(servPlayer) {
+      // Background
+      this.ctxFixedBack.drawImage(this.gameUI_Img,
+         522, 477, 26, 48,
+         this.fame.x + (32 * this.fameScale_X),
+         this.fame.y + 19,
+         this.fame.width - (65 * this.fameScale_X),
+         this.fame.height - 27
+      );
 
-      const fameBarWidth = 1000;
-
-      const fameBarSpecs = {
-         ctx: this.ctxUI,
-         x: this.viewSize.width/2 - fameBarWidth/2,
-         y: 10,
-         width: fameBarWidth,
-         height: 20,
-      }
-
-      const fameBar = new GameBar(fameBarSpecs, 0, 0, servPlayer.baseFame, servPlayer.fameValue);
-
-      fameBar.draw(
-         this.hudImage,
-         50, 586, 350, 50
-         // 50, 612, 350, 23
+      // Fame Sprite
+      this.ctxFixedFront.drawImage(this.gameUI_Img,
+         6, 631, 2083, 105,
+         this.fame.x,
+         this.fame.y,
+         this.fame.width,
+         this.fame.height
       );
    }
 
+   drawFame_Bar(serverPlayer) {
 
-   // =====================================================================
-   // Player HUD
-   // =====================================================================
+      let fameBarWidth = (serverPlayer.fameValue / serverPlayer.baseFame) * (this.fame.width - (65 * this.fameScale_X));
+   
+      // Fame Bar
+      this.ctxUI.drawImage(this.gameUI_Img,
+         522, 529, 26, 48,
+         this.fame.x + (32 * this.fameScale_X),
+         this.fame.y + 19,
+         fameBarWidth,
+         this.fame.height - 27
+      );
+   }
+   
+   drawFame_Count(fameCount) {
+   
+      // Fame Count   
+      this.ctxFixedFront.fillStyle = "darkviolet";
+      this.ctxFixedFront.font = "30px Orbitron-ExtraBold";
+      this.ctxFixedFront.fillText(fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
+      this.ctxFixedFront.strokeText(fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
+   }
+   
+   // ******************
+   fameFluidity = (player, fameFluid, state, stateName) => {
+   
+      // if(state) {
+   
+      //    let origin_X;
+      //    const fluidSpeed = 15;
+   
+      //    let fullBarWidth = fame.width - (65 *fameScale_X);
+      //    let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+      //    let calcWidth = (fameFluid / fameCost) * miniBarWidth;
+         
+      //    if(calcWidth <= 0) calcWidth = 0;
+   
+      //    if(stateName === "get") {
+      //       fameFluid += fluidSpeed;
+      //       origin_X = player.fameValue / player.baseFame * fullBarWidth;
+   
+      //       if(fameFluid >= fameCost) {
+      //          fameFluid = 0;
+      //          state = false;
+      //       }
+      //    }
+   
+      //    if(stateName === "loose") {
+      //       fameFluid -= fluidSpeed;
+      //       origin_X = player.fameValue / player.baseFame * fullBarWidth;
+   
+      //       if(fameFluid <= -fameCost) {
+      //          fameFluid = 0;
+      //          state = false;
+      //       }
+      //    }
+   
+      //    ctxUI.drawImage(
+      //       gameUIimage,
+      //       522, 529, 26, 48,
+      //       origin_X,
+      //       fame.y +19 +50,
+      //       calcWidth,
+      //       fame.height - 27
+      //    );
+      // }
+   
+      if(isGettingFame) {
+      
+         let fullBarWidth = fame.width - (83 *fameScale_X);
+         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+         let fameBarWidth = player.fameValue / player.baseFame * fullBarWidth;
+         let origin_X = fame.x + (41 *fameScale_X) + fameBarWidth;
+   
+         let calcWidth = (getFameFluid / fameCost) * miniBarWidth;
+         if(calcWidth <= 0) calcWidth = 0;
+   
+         // Value Bar
+         ctxUI.drawImage(
+            gameUIimage,
+            // 522, 529, 26, 48,
+            552, 477, 26, 48,
+            origin_X,
+            fame.y +19 +20,
+            calcWidth,
+            fame.height - 27
+         );
+   
+         const ratio = 3;
+         getFameFluid += ratio;
+         
+         if(getFameFluid >= fameCost) {
+            getFameFluid = fameCost;
+            // getFameFluid = 0;
+            // isGettingFame = false;
+         }
+      }
+   
+      if(isLoosingFame) {
+   
+         let fullBarWidth = fame.width - (83 *fameScale_X);
+         let origin_X = player.fameValue / player.baseFame * fullBarWidth;
+         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
+   
+         let calcWidth = (looseFameFluid / fameCost) * miniBarWidth;
+         if(calcWidth <= 0) calcWidth = 0;
+   
+         // Value Bar
+         ctxUI.drawImage(
+            gameUIimage,
+            522, 529, 26, 48,
+            origin_X,
+            fame.y +19 +30,
+            calcWidth,
+            fame.height - 27
+         );
+   
+         const ratio = 15;
+         looseFameFluid -= ratio;
+         
+         if(looseFameFluid <= -fameCost) {
+            looseFameFluid = 0;
+            isLoosingFame = false;
+         }
+      }
+   }
+   // ******************
+   
+   // Draw HUD
    drawHUD_Frame() {
       
       // Background
-      this.ctxFixedBack.drawImage(
-         this.hudImage,
-         4, 179, 729, 141,
+      this.ctxFixedBack.drawImage(this.gameUI_Img,
+         5, 181, 729, 141,
          this.HUD.x + (15 * this.HUD_scale_X),     // Pos X
          this.HUD.y + (10 * this.HUD_scale_Y),     // Pos Y
          this.HUD.width - (30 * this.HUD_scale_X), // Width
@@ -227,17 +431,19 @@ class ClientPlayer {
       );
 
       // HUD Sprite
-      this.ctxFixedFront.drawImage(
-         this.hudImage,
-         3, 4, 782, 172,
-         this.HUD.x, this.HUD.y, this.HUD.width, this.HUD.height
+      this.ctxFixedFront.drawImage(this.gameUI_Img,
+         5, 4, 782, 173,
+         this.HUD.x,
+         this.HUD.y,
+         this.HUD.width,
+         this.HUD.height
       );
    }
 
    drawHUD_BaseBar(ratio, sx, sy, sw, sh, offX, offY, offW, offH) {
 
       this.ctxUI.drawImage(
-         this.hudImage,
+         this.gameUI_Img,
          sx, sy, sw *ratio, sh,
          this.HUD.x + (offX * this.HUD_scale_X),                  // Pos X
          this.HUD.y + (offY * this.HUD_scale_Y),                  // Pos Y
@@ -246,16 +452,16 @@ class ClientPlayer {
       );
    }
 
-   drawHUD_Mana(servPlayer) {
+   drawHUD_Mana(serverPlayer) {
       
-      let manaRatio = servPlayer.mana / servPlayer.baseMana;
+      let manaRatio = serverPlayer.mana / serverPlayer.baseMana;
       
       // Still Castable Mana
-      if(servPlayer.mana >= servPlayer.healCost) {
+      if(serverPlayer.mana >= serverPlayer.healCost) {
 
          this.drawHUD_BaseBar(
             manaRatio,
-            4, 382, 460, 47,
+            6, 528, 460, 47,
             82, 10, 165, 8
          );
       }
@@ -264,23 +470,23 @@ class ClientPlayer {
       else {
          this.drawHUD_BaseBar(
             manaRatio,
-            3, 328, 462, 47,
+            5, 475, 461, 47,
             82, 10, 165, 8
          );
       }
    }
 
-   drawHUD_Health(servPlayer) {
+   drawHUD_Health(serverPlayer) {
       
-      let healthRatio = servPlayer.health / servPlayer.baseHealth;
+      let healthRatio = serverPlayer.health / serverPlayer.baseHealth;
 
       // if Health Over 30%
-      if(servPlayer.health > servPlayer.baseHealth * minHealthRatio) {
+      if(serverPlayer.health > serverPlayer.baseHealth * this.minHealthRatio) {
 
          // Normal Bar
          this.drawHUD_BaseBar(
             healthRatio,
-            5, 486, 729, 45,
+            5, 327, 729, 45,
             15, 39, 30, 9
          );
       }
@@ -291,7 +497,7 @@ class ClientPlayer {
          // Flashing Bar
          this.drawHUD_BaseBar(
             healthRatio,
-            4, 435, 729, 45,
+            6, 424, 729, 45,
             15, 39, 30, 9
          );
 
@@ -302,7 +508,7 @@ class ClientPlayer {
             // Normal Bar
             this.drawHUD_BaseBar(
                healthRatio,
-               5, 486, 729, 45,
+               5, 327, 729, 45,
                15, 39, 30, 9
             );
          }
@@ -311,23 +517,20 @@ class ClientPlayer {
       }
    }
 
-   drawHUD_Energy(servPlayer) {
+   drawHUD_Energy(serverPlayer) {
       
-      let energyRatio = servPlayer.energy / servPlayer.baseEnergy;
+      let energyRatio = serverPlayer.energy / serverPlayer.baseEnergy;
 
       // Yellow Bar
       this.drawHUD_BaseBar(
          energyRatio,
-         4, 536, 461, 45,
+         6, 582, 460, 46,
          82, 65, 165, 8
       );
    }
-
-
-   // =====================================================================
-   // Player Mini Bars
-   // =====================================================================   
-   drawBars_Client(servPlayer) {
+   
+   // Draw Mini Bars
+   drawBars_Client(serverPlayer) {
       
       const clientPlayerBar = {
          ctx: this.ctxUI,
@@ -337,12 +540,11 @@ class ClientPlayer {
          height: this.barHeight,
       }
       
-      // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
-      const attackBar = new GameBar(clientPlayerBar, 0, 65, servPlayer.GcD, servPlayer.speedGcD);
-      const attackCoord = this.barCoordArray[ this.barCoordArray.length -1 ]; // Always get last index
+      const attackBar = new GameBar(clientPlayerBar, 0, 65, serverPlayer.GcD, serverPlayer.speedGcD);
+      const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
-         this.hudImage,
+         this.gameUI_Img,
          attackCoord.x,
          attackCoord.y,
          attackCoord.width,
@@ -350,31 +552,27 @@ class ClientPlayer {
       );
    }
 
-   drawBars_OtherPlayer(servPlayer) {
+   drawBars_OtherPlayer(serverPlayer) {
       
-      const healthBar = {
-         name: "health",
-         maxValue: servPlayer.baseHealth,
-         value: servPlayer.health,
-      };
-
-      const manaBar = {
-         name: "mana",
-         maxValue: servPlayer.baseMana,
-         value: servPlayer.mana,
-      };
-
-      const energyBar = {
-         name: "energy",
-         maxValue: servPlayer.baseEnergy,
-         value: servPlayer.energy,
-      };
-
       // Bar Value Array
       const barValueArray = [
-         healthBar,
-         manaBar,
-         energyBar,
+         {
+            name: "health",
+            maxValue: serverPlayer.baseHealth,
+            value: serverPlayer.health,
+         },
+
+         {
+            name: "mana",
+            maxValue: serverPlayer.baseMana,
+            value: serverPlayer.mana,
+         },
+
+         {
+            name: "energy",
+            maxValue: serverPlayer.baseEnergy,
+            value: serverPlayer.energy,
+         }
       ];
 
       const otherPlayerBar = {
@@ -390,192 +588,213 @@ class ClientPlayer {
       
       for(let i = 0; i < barValueArray.length; i++) {
          
+         let index;
          let bar = barValueArray[i];
-         if(servPlayer.isDead) bar.value = 0;
+         if(serverPlayer.isDead) bar.value = 0;
          
-         // GameBar(playerBarObj, offsetX, offsetY, maxValue, value)
-         const otherBar = new GameBar(otherPlayerBar, -this.barWidth/2, -95 +barGap, bar.maxValue, bar.value);
-         
-         let index = i;
+         const gameBar = new GameBar(otherPlayerBar, -this.barWidth/2, -95 +barGap, bar.maxValue, bar.value);
+
+         // Health Bar
+         if(bar.name === "health") {
+            index = 0;
+            if(serverPlayer.health <= serverPlayer.baseHealth * this.minHealthRatio) index = 3;
+         }
 
          // Mana Bar
          if(bar.name === "mana") {
-            if(servPlayer.mana >= servPlayer.healCost) index = i;
-            else index = this.barCoordArray.length -2;
+            index = 5;
+            if(serverPlayer.mana < serverPlayer.healCost) index = 6;
          }
+
+         // Energy Bar
+         if(bar.name === "energy") index = 1;
          
-         // Health Bar
-         if(bar.name === "health") {
-            if(servPlayer.health > servPlayer.baseHealth * this.minHealthRatio) index = i;
-            else index = this.barCoordArray.length -1;
-         }
-         
-         // Other Bar
-         otherBar.draw(
-            this.hudImage,
-            this.barCoordArray[index].x,
-            this.barCoordArray[index].y,
-            this.barCoordArray[index].width,
-            this.barCoordArray[index].height
+         // Draw Bar
+         gameBar.draw(
+            this.gameUI_Img,
+            barCoordArray[index].x,
+            barCoordArray[index].y,
+            barCoordArray[index].width,
+            barCoordArray[index].height
          );
 
          barGap += barOffset;
       };
    }
 
-
-   // =====================================================================
-   // Draw Player ==> Sprites, Shadow, Name
-   // =====================================================================
-   drawShadow(ctx, servPlayer) {
+   // Draw Player, Shadow, Name
+   drawShadow(ctx, serverPlayer) {
       
       ctx.fillStyle = "rgba(30, 30, 30, 0.6)";
       ctx.beginPath();
       ctx.ellipse(
-         this.pos(servPlayer, "x"),
-         this.pos(servPlayer, "y") + this.sprites.radius,
+         this.pos(serverPlayer, "x"),
+         this.pos(serverPlayer, "y") + this.sprites.radius,
          this.sprites.radius * 0.8, this.sprites.radius * 0.4, 0, 0, Math.PI * 2
       );
       ctx.fill();
       ctx.closePath();
    }
 
-   drawPlayer(ctx, servPlayer) {
-
-      let animState = this.playerAnimState();
+   drawPlayer(ctx, serverPlayer) {
 
       ctx.drawImage(
-         animState,
+         this.character_Img,
 
          // Source
-         servPlayer.frameX * this.sprites.width,
-         servPlayer.frameY * this.sprites.height,
+         this.frameX * this.sprites.width,
+         (serverPlayer.frameY + this.animState) * this.sprites.height,
          this.sprites.width,
          this.sprites.height,      
          
          // Destionation
-         this.pos(servPlayer, "x") - this.sprites.width/2,
-         this.pos(servPlayer, "y") - this.sprites.height/2 - this.sprites.offsetY,
+         this.pos(serverPlayer, "x") - this.sprites.width/2,
+         this.pos(serverPlayer, "y") - this.sprites.height/2 - this.sprites.offsetY,
          this.sprites.height,
          this.sprites.width,
       );
    }
 
-   drawName(ctx, servPlayer) {
+   drawName(ctx, serverPlayer) {
       
       let offsetY = 95;
-      let namePos_X = this.pos(servPlayer, "x") - (servPlayer.name.length * 7);
-      let namePos_Y = this.pos(servPlayer, "y") + offsetY;
+      let namePos_X = this.pos(serverPlayer, "x") - (serverPlayer.name.length * 7);
+      let namePos_Y = this.pos(serverPlayer, "y") + offsetY;
       
       ctx.fillStyle = "lime";
       ctx.font = "22px Orbitron-ExtraBold";
-      ctx.fillText(this.name, namePos_X, namePos_Y);
-      ctx.strokeText(this.name, namePos_X, namePos_Y);
+      ctx.fillText(serverPlayer.name, namePos_X, namePos_Y);
+      ctx.strokeText(serverPlayer.name, namePos_X, namePos_Y);
    }
 
-
-   // =====================================================================
-   // Player Animation State
-   // =====================================================================
-   playerAnimState() {
+   // Animation
+   animation(frame, index, spritesNumber) {
       
-      let animState;
+      if(frame % index === 0) {       
+         if(this.frameX < spritesNumber) this.frameX++;
+         else this.frameX = 0;
+      }
+   }
 
-      switch(this.state) {
-         case "walk": animState = this.animArray[1];
+   playerState(serverPlayer, frame) {
+      
+      const frameToJump = 4;
+
+      switch(serverPlayer.state) {
+         case "walk": {
+            this.animState = frameToJump * 1;
+            this.animation(frame, this.animSpecs.walk.index, this.animSpecs.walk.spritesNumber);
+         };
          break;
 
-         case "run": animState = this.animArray[2];
+         case "run": {
+            this.animState = frameToJump * 2;
+            this.animation(frame, this.animSpecs.run.index, this.animSpecs.run.spritesNumber);
+         };
          break;
 
-         case "attack": animState = this.animArray[3];
+         case "attack": {
+            this.animState = frameToJump * 3;
+            this.animation(frame, this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber);
+         }
          break;
 
-         case "heal": animState = this.animArray[4];
+         case "heal": {
+            this.animState = frameToJump * 4;
+            this.animation(frame, this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber);
+         }
          break;
 
-         case "died": animState = this.animArray[5];
+         case "died": {
+            this.animState = frameToJump * 5;
+            this.animation(frame, this.animSpecs.died.index, this.animSpecs.died.spritesNumber);
+         }
          break;
 
-         default: animState = this.animArray[0];
+         default: {
+            this.animState = frameToJump * 0;
+            this.animation(frame, this.animSpecs.idle.index, this.animSpecs.idle.spritesNumber);
+         }
          break;
       }
-
-      return animState;
    }
 
-
-   // =====================================================================
-   // Player Sync (Every frame)
-   // =====================================================================
-   playerSync(servPlayer, viewport, mapTiles, cellSize) {
-
-      // if Client
-      if(this.viewport_HTML.id === String(servPlayer.id)) {
+   // Sync (Every frame)
+   playerSync(serverPlayer, frame) {
+      
+      // Client
+      if(this.viewport_HTML.id === String(serverPlayer.id)) {
          
          // Camera 
-         this.scrollCam(servPlayer, viewport, mapTiles, cellSize);
-         
+         this.scrollCam(serverPlayer);
+
          // UI
-         this.playerFame(servPlayer);
-         this.drawHUD_Mana(servPlayer);
-         this.drawHUD_Health(servPlayer);
-         this.drawHUD_Energy(servPlayer);
+         this.drawFame_Bar(serverPlayer);
+         // this.fameFluidity(serverPlayer, getFameFluid, isGettingFame, "get");
+         // this.fameFluidity(serverPlayer, looseFameFluid, isLoosingFame, "loose");
+         this.drawHUD_Mana(serverPlayer);
+         this.drawHUD_Health(serverPlayer);
+         this.drawHUD_Energy(serverPlayer);
          
          // Player
-         this.drawShadow(this.ctxPlayer, servPlayer);
-         this.drawPlayer(this.ctxPlayer, servPlayer);
-         this.drawName(this.ctxPlayer, servPlayer);  
-         this.drawBars_Client(servPlayer);
+         this.drawBars_Client(serverPlayer);
+         this.drawShadow(this.ctxPlayer, serverPlayer);
+         this.drawPlayer(this.ctxPlayer, serverPlayer);
+
+         if(!this.isClientName) {
+            this.isClientName = true;
+            this.drawName(this.ctxFixedBack, serverPlayer);  
+         }
       }
       
       
-      // if Other Players
+      // Other Players
       else {
-         this.drawBars_OtherPlayer(servPlayer);
-
-         // Player
-         this.drawShadow(this.ctxEnemies, servPlayer);
-         this.drawPlayer(this.ctxEnemies, servPlayer);
-         this.drawName(this.ctxEnemies, servPlayer);   
+         this.drawBars_OtherPlayer(serverPlayer);
+         this.drawShadow(this.ctxEnemies, serverPlayer);
+         this.drawPlayer(this.ctxEnemies, serverPlayer);
+         this.drawName(this.ctxEnemies, serverPlayer);
       }
       
-      // this.DEBUG_Player(servPlayer);
+      this.playerState(serverPlayer, frame);
+      // this.DEBUG_Player(serverPlayer);
    }
+   
 
-
-   // =====================================================================
    // ==>  DEBUG MODE  <==
-   // =====================================================================
-   DEBUG_Player(servPlayer) {
+   DEBUG_Player(serverPlayer) {
 
-      this.DEBUG_DrawPlayer(servPlayer);
-      this.DEBUG_DrawAttackArea(servPlayer);
-      this.DEBUG_DrawHealthNumber(servPlayer);
+      this.DEBUG_DrawPlayer(serverPlayer);
+      this.DEBUG_DrawAttackArea(serverPlayer);
+      this.DEBUG_DrawHealthNumber(serverPlayer);
    }
 
-   DEBUG_DrawPlayer(servPlayer) {
+   DEBUG_DrawPlayer(serverPlayer) {
       
       this.ctxPlayer.fillStyle = "darkviolet";
       this.ctxPlayer.beginPath();
-      this.ctxPlayer.arc( this.pos(servPlayer, "x"), this.pos(servPlayer, "y"), servPlayer.radius, 0, Math.PI * 2);
+      this.ctxPlayer.arc( this.pos(serverPlayer, "x"), this.pos(serverPlayer, "y"), serverPlayer.radius, 0, Math.PI * 2);
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
    }
 
-   DEBUG_DrawAttackArea(servPlayer) {
+   DEBUG_DrawAttackArea(serverPlayer) {
 
       this.ctxPlayer.fillStyle = "orangered";
       this.ctxPlayer.beginPath();
-      this.ctxPlayer.arc( this.pos(servPlayer, "x") + servPlayer.attkOffset_X, this.pos(servPlayer, "y") + servPlayer.attkOffset_Y, servPlayer.attkRadius, 0, Math.PI * 2);
+      this.ctxPlayer.arc(
+         this.pos(serverPlayer, "x") + serverPlayer.attkOffset_X,
+         this.pos(serverPlayer, "y") + serverPlayer.attkOffset_Y,
+         serverPlayer.attkRadius, 0, Math.PI * 2
+      );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
    }
 
-   DEBUG_DrawHealthNumber(servPlayer) {
+   DEBUG_DrawHealthNumber(serverPlayer) {
 
       this.ctxPlayer.fillStyle = "black";
       this.ctxPlayer.font = "26px Orbitron-Regular";
-      this.ctxPlayer.fillText(Math.floor(servPlayer.health), this.pos(servPlayer, "x") -35, this.pos(servPlayer, "y") -15);
+      this.ctxPlayer.fillText(Math.floor(serverPlayer.health), this.pos(serverPlayer, "x") -35, this.pos(serverPlayer, "y") -15);
    }
 }

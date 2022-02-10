@@ -374,8 +374,8 @@ class Enemy {
       
       if(!this.isDead) {
 
-         this.calcGcD();
          this.movements();
+         this.calcGcD();
          this.sateMachine(socketList, playerList);
       }
 

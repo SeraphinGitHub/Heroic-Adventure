@@ -1,86 +1,88 @@
 
 "use strict"
 
+// window.dispatchEvent(new KeyboardEvent("keydown", {
+//    "key": "F11"
+// }));
+
+
 // =====================================================================
 // Set Viewport
 // =====================================================================
-const viewport_HTML = document.querySelector(".viewport");
+const set_Viewport = () => {
 
-const viewSize = { // ==> Check to match with viewport size in CSS
-   height: 800,
-   width: 1200,
+   const viewport_HTML = document.querySelector(".viewport");
+   
+   const viewSize = { // ==> Check to match with viewport size in CSS
+      height: 800,
+      width: 1200,
+   }
+   
+   const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
+   const centerVp_X = viewSize.width/2 - viewport.width/2;
+   const centerVp_Y = viewSize.height/2 - viewport.height/2;
+   
+   // const viewport = new Viewport(0, 0, 900, 500);
+   // const centerVp_X = viewSize.width/2 - 900/2;
+   // const centerVp_Y = viewSize.height/2 - 500/2;
+
+   return {
+      viewport_HTML: viewport_HTML,
+      viewSize: viewSize,
+      viewport: viewport,
+      centerVp_X: centerVp_X,
+      centerVp_Y: centerVp_Y
+   };
 }
 
-const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
-const centerVp_X = viewSize.width/2 - viewport.width/2;
-const centerVp_Y = viewSize.height/2 - viewport.height/2;
-
-// const viewport = new Viewport(0, 0, 900, 500);
-// const centerVp_X = viewSize.width/2 - 900/2;
-// const centerVp_Y = viewSize.height/2 - 500/2;
+const viewportSpecs = set_Viewport();
 
 
 // =====================================================================
 // Set All Canvas & Contexts
 // =====================================================================
-const allCanvas = document.getElementsByTagName("canvas");
-let ctxArray = [];
+const set_Canvas = () => {
 
-for(let i = 0; i < allCanvas.length; i++) {
-   let canvasIndexed = allCanvas[i];
-   ctxArray.push(canvasIndexed.getContext("2d"));
+   const allCanvas = document.getElementsByTagName("canvas");
+   let ctxArray = [];
+   
+   for(let i = 0; i < allCanvas.length; i++) {
+      let canvasIndexed = allCanvas[i];
+      ctxArray.push(canvasIndexed.getContext("2d"));
+   
+      canvasIndexed.height = viewportSpecs.viewSize.height;
+      canvasIndexed.width = viewportSpecs.viewSize.width;
+      ctxArray[i].imageSmoothingEnabled = false;
+   }
 
-   canvasIndexed.height = viewSize.height;
-   canvasIndexed.width = viewSize.width;
-   ctxArray[i].imageSmoothingEnabled = false;
+   return ctxArray;
 }
 
-const ctxMap = ctxArray[0];
-const ctxEnemies = ctxArray[1];
-const ctxPlayer = ctxArray[2];
-const ctxFixedBack = ctxArray[3];
-const ctxUI = ctxArray[4];
-const ctxFixedFront = ctxArray[5];
+const contexts = {
+
+   ctxMap:        set_Canvas()[0],
+   ctxEnemies:    set_Canvas()[1],
+   ctxPlayer:     set_Canvas()[2],
+   ctxFixedBack:  set_Canvas()[3],
+   ctxUI:         set_Canvas()[4],
+   ctxFixedFront: set_Canvas()[5],
+}
 
 
 // =====================================================================
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
-viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
+viewportSpecs.viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
+viewportSpecs.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
-// Map Settings
-// =====================================================================
-const mapTiles = new Image();
-mapTiles.src = "client/images/map/map_tile_3_lands.png";
-
-const cellSize = 180;
-const mapSpriteSize = 256;
-const columns = 12;
-const rows = 9;
-
-const mapScheme = [
-   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
-   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
-   2, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2,
-   1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 1,
-   1, 2, 3, 3, 2, 3, 3, 2, 3, 3, 2, 1,
-   1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
-   1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1,
-];
-
-
-// =====================================================================
-// Floating Text
+// Draw Floating Text
 // =====================================================================
 let floatTextArray = [];
 
-const handleFloatingText = () => {
+const drawFloatingText = () => {
 
    floatTextArray.forEach(text => {
       text.drawText();
@@ -97,8 +99,11 @@ const handleFloatingText = () => {
 // =====================================================================
 // Mini Bars Coordinates
 // =====================================================================
-const barWidth = 110;
-const barHeight = 8;
+const miniBarSpecs = {
+   
+   barWidth: 110,
+   barHeight: 8,
+}
 
 const barsCoordinates = () => {
    // Coordinates PNG file
@@ -182,22 +187,72 @@ const barsCoordinates = () => {
 const barCoordArray = barsCoordinates();
 
 
-// const barFluidity = (value, maxValue, width) => {
+// =====================================================================
+// PNG Image Files
+// =====================================================================
+const mapTile_Img = new Image();
+mapTile_Img.src = "client/images/map/map_tile_3_lands.png";
 
-//    (value / maxValue) * width
-// }
+const gameUI_Img = new Image();
+gameUI_Img.src = "client/images/playerUI/Game_UI.png";
 
+const character_Img = new Image();
+character_Img.src = "client/images/playerAnimation/playerAnim_4x.png";
+
+
+// =====================================================================
+// Init Client Class
+// =====================================================================
+const clientSpecs = {
+
+   // Viewport
+   viewport:      viewportSpecs.viewport,
+   viewport_HTML: viewportSpecs.viewport_HTML,
+   viewSize:      viewportSpecs.viewSize,
+   centerVp_X:    viewportSpecs.centerVp_X,
+   centerVp_Y:    viewportSpecs.centerVp_Y,
+
+   // Canvas
+   ctxUI:         contexts.ctxUI,
+   ctxMap:        contexts.ctxMap,
+   ctxPlayer:     contexts.ctxPlayer,
+   ctxEnemies:    contexts.ctxEnemies,
+   ctxFixedBack:  contexts.ctxFixedBack,
+   ctxFixedFront: contexts.ctxFixedFront,
+
+   // PNG Files
+   mapTile_Img:   mapTile_Img,
+   gameUI_Img:    gameUI_Img,
+   character_Img: character_Img,
+
+   // Map
+   mapSpecs: mapSpecs,
+
+   // Game UI ==> Mini Bars
+   barWidth:      miniBarSpecs.barWidth,
+   barHeight:     miniBarSpecs.barHeight,
+   barCoordArray: barCoordArray,
+}
+
+const client = new ClientPlayer(clientSpecs);
 
 
 // =====================================================================
 // Client Sync (Every frame)
 // =====================================================================
+let frame = 0;
+
 const clientSync = (socket) => {
+
+   const ctxArray = set_Canvas();
 
    let ctxFixedBack_index = ctxArray.length -3;
    let ctxFixedFront_index = ctxArray.length -1;
 
-   socket.on("newSituation", (playerData, minotaurData) => {
+   socket.on("newSituation", (
+         playerData,
+         minotaurData
+      ) => {
 
       // Canvas Clearing
       for(let i = 0; i < ctxArray.length; i++) {
@@ -205,15 +260,16 @@ const clientSync = (socket) => {
 
          if(i !== ctxFixedBack_index
          && i !== ctxFixedFront_index) {
-            ctxIndexed.clearRect(0, 0, viewSize.width, viewSize.height);
+            ctxIndexed.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
          }
       }
 
-      playerData.forEach(player => playerSync(player));
-      minotaurData.forEach(minotaur => minotaurSync(minotaur));
+      playerData.forEach(serverPlayer => client.playerSync(serverPlayer, frame));
+      minotaurData.forEach(minotaur => minotaurSync(minotaur, frame));
 
-      handleFloatingText();
-
+      drawFloatingText();
+      frame++;
+      
       if(showFPS) frameRate++;
    });
 }

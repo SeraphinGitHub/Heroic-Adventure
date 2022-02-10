@@ -25,14 +25,15 @@ setTimeout(() => {
 const scripts = [
    
    // Scripts
-   // "client_Player.js",
+   "client_Player.js",
    "client_Classes.js",
    "client_Chat.js",
 
    // Handlers
-   "client_GameHandler.js",
-   "client_PlayerHandler.js",
+   "client_Map.js",
    "client_MinotaursHandler.js",
+   "client_PlayerDOM.js",
+   "client_GameHandler.js",
 ];
 
 const instantiate = (scriptName) => {
@@ -56,9 +57,9 @@ scripts.forEach(script => {
 // =====================================================================
 const initClient = (socket) => {
 
-   clientSync(socket);
-   initChat(socket);
    initPlayer(socket);
+   initChat(socket);
+   clientSync(socket);
 }
 
 
