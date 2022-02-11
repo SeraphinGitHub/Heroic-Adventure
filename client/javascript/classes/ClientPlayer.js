@@ -79,8 +79,9 @@ class Player extends Character {
       }
 
       // Animation
-      this.animState;
       this.frameX = 0;
+      this.animState;
+      this.isAnimable = true;
       this.animSpecs = animSpecs;
 
       // General Vars
@@ -183,7 +184,7 @@ class Player extends Character {
             value: `+${serverPlayer.calcHealing}`,
          }
          
-         this.toggleFloatingText(player, text);
+         this.toggleFloatingText(serverPlayer, text);
       });
    
       socket.on("giveDamage", (playerPos, calcDamage) => {
@@ -644,7 +645,11 @@ class Player extends Character {
       
       if(frame % index === 0) {
          if(this.frameX < spritesNumber) this.frameX++;
-         else this.frameX = 0;
+
+         else {
+            this.frameX = 0;
+            if(!this.isAnimable) this.isAnimable = true;
+         }
       }
    }
 
@@ -667,12 +672,20 @@ class Player extends Character {
          break;
 
          case "attack": {
+            if(this.isAnimable) {
+               this.frameX = 0;
+               this.isAnimable = false;
+            }
             this.animState = frameToJump * 3;
             this.animation(frame, this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber);
          }
          break;
 
          case "heal": {
+            if(this.isAnimable) {
+               this.frameX = 0;
+               this.isAnimable = false;
+            }
             this.animState = frameToJump * 4;
             this.animation(frame, this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber);
          }

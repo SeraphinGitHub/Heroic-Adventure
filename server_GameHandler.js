@@ -40,6 +40,14 @@ let playerList = {};
 let mobList = [];
 
 
+// *******************************
+let mobList_Light = [];
+let playerList_Light = [];
+let playerList_Coord = [];
+// *******************************
+
+
+
 // =====================================================================
 // Players connections
 // =====================================================================
@@ -257,14 +265,56 @@ initEnemies();
 let frame = 0
 
 setInterval(() => {
+
+
+   // *******************************
+
+   // let mobData = [];
+   // let otherPlayerData = [];
+
+   // playerList_Coord.forEach(player => {
+
+   //    mobList_Light.forEach(mob => {
+
+   //       // Collision square to circle ==> size of viewport
+   //       if(collision(player, mob)) {
+
+   //          mobData.push(mob);
+   //       }
+   //    });
+
+
+   //    playerList_Light.forEach(otherPlayer => {
+
+   //       // Collision square to circle ==> size of viewport
+   //       if(player !== otherPlayer
+   //       && collision(player, otherPlayer)) {
+            
+   //          otherPlayerData.push(otherPlayer);
+   //       }
+   //    });
+
+   //    let socket = socketList[player.id];
+   //    let clientIndex = playerList_Light.indexOf(player.id);
+   //    let clientData = playerList_Light[clientIndex];
+
+   //    socket.emit("mobData", mobData);
+   //    socket.emit("otherPlayerData", otherPlayerData);
+   //    socket.emit("clientData", clientData);
+   // });
+   
+   // *******************************
+
+
+
    let playerData = [];
    let enemiesData = [];
 
-   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, enemiesData));
+   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, mobList_Light, enemiesData));
 
    for(let i in playerList) {
       let player = playerList[i];
-      player.update(socketList, playerList, mobList, playerData);
+      player.update(socketList, playerList, mobList, playerList_Coord, playerList_Light, playerData);
    }
    
    playerData.forEach(player => {

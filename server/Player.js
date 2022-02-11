@@ -121,8 +121,7 @@ class Player extends Character {
          },
       
          attack: {
-            // index: 1,
-            index: 30,
+            index: 1,
             spritesNumber: 14,
          },
       
@@ -304,7 +303,6 @@ class Player extends Character {
       && this.speedGcD >= this.GcD) {
 
          let socket = socketList[this.id];
-         socket.emit("resetAnim");
 
          this.speedGcD = 0;
          this.isAttacking = false;
@@ -335,14 +333,13 @@ class Player extends Character {
       && this.health < this.baseHealth) {
 
          let socket = socketList[this.id];
-         socket.emit("resetAnim");
 
          this.speedGcD = 0;
          this.cast_Heal = false;
          this.heal_isAnimable = true;
          
          setTimeout(() => {
-            this.attack_isAnimable = false
+            this.heal_isAnimable = false
          }, this.animTimeOut(this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber));
    
          this.calcHealing = this.healRnG();
@@ -518,7 +515,7 @@ class Player extends Character {
    }
    
    animTimeOut(index, spritesNumber) {
-      // return Math.round(this.frameRate * this.syncCoeff * index * spritesNumber / 4);
+      // client frameRate * index * spritesNumber
       return Math.round(1000/75 * index * spritesNumber);
    }
    
@@ -548,7 +545,7 @@ class Player extends Character {
    }
 
    // Update (Sync)
-   update(socketList, playerList, mobList, playerData) {
+   update(socketList, playerList, mobList, playerList_Coord, playerList_Light, playerData) {
 
       if(!this.isDead) {
 
@@ -562,6 +559,15 @@ class Player extends Character {
 
       else this.state = "died";
 
+
+      // playerList_Coord.push({
+      //    id: this.id,
+      //    x: this.x,
+      //    y: this.y,
+      //    radius: this.radius,
+      // });
+
+      // playerList_Light.push(this.(Var Allégées ));
       playerData.push(this);
    }
 }

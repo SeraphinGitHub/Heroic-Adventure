@@ -111,7 +111,52 @@ class Enemy extends Character {
          this.calcY = this.spawnY + (RnG_Distance * Math.sin(RnG_Radians));
       }
    }
+   
+   calcAggroPlayers(player, aggroArray) {
 
+      let distX = player.x - this.x;
+      let distY = player.y - this.y;
+      
+      let distance = Math.round( Math.sqrt(distX * distX + distY * distY) );
+
+      aggroArray.push({
+         id: player.id,
+         x: player.x,
+         y: player.y,
+         radius: player.radius,
+         dist: distance
+      });
+   }
+
+   calcNearestPlayer(aggroArray) {
+
+      aggroArray.sort((first, second) => { return first.dist - second.dist });
+      return aggroArray[0];
+   }
+
+   movements() {
+      // For 2 Directions Sprites Sheets
+
+      // Cross Move
+      if(this.y > this.calcY || this.x > this.calcX) this.frameY = 0; // Left
+      if(this.y < this.calcY || this.x < this.calcX) this.frameY = 1; // Right
+
+      // Diag Move
+      if(this.y > this.calcY && this.x > this.calcX
+      || this.y < this.calcY && this.x > this.calcX) this.frameY = 0; // Top / Down Left
+      if(this.y > this.calcY && this.x < this.calcX
+      || this.y < this.calcY && this.x < this.calcX) this.frameY = 1; // Top / Down Right
+   }
+
+   calcGcD() {
+      
+      // Regen GcD
+      if(this.speedGcD < this.GcD) {
+         this.speedGcD += this.syncCoeff *1;
+         if(this.isAttacking) this.isAttacking = false;
+      }
+   }
+   
    moveToPosition(x, y, speed) {
 
       this.calcX = Math.round(x);
@@ -159,52 +204,19 @@ class Enemy extends Character {
    }
 
    chasing(player) {
-
-      this.isWandering = false;
-      this.isChasing = true;
-      this.isAttacking = false;
-      this.runSpeed = this.baseRunSpeed;
-
-      this.moveToPosition(player.x, player.y, this.runSpeed);
-   }
-
-   backToSpawn() {
-      if(this.isChasing) {
-
-         this.isWandering = true;
-         this.isChasing = false;
+            
+      // if(player !== undefined) {
+         this.isWandering = false;
+         this.isChasing = true;
          this.isAttacking = false;
-
-         this.calcX = this.spawnX;
-         this.calcY = this.spawnY;
-      }
-   }
-
-   movements() {
-      // For 2 Directions Sprites Sheets
-
-      // Cross Move
-      if(this.y > this.calcY || this.x > this.calcX) this.frameY = 0; // Left
-      if(this.y < this.calcY || this.x < this.calcX) this.frameY = 1; // Right
-
-      // Diag Move
-      if(this.y > this.calcY && this.x > this.calcX
-      || this.y < this.calcY && this.x > this.calcX) this.frameY = 0; // Top / Down Left
-      if(this.y > this.calcY && this.x < this.calcX
-      || this.y < this.calcY && this.x < this.calcX) this.frameY = 1; // Top / Down Right
-   }
-
-   calcGcD() {
-      
-      // Regen GcD
-      if(this.speedGcD < this.GcD) {
-         this.speedGcD += this.syncCoeff *1;
-         if(this.isAttacking) this.isAttacking = false;
-      }
+         this.runSpeed = this.baseRunSpeed;
+   
+         this.moveToPosition(player.x, player.y, this.runSpeed);
+      // }
    }
 
    attacking(socket, player) {
-      
+
       if(!this.isAttacking
       && !this.attack_isAnimable
       && this.speedGcD >= this.GcD) {
@@ -232,8 +244,7 @@ class Enemy extends Character {
          y: player.y,
       };
 
-      if(!player.isDead
-      && this.circle_toCircle(this, player, 0, 0, this.radius)) {
+      if(!player.isDead) {
 
          // Delay logic to match animation
          setTimeout(() => {
@@ -241,7 +252,7 @@ class Enemy extends Character {
             player.calcDamage = this.damageRnG();
             player.health -= player.calcDamage;
             socket.emit("getDamage", playerPos, player.calcDamage);
-
+            
             // Player's Death
             if(player.health <= 0) {
                
@@ -265,8 +276,23 @@ class Enemy extends Character {
       }
    }
 
+   backToSpawn() {
+      if(this.isChasing) {
+
+         this.isWandering = true;
+         this.isChasing = false;
+         this.isAttacking = false;
+
+         this.calcX = this.spawnX;
+         this.calcY = this.spawnY;
+      }
+   }
+   
+   // State Machine
    sateMachine(socketList, playerList) {
       
+      // let aggroArray = [];
+
       for(let i in playerList) {
 
          let player = playerList[i];
@@ -279,9 +305,12 @@ class Enemy extends Character {
             if(this.circle_toCircle(this, player, 0, 0, this.radius)) this.attacking(socket, player);
             else this.chasing(player);
          }
-         
          else this.backToSpawn();
       }
+
+      // let nearestPlayer = this.calcNearestPlayer(aggroArray);
+      // if(nearestPlayer !== undefined) {
+      // }
 
       this.wandering();
    }
@@ -358,7 +387,7 @@ class Enemy extends Character {
    }
 
    // Update (Sync)
-   update(frame, socketList, playerList, enemiesData) {
+   update(frame, socketList, playerList, mobList_Light, enemiesData) {
 
       this.animState(frame);
       
@@ -369,6 +398,7 @@ class Enemy extends Character {
          this.sateMachine(socketList, playerList);
       }
 
+      // mobList_Light.push(this.(Var Allégées ));
       enemiesData.push(this);
    }
 }

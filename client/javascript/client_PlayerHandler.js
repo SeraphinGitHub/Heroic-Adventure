@@ -207,7 +207,4 @@ const initPlayer = (socket) => {
       clientPlayer.drawFame_Frame();
       clientPlayer.drawFame_Count(fameCount);
    });
-
-   // socket.on("resetAnim", () => clientPlayer.isAnimable = false);
-   // socket.on("resetAnim", () => clientPlayer.frameX = 0);
 }
