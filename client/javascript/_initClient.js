@@ -25,14 +25,20 @@ setTimeout(() => {
 const scripts = [
    
    // Scripts
-   "client_Player.js",
-   "client_Classes.js",
-   "client_Chat.js",
-
+   "classes/Character.js",
+   "classes/ClientPlayer.js",
+   "classes/FloatingText.js",
+   "classes/GameBar.js",
+   "classes/Tile.js",
+   "classes/Viewport.js",
+   
    // Handlers
-   "client_Map.js",
+   "client_PlayerHandler.js",
+   "client_MapHandler.js",
+   "client_ChatHandler.js",
    "client_MinotaursHandler.js",
-   "client_PlayerDOM.js",
+
+   // Game Handler (Last)
    "client_GameHandler.js",
 ];
 
@@ -59,7 +65,7 @@ const initClient = (socket) => {
 
    initPlayer(socket);
    initChat(socket);
-   clientSync(socket);
+   clientUpdate();
 }
 
 

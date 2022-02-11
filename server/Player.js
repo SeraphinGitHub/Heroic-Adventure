@@ -1,9 +1,13 @@
 
 "use strict"
 
-class Player {
+const Character = require("./Character.js");
+
+class Player extends Character {
    constructor(id) {
       
+      super();
+
       this.id = id;
       this.name = "";
       
@@ -100,29 +104,47 @@ class Player {
       // Animation
       this.state;
       this.frameY = 1;
+      this.animSpecs = {
+         idle: {
+            index: 2,
+            spritesNumber: 29,
+         },
+      
+         walk: {
+            index: 1,
+            spritesNumber: 29,
+         },
+      
+         run: {
+            index: 1,
+            spritesNumber: 14,
+         },
+      
+         attack: {
+            // index: 1,
+            index: 30,
+            spritesNumber: 14,
+         },
+      
+         heal: {
+            index: 2,
+            spritesNumber: 14,
+         },
+      
+         died: {
+            index: 3,
+            spritesNumber: 29,
+         },
+      }
    }
 
-   // RnG
-   RnG(baseSpec, coeff) {
-      return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));
-   }
-
+   // CalcRng
    healRnG() {
       return this.RnG(this.baseHealing, 0.57); // More high => Higher RnG Range => More heal
    }
 
    damageRnG() {
       return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
-   }
-
-   // Collision
-   circle_toCircle(first, second, offsetX, offsetY, radius) {
-      let dx = second.x - (first.x + offsetX);
-      let dy = second.y - (first.y + offsetY);
-      let distance = Math.sqrt(dx * dx + dy * dy);
-      let sumRadius = radius + second.radius;
-   
-      if(distance <= sumRadius) return true;
    }
 
    // Movements
@@ -282,16 +304,15 @@ class Player {
       && this.speedGcD >= this.GcD) {
 
          let socket = socketList[this.id];
-         
-         this.frameX = 0;
+         socket.emit("resetAnim");
+
          this.speedGcD = 0;
          this.isAttacking = false;
          this.attack_isAnimable = true;
 
          setTimeout(() => {
-            this.attack_isAnimable = false
-         // }, this.animTimeOut(this.animSpecsObj.attack.index, this.animSpecsObj.attack.spritesNumber));
-         }, this.animTimeOut(1, 14));
+            this.attack_isAnimable = false;
+         }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));
 
          this.damagingOtherPlayers(socket, socketList, playerList);
          this.damagingMobs(socketList, mobList);
@@ -314,16 +335,15 @@ class Player {
       && this.health < this.baseHealth) {
 
          let socket = socketList[this.id];
-         
-         this.frameX = 0;
+         socket.emit("resetAnim");
+
          this.speedGcD = 0;
          this.cast_Heal = false;
          this.heal_isAnimable = true;
          
          setTimeout(() => {
             this.attack_isAnimable = false
-         // }, this.animTimeOut(this.animSpecsObj.heal.index, this.animSpecsObj.heal.spritesNumber));
-         }, this.animTimeOut(2, 14));
+         }, this.animTimeOut(this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber));
    
          this.calcHealing = this.healRnG();
          this.health += this.calcHealing;
@@ -498,7 +518,8 @@ class Player {
    }
    
    animTimeOut(index, spritesNumber) {
-      return this.frameRate * this.syncCoeff * index * spritesNumber / 4;
+      // return Math.round(this.frameRate * this.syncCoeff * index * spritesNumber / 4);
+      return Math.round(1000/75 * index * spritesNumber);
    }
    
    // Animation State

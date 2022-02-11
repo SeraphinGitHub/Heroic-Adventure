@@ -1,7 +1,6 @@
 
 "use strict"
 
-
 // Enemy Obj ==> Exemple
 // {
 //    health: 150,
@@ -22,9 +21,12 @@
 //    animArray: minotaursAnim,
 // }
 
+const Character = require("./Character.js");
 
-class Enemy {
+class Enemy extends Character {
    constructor(spawnX, spawnY, enemySpecs) {
+
+      super();
 
       this.x = spawnX;
       this.y = spawnY;
@@ -89,22 +91,10 @@ class Enemy {
       this.frameX = 0;
       this.frameY = 1;
    }
-
-   RnG(baseSpec, coeff) {
-      return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));
-   }
-
+   
+   // CalcRng
    damageRnG() {
       return this.RnG(this.baseDamage, this.damageRatio); // More high => Higher RnG Range => More damage (0 ~ 1)
-   }
-
-   circle_toCircle = (first, second, offsetX, offsetY, radius) => {
-      let dx = second.x - (first.x + offsetX);
-      let dy = second.y - (first.y + offsetY);
-      let distance = Math.sqrt(dx * dx + dy * dy);
-      let sumRadius = radius + second.radius;
-   
-      if(distance <= sumRadius) return true;
    }
 
    calcPosition() {

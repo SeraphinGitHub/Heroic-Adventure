@@ -2,10 +2,12 @@
 "use strict"
 
 // =====================================================================
-// Client Player
+// Player
 // =====================================================================
-class ClientPlayer {
-   constructor(clientSpecs) {
+class Player extends Character {
+   constructor(clientSpecs, animSpecs) {
+      
+      super();
 
       // Viewport
       this.viewport = clientSpecs.viewport;
@@ -15,11 +17,12 @@ class ClientPlayer {
       this.centerVp_Y = clientSpecs.centerVp_Y;
      
       // Canvas
-      this.ctxUI = clientSpecs.ctxUI;
       this.ctxMap = clientSpecs.ctxMap;
-      this.ctxPlayer = clientSpecs.ctxPlayer;
       this.ctxEnemies = clientSpecs.ctxEnemies;
+      this.ctxOtherPlay = clientSpecs.ctxOtherPlay;
+      this.ctxPlayer = clientSpecs.ctxPlayer;
       this.ctxFixedBack = clientSpecs.ctxFixedBack;
+      this.ctxUI = clientSpecs.ctxUI;
       this.ctxFixedFront = clientSpecs.ctxFixedFront;
 
       // PNG Files
@@ -78,37 +81,7 @@ class ClientPlayer {
       // Animation
       this.animState;
       this.frameX = 0;
-      this.animSpecs = {
-         idle: {
-            index: 2,
-            spritesNumber: 29,
-         },
-      
-         walk: {
-            index: 1,
-            spritesNumber: 29,
-         },
-      
-         run: {
-            index: 1,
-            spritesNumber: 14,
-         },
-      
-         attack: {
-            index: 1,
-            spritesNumber: 14,
-         },
-      
-         heal: {
-            index: 2,
-            spritesNumber: 14,
-         },
-      
-         died: {
-            index: 3,
-            spritesNumber: 29,
-         },
-      }
+      this.animSpecs = animSpecs;
 
       // General Vars
       this.isClientName = false;
@@ -122,8 +95,8 @@ class ClientPlayer {
       }
 
       else {
-         if(coord === "x") return this.x - this.viewport.x;
-         if(coord === "y") return this.y - this.viewport.y;
+         if(coord === "x") return serverPlayer.x - this.viewport.x;
+         if(coord === "y") return serverPlayer.y - this.viewport.y;
       }
    }
 
@@ -180,8 +153,8 @@ class ClientPlayer {
    }
    
    // Floating Text
-   toggleFloatingText(floatTextArray, serverPlayer, textObj) {
-
+   toggleFloatingText(serverPlayer, textObj) {
+      
       const newText = new FloatingText(
          this.ctxPlayer,
          this.pos(serverPlayer, "x"),
@@ -192,8 +165,8 @@ class ClientPlayer {
          textObj.color,
          textObj.value
       );
-   
-      floatTextArray.push(newText);
+      
+      this.floatTextArray.push(newText);
    }
 
    initFloatingText(socket) {
@@ -577,8 +550,8 @@ class ClientPlayer {
 
       const otherPlayerBar = {
          ctx: this.ctxEnemies,
-         x: this.x - this.viewport.x,
-         y: this.y - this.viewport.y,
+         x: serverPlayer.x - this.viewport.x,
+         y: serverPlayer.y - this.viewport.y,
          width: this.barWidth,
          height: this.barHeight,
       }
@@ -637,7 +610,7 @@ class ClientPlayer {
    }
 
    drawPlayer(ctx, serverPlayer) {
-
+      
       ctx.drawImage(
          this.character_Img,
 
@@ -666,16 +639,16 @@ class ClientPlayer {
       ctx.fillText(serverPlayer.name, namePos_X, namePos_Y);
       ctx.strokeText(serverPlayer.name, namePos_X, namePos_Y);
    }
-
-   // Animation
+   
    animation(frame, index, spritesNumber) {
       
-      if(frame % index === 0) {       
+      if(frame % index === 0) {
          if(this.frameX < spritesNumber) this.frameX++;
          else this.frameX = 0;
       }
    }
 
+   // Animation State
    playerState(serverPlayer, frame) {
       
       const frameToJump = 4;
@@ -719,47 +692,64 @@ class ClientPlayer {
       }
    }
 
-   // Sync (Every frame)
-   playerSync(serverPlayer, frame) {
-      
-      // Client
-      if(this.viewport_HTML.id === String(serverPlayer.id)) {
-         
-         // Camera 
-         this.scrollCam(serverPlayer);
 
-         // UI
-         this.drawFame_Bar(serverPlayer);
-         // this.fameFluidity(serverPlayer, getFameFluid, isGettingFame, "get");
-         // this.fameFluidity(serverPlayer, looseFameFluid, isLoosingFame, "loose");
-         this.drawHUD_Mana(serverPlayer);
-         this.drawHUD_Health(serverPlayer);
-         this.drawHUD_Energy(serverPlayer);
-         
-         // Player
-         this.drawBars_Client(serverPlayer);
-         this.drawShadow(this.ctxPlayer, serverPlayer);
-         this.drawPlayer(this.ctxPlayer, serverPlayer);
+   // =====================================================================
+   // Client Sync (Every frame)
+   // =====================================================================
+   render_ClientPlayer(serverPlayer, frame) {
 
-         if(!this.isClientName) {
-            this.isClientName = true;
-            this.drawName(this.ctxFixedBack, serverPlayer);  
-         }
-      }
-      
-      
-      // Other Players
-      else {
-         this.drawBars_OtherPlayer(serverPlayer);
-         this.drawShadow(this.ctxEnemies, serverPlayer);
-         this.drawPlayer(this.ctxEnemies, serverPlayer);
-         this.drawName(this.ctxEnemies, serverPlayer);
-      }
-      
+      // Animation State
       this.playerState(serverPlayer, frame);
+
+      // Camera 
+      this.scrollCam(serverPlayer);
+
+      // UI
+      this.drawFame_Bar(serverPlayer);
+      // this.fameFluidity(serverPlayer, getFameFluid, isGettingFame, "get");
+      // this.fameFluidity(serverPlayer, looseFameFluid, isLoosingFame, "loose");
+      this.drawHUD_Mana(serverPlayer);
+      this.drawHUD_Health(serverPlayer);
+      this.drawHUD_Energy(serverPlayer);
+      
+      // Mini Bars
+      this.drawBars_Client(serverPlayer);
+      
+      // Player
+      this.drawShadow(this.ctxPlayer, serverPlayer);
+      this.drawPlayer(this.ctxPlayer, serverPlayer);
+
+      // Player Name
+      if(!this.isClientName) {
+         this.isClientName = true;
+         this.drawName(this.ctxFixedBack, serverPlayer);
+      }
+
       // this.DEBUG_Player(serverPlayer);
    }
-   
+
+
+   // =====================================================================
+   // Other Players Sync (Every frame)
+   // =====================================================================
+   render_OtherPlayer(serverPlayer, frame) {
+
+      // Animation State
+      this.playerState(serverPlayer, frame);
+
+      // Mini Bars
+      this.drawBars_OtherPlayer(serverPlayer);
+
+      // Player
+      this.drawShadow(this.ctxOtherPlay, serverPlayer);
+      this.drawPlayer(this.ctxOtherPlay, serverPlayer);
+
+      // Player Name
+      this.drawName(this.ctxOtherPlay, serverPlayer);
+
+      // this.DEBUG_Player(serverPlayer);
+   }
+
 
    // ==>  DEBUG MODE  <==
    DEBUG_Player(serverPlayer) {

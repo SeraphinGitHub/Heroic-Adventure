@@ -13,9 +13,8 @@ const io = new Server(server);
 // =====================================================================
 // Scrips import
 // =====================================================================
-const Player = require("./server/classes/Player.js");
-const Enemy = require("./server/classes/Enemy.js");
-const map = require("./client/javascript/client_Map.js");
+const Player = require("./server/Player.js");
+const Enemy = require("./server/Enemy.js");
 
 
 // =====================================================================
@@ -74,6 +73,12 @@ io.on("connection", (socket) => {
 const onConnect = (socket) => {
    const player = new Player(socket.id);
    playerList[socket.id] = player;
+
+   for(let i in playerList) {
+      let player = playerList[i];
+      let socket = socketList[player.id];
+      socket.emit("initPlayerPack", playerList);
+   };
    
    // ================================
    // Init Player
@@ -160,6 +165,15 @@ const onConnect = (socket) => {
 
 // Player disconnection
 const onDisconnect = (socket) => {
+
+   let loggedOutPlayer = playerList[socket.id];
+   
+   for(let i in playerList) {
+      let player = playerList[i];
+      let socket = socketList[player.id];
+      socket.emit("removePlayerPack", loggedOutPlayer);
+   };
+
    delete playerList[socket.id];
 }
 
@@ -256,7 +270,7 @@ setInterval(() => {
    playerData.forEach(player => {
       
       let socket = socketList[player.id];
-      socket.emit("newSituation", playerData, enemiesData);
+      socket.emit("serverSync", playerData, enemiesData);
 
       // Death Screen Event
       if(player.isDead && !player.isRespawning) {

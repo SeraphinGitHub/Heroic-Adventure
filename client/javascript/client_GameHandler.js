@@ -62,10 +62,29 @@ const contexts = {
 
    ctxMap:        set_Canvas()[0],
    ctxEnemies:    set_Canvas()[1],
-   ctxPlayer:     set_Canvas()[2],
-   ctxFixedBack:  set_Canvas()[3],
-   ctxUI:         set_Canvas()[4],
-   ctxFixedFront: set_Canvas()[5],
+   ctxOtherPlay:  set_Canvas()[2],
+   ctxPlayer:     set_Canvas()[3],
+   ctxFixedBack:  set_Canvas()[4],
+   ctxUI:         set_Canvas()[5],
+   ctxFixedFront: set_Canvas()[6],
+}
+
+
+// =====================================================================
+// Canvas Clearing
+// =====================================================================
+const ctxArray = set_Canvas();
+let ctxFixedBack_index = ctxArray.length -3;
+let ctxFixedFront_index = ctxArray.length -1;
+
+const canvasClearing = () => {
+   
+   for(let i = 0; i < ctxArray.length; i++) {
+      let ctxIndexed = ctxArray[i];
+      
+      if(i === ctxFixedBack_index || i === ctxFixedFront_index) continue;
+      ctxIndexed.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
+   }
 }
 
 
@@ -75,25 +94,6 @@ const contexts = {
 let insideCanvas = false;
 viewportSpecs.viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
 viewportSpecs.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
-
-
-// =====================================================================
-// Draw Floating Text
-// =====================================================================
-let floatTextArray = [];
-
-const drawFloatingText = () => {
-
-   floatTextArray.forEach(text => {
-      text.drawText();
-
-      if(text.displayDuration <= 0) {
-         let textIndex = floatTextArray.indexOf(text);
-         floatTextArray.splice(textIndex, 1);
-         textIndex--;
-      }
-   });
-}
 
 
 // =====================================================================
@@ -201,7 +201,21 @@ character_Img.src = "client/images/playerAnimation/playerAnim_4x.png";
 
 
 // =====================================================================
-// Init Client Class
+// Toggle Frame Rate
+// =====================================================================
+let showFPS = false;
+let frameRate = 0;
+
+setInterval(() => {
+   if(showFPS) {
+      console.log(frameRate);
+      frameRate = 0;
+   }
+}, 1000);
+
+
+// =====================================================================
+// Init Classes
 // =====================================================================
 const clientSpecs = {
 
@@ -213,11 +227,12 @@ const clientSpecs = {
    centerVp_Y:    viewportSpecs.centerVp_Y,
 
    // Canvas
-   ctxUI:         contexts.ctxUI,
    ctxMap:        contexts.ctxMap,
-   ctxPlayer:     contexts.ctxPlayer,
    ctxEnemies:    contexts.ctxEnemies,
+   ctxOtherPlay:  contexts.ctxOtherPlay,
+   ctxPlayer:     contexts.ctxPlayer,
    ctxFixedBack:  contexts.ctxFixedBack,
+   ctxUI:         contexts.ctxUI,
    ctxFixedFront: contexts.ctxFixedFront,
 
    // PNG Files
@@ -234,56 +249,53 @@ const clientSpecs = {
    barCoordArray: barCoordArray,
 }
 
-const client = new ClientPlayer(clientSpecs);
+const character = new Character();
+const clientPlayer = new Player(clientSpecs);
 
 
 // =====================================================================
-// Client Sync (Every frame)
+// Client Sync with Server
+// =====================================================================
+let playerList = [];
+let playerSituation = [];
+let enemySituation = [];
+
+
+// =====================================================================
+// Client Update (Every frame)
 // =====================================================================
 let frame = 0;
 
-const clientSync = (socket) => {
+const clientUpdate = () => {
 
-   const ctxArray = set_Canvas();
+   // Clear contexts
+   canvasClearing();
 
-   let ctxFixedBack_index = ctxArray.length -3;
-   let ctxFixedFront_index = ctxArray.length -1;
+   // Server Sync (Players)
+   for(let i = 0; i < playerSituation.length; i++) {
+      let initPlayer = playerList[i];
+      let serverPlayer = playerSituation[i];
 
-   socket.on("newSituation", (
-         playerData,
-         minotaurData
-      ) => {
+      // is Player exists
+      if(initPlayer) {
 
-      // Canvas Clearing
-      for(let i = 0; i < ctxArray.length; i++) {
-         let ctxIndexed = ctxArray[i];
-
-         if(i !== ctxFixedBack_index
-         && i !== ctxFixedFront_index) {
-            ctxIndexed.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
+         // is Client
+         if(initPlayer.viewport_HTML.id === String(serverPlayer.id)) {
+            initPlayer.render_ClientPlayer(serverPlayer, frame);
          }
+
+         // is Other players
+         else initPlayer.render_OtherPlayer(serverPlayer, frame);
       }
+   };
 
-      playerData.forEach(serverPlayer => client.playerSync(serverPlayer, frame));
-      minotaurData.forEach(minotaur => minotaurSync(minotaur, frame));
+   enemySituation.forEach(enemy => minotaurSync(enemy, frame));
 
-      drawFloatingText();
-      frame++;
-      
-      if(showFPS) frameRate++;
-   });
+   // Draw floating text
+   clientPlayer.drawFloatingText();
+   frame++;
+
+   if(showFPS) frameRate++;
+
+   window.requestAnimationFrame(clientUpdate);
 }
-
-
-// =====================================================================
-// Toggle Frame Rate
-// =====================================================================
-let showFPS = false;
-let frameRate = 0;
-
-setInterval(() => {
-   if(showFPS) {
-      console.log(frameRate);
-      frameRate = 0;
-   }
-}, 1000);
