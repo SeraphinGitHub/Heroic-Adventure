@@ -7,7 +7,7 @@ class Player extends Character {
    constructor(id) {
       
       super();
-
+      
       this.id = id;
       this.name = "";
       
@@ -92,6 +92,7 @@ class Player extends Character {
       this.isRunning = false;
       this.isRunnable = false;
       this.isAttacking = false;
+      this.hasBeenChased = false;
 
       // Anim States
       this.attack_isAnimable = false;
@@ -137,7 +138,7 @@ class Player extends Character {
       }
    }
 
-   // CalcRng
+   // Calc Rng
    healRnG() {
       return this.RnG(this.baseHealing, 0.57); // More high => Higher RnG Range => More heal
    }
@@ -392,7 +393,7 @@ class Player extends Character {
                if(otherPlayer.health <= 0) {
                   
                   this.kills++;
-                  this.calcfame(this, this.getFameCost, socket);
+                  this.calcfame(this.getFameCost, socket);
                   otherPlayer.death(this.looseFameCost);
                   
                   // Player Score
@@ -402,7 +403,7 @@ class Player extends Character {
                      fame: this.fame,
                      fameCount: this.fameCount,
                   });
-      
+                  
                   socket.emit("getFame", playerPos, this.getFameCost);
                   otherSocket.emit("looseFame", otherPlayerPos, this.looseFameCost);
                }
@@ -440,7 +441,7 @@ class Player extends Character {
             if(mob.health <= 0) {
                
                mob.death();
-               this.calcfame(this, mob.getFameCost, socket);
+               this.calcfame(mob.getFameCost, socket);
    
                socket.emit("playerScore", {
                   kills: this.kills,

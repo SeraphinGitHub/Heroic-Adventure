@@ -25,6 +25,13 @@ class Character {
       if(distance <= sumRadius) return true;
    }
 
+   // Distance
+   calcDistance(firstX, firstY, secondX, secondY) {
+      let distX = secondX - firstX;
+      let distY = secondY - firstY;
+      return Math.round( Math.sqrt(distX * distX + distY * distY) );
+   }
+
    // RnG
    RnG(baseSpec, coeff) {
       return Math.floor(baseSpec) + Math.floor(Math.random() * (baseSpec * coeff));

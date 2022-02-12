@@ -43,7 +43,9 @@ class Enemy extends Character {
       this.calcY = spawnY;
       this.wanderBreakTime = enemySpecs.wanderBreakTime;
       this.wanderRange = enemySpecs.wanderRange;
-      this.chasingRange = enemySpecs.chasingRange
+      this.baseChasingRange = enemySpecs.chasingRange;
+      this.chasingRange = this.baseChasingRange;
+      this.maxChaseRange = this.wanderRange * 3;
 
       // Health
       this.baseHealth = enemySpecs.health;
@@ -77,7 +79,8 @@ class Enemy extends Character {
       this.isDead = false;
       this.isHidden = false;
       this.isWandering = true;
-      this.isChasing = true;
+      this.isChasing = false;
+      // this.hasBeenChased = false;
       this.isAttacking = false;
       this.isCalcPos = false;
       this.isReCalc = false;
@@ -92,7 +95,7 @@ class Enemy extends Character {
       this.frameY = 1;
    }
    
-   // CalcRng
+   // Calc Rng
    damageRnG() {
       return this.RnG(this.baseDamage, this.damageRatio); // More high => Higher RnG Range => More damage (0 ~ 1)
    }
@@ -111,58 +114,12 @@ class Enemy extends Character {
          this.calcY = this.spawnY + (RnG_Distance * Math.sin(RnG_Radians));
       }
    }
-   
-   calcAggroPlayers(player, aggroArray) {
 
-      let distX = player.x - this.x;
-      let distY = player.y - this.y;
-      
-      let distance = Math.round( Math.sqrt(distX * distX + distY * distY) );
-
-      aggroArray.push({
-         id: player.id,
-         x: player.x,
-         y: player.y,
-         radius: player.radius,
-         dist: distance
-      });
-   }
-
-   calcNearestPlayer(aggroArray) {
-
-      aggroArray.sort((first, second) => { return first.dist - second.dist });
-      return aggroArray[0];
-   }
-
-   movements() {
-      // For 2 Directions Sprites Sheets
-
-      // Cross Move
-      if(this.y > this.calcY || this.x > this.calcX) this.frameY = 0; // Left
-      if(this.y < this.calcY || this.x < this.calcX) this.frameY = 1; // Right
-
-      // Diag Move
-      if(this.y > this.calcY && this.x > this.calcX
-      || this.y < this.calcY && this.x > this.calcX) this.frameY = 0; // Top / Down Left
-      if(this.y > this.calcY && this.x < this.calcX
-      || this.y < this.calcY && this.x < this.calcX) this.frameY = 1; // Top / Down Right
-   }
-
-   calcGcD() {
-      
-      // Regen GcD
-      if(this.speedGcD < this.GcD) {
-         this.speedGcD += this.syncCoeff *1;
-         if(this.isAttacking) this.isAttacking = false;
-      }
-   }
-   
    moveToPosition(x, y, speed) {
 
       this.calcX = Math.round(x);
       this.calcY = Math.round(y);
-      
-      // Reach calculated position (Every Frame)
+
       if(this.calcX > this.x) {
          this.x += speed;
          if(this.x + speed > this.calcX) this.x = this.calcX;
@@ -183,7 +140,50 @@ class Enemy extends Character {
          if(this.y - speed < this.calcY) this.y = this.calcY;
       }
    }
+   
+   // Calc Aggro
+   calcAggroPlayers(player, aggroArray) {
 
+      let distance = this.calcDistance(this.x, this.y, player.x, player.y);
+
+      aggroArray.push({
+         id: player.id,
+         dist: distance
+      });
+   }
+
+   calcNearestPlayer(aggroArray) {
+
+      aggroArray.sort((first, second) => { return first.dist - second.dist });
+      return aggroArray[0];
+   }
+
+   // Movements
+   movements() {
+      // For 2 Directions Sprites Sheets
+
+      // Cross Move
+      if(this.y > this.calcY || this.x > this.calcX) this.frameY = 0; // Left
+      if(this.y < this.calcY || this.x < this.calcX) this.frameY = 1; // Right
+
+      // Diag Move
+      if(this.y > this.calcY && this.x > this.calcX
+      || this.y < this.calcY && this.x > this.calcX) this.frameY = 0; // Top / Down Left
+      if(this.y > this.calcY && this.x < this.calcX
+      || this.y < this.calcY && this.x < this.calcX) this.frameY = 1; // Top / Down Right
+   }
+
+   // GcD
+   calcGcD() {
+      
+      // Regen GcD
+      if(this.speedGcD < this.GcD) {
+         this.speedGcD += this.syncCoeff *1;
+         if(this.isAttacking) this.isAttacking = false;
+      }
+   }   
+
+   // Enemy States
    wandering() {
       if(this.isWandering) {
 
@@ -204,15 +204,20 @@ class Enemy extends Character {
    }
 
    chasing(player) {
-            
-      // if(player !== undefined) {
+      if(!this.isChasing) {
+
          this.isWandering = false;
-         this.isChasing = true;
          this.isAttacking = false;
          this.runSpeed = this.baseRunSpeed;
-   
          this.moveToPosition(player.x, player.y, this.runSpeed);
-      // }
+   
+         let distance = this.calcDistance(this.spawnX, this.spawnY, this.x, this.y);
+         
+         if(distance >= this.maxChaseRange) {
+            this.isChasing = true;
+            this.backToSpawn(player);
+         }
+      }
    }
 
    attacking(socket, player) {
@@ -276,45 +281,62 @@ class Enemy extends Character {
       }
    }
 
-   backToSpawn() {
-      if(this.isChasing) {
-
+   backToSpawn(player) {
+      
+      this.chasingRange = 0;
+      this.isAttacking = false;
+      this.moveToPosition(this.spawnX, this.spawnY, this.runSpeed);
+      
+      if(this.x === this.spawnX && this.y === this.spawnY) {
          this.isWandering = true;
          this.isChasing = false;
-         this.isAttacking = false;
-
-         this.calcX = this.spawnX;
-         this.calcY = this.spawnY;
+         this.chasingRange = this.baseChasingRange;
+         
+         player.hasBeenChased = false;
       }
    }
    
    // State Machine
    sateMachine(socketList, playerList) {
+      let aggroArray = [];
       
-      // let aggroArray = [];
-
+      // ===========================================
+      // Chasing ==> Players enter Chasing range
+      // ===========================================
       for(let i in playerList) {
-
          let player = playerList[i];
-         let socket = socketList[player.id];
 
-         // if player enter chasing range
          if(this.circle_toCircle(this, player, 0, 0, this.chasingRange) && !player.isDead) {
-
-            // if enemy collide with player
-            if(this.circle_toCircle(this, player, 0, 0, this.radius)) this.attacking(socket, player);
-            else this.chasing(player);
+            this.calcAggroPlayers(player, aggroArray);
+            player.hasBeenChased = true;
          }
-         else this.backToSpawn();
+         else if(player.hasBeenChased) this.backToSpawn(player);
       }
+      let nearestPlayer = this.calcNearestPlayer(aggroArray);
 
-      // let nearestPlayer = this.calcNearestPlayer(aggroArray);
-      // if(nearestPlayer !== undefined) {
-      // }
+      
+      // ===========================================
+      // Attacking ==> Players collide with enemy
+      // ===========================================
+      if(nearestPlayer !== undefined) {
+         for(let i in playerList) {
+           
+            let player = playerList[i];
+            let socket = socketList[player.id];
 
+            if(nearestPlayer.id === player.id) {
+               if(this.circle_toCircle(this, player, 0, 0, this.radius)) {
+                  this.attacking(socket, player);
+               }
+               else this.chasing(player);
+            }
+         }
+      }
+      
       this.wandering();
    }
 
+   // Death
    death() {
       this.health = 0;
       this.isDead = true;

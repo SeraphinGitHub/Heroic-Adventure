@@ -134,6 +134,7 @@ const minotaurSync = (minotaur) => {
 const DEBUG_Minotaur = (minotaur) => {
 
    if(!minotaur.isDead) {
+      DEBUG_MaxChaseRange(minotaur);
       DEBUG_WanderRange(minotaur);
       DEBUG_ChasingRange(minotaur);
       DEBUG_DrawMinotaur(minotaur);
@@ -142,12 +143,32 @@ const DEBUG_Minotaur = (minotaur) => {
    }
 }
 
+const DEBUG_MaxChaseRange = (minotaur) => {
+
+   // Circle
+   contexts.ctxEnemies.globalAlpha = 0.5;
+   contexts.ctxEnemies.fillStyle = "gold";
+   contexts.ctxEnemies.beginPath();
+   contexts.ctxEnemies.arc(
+      minotaur.spawnX -viewportSpecs.viewport.x,
+      minotaur.spawnY -viewportSpecs.viewport.y,
+      minotaur.maxChaseRange + minotaur.radius,
+      0, Math.PI * 2);
+   contexts.ctxEnemies.fill();
+   contexts.ctxEnemies.closePath();
+   contexts.ctxEnemies.globalAlpha = 1;
+}
+
 const DEBUG_WanderRange = (minotaur) => {
 
    // Circle
    contexts.ctxEnemies.fillStyle = "darkviolet";
    contexts.ctxEnemies.beginPath();
-   contexts.ctxEnemies.arc(minotaur.spawnX -viewportSpecs.viewport.x, minotaur.spawnY -viewportSpecs.viewport.y, minotaur.wanderRange+minotaur.radius, 0, Math.PI * 2);
+   contexts.ctxEnemies.arc(
+      minotaur.spawnX -viewportSpecs.viewport.x,
+      minotaur.spawnY -viewportSpecs.viewport.y,
+      minotaur.wanderRange + minotaur.radius,
+      0, Math.PI * 2);
    contexts.ctxEnemies.fill();
    contexts.ctxEnemies.closePath();
 }
