@@ -5,37 +5,40 @@
 // Player
 // =====================================================================
 class Player extends Character {
-   constructor(clientSpecs, animSpecs) {
+   constructor(cl_PlayerObj, initPlayer) {
       
       super();
 
+      // Init Server Player
+      this.initPlayer = initPlayer;
+
       // Viewport
-      this.viewport = clientSpecs.viewport;
-      this.viewport_HTML = clientSpecs.viewport_HTML;
-      this.viewSize = clientSpecs.viewSize;
-      this.centerVp_X = clientSpecs.centerVp_X;
-      this.centerVp_Y = clientSpecs.centerVp_Y;
+      this.viewport = cl_PlayerObj.viewport;
+      this.viewport_HTML = cl_PlayerObj.viewport_HTML;
+      this.viewSize = cl_PlayerObj.viewSize;
+      this.centerVp_X = cl_PlayerObj.centerVp_X;
+      this.centerVp_Y = cl_PlayerObj.centerVp_Y;
      
       // Canvas
-      this.ctxMap = clientSpecs.ctxMap;
-      this.ctxEnemies = clientSpecs.ctxEnemies;
-      this.ctxOtherPlay = clientSpecs.ctxOtherPlay;
-      this.ctxPlayer = clientSpecs.ctxPlayer;
-      this.ctxFixedBack = clientSpecs.ctxFixedBack;
-      this.ctxUI = clientSpecs.ctxUI;
-      this.ctxFixedFront = clientSpecs.ctxFixedFront;
+      this.ctxMap = cl_PlayerObj.ctxMap;
+      this.ctxEnemies = cl_PlayerObj.ctxEnemies;
+      this.ctxOtherPlay = cl_PlayerObj.ctxOtherPlay;
+      this.ctxPlayer = cl_PlayerObj.ctxPlayer;
+      this.ctxFixedBack = cl_PlayerObj.ctxFixedBack;
+      this.ctxUI = cl_PlayerObj.ctxUI;
+      this.ctxFixedFront = cl_PlayerObj.ctxFixedFront;
 
       // PNG Files
-      this.mapTile_Img = clientSpecs.mapTile_Img;
-      this.gameUI_Img = clientSpecs.gameUI_Img;
-      this.character_Img = clientSpecs.character_Img;
+      this.mapTile_Img = cl_PlayerObj.mapTile_Img;
+      this.gameUI_Img = cl_PlayerObj.gameUI_Img;
+      this.player_Img = cl_PlayerObj.player_Img;
 
       // Map
-      this.mapSpriteSize = clientSpecs.mapSpecs.mapSpriteSize;
-      this.cellSize = clientSpecs.mapSpecs.cellSize;
-      this.columns = clientSpecs.mapSpecs.columns;
-      this.rows = clientSpecs.mapSpecs.rows;      
-      this.mapScheme = clientSpecs.mapSpecs.mapScheme;
+      this.mapSpriteSize = cl_PlayerObj.mapSpecs.mapSpriteSize;
+      this.cellSize = cl_PlayerObj.mapSpecs.cellSize;
+      this.columns = cl_PlayerObj.mapSpecs.columns;
+      this.rows = cl_PlayerObj.mapSpecs.rows;      
+      this.mapScheme = cl_PlayerObj.mapSpecs.mapScheme;
       
       // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
@@ -51,9 +54,9 @@ class Player extends Character {
       this.flashFrame = 0;
 
       // Game UI ==> Mini Bars
-      this.barWidth = clientSpecs.barWidth;
-      this.barHeight = clientSpecs.barHeight;
-      this.barCoordArray = clientSpecs.barCoordArray;
+      this.barWidth = cl_PlayerObj.barWidth;
+      this.barHeight = cl_PlayerObj.barHeight;
+      this.barCoordArray = cl_PlayerObj.barCoordArray;
 
       // Game UI ==> Fame Bar
       this.fameScale_X = 1.25;
@@ -71,21 +74,14 @@ class Player extends Character {
       this.isLoosingFame = false;
 
       // Player Sprites
-      this.sprites = {
-         height: 200,
-         width: 200,
-         offsetY: 5,
-         radius: 45,
-      }
+      this.sprites = initPlayer.sprites;
 
       // Animation
-      this.frameX = 0;
-      this.animState;
+      this.frameY = 0;
+      this.frameToJump = 4;
       this.isAnimable = true;
-      this.animSpecs = animSpecs;
-
-      // General Vars
-      this.isClientName = false;
+      this.animState;
+      this.animSpecs = initPlayer.animSpecs;
    }
    
    pos(serverPlayer, coord) {
@@ -177,8 +173,8 @@ class Player extends Character {
       socket.on("getHeal", (serverPlayer) => {
    
          const text = {
-            x: -35,
-            y: -100,
+            x: -5,
+            y: -75,
             size: mainTexSize,
             color: "lime",
             value: `+${serverPlayer.calcHealing}`,
@@ -190,7 +186,7 @@ class Player extends Character {
       socket.on("giveDamage", (playerPos, calcDamage) => {
    
          const text = {
-            x: -35,
+            x: -5,
             y: -100,
             size: mainTexSize,
             color: "yellow",
@@ -202,8 +198,8 @@ class Player extends Character {
    
       socket.on("getDamage", (playerPos, calcDamage) => {
          const text = {
-            x: -35,
-            y: -100,
+            x: -5,
+            y: -85,
             size: mainTexSize,
             color: "red",
             value: `-${calcDamage}`,
@@ -214,7 +210,7 @@ class Player extends Character {
       
       socket.on("getFame", (playerPos, serverfameCost) => {
          const text = {
-            x: -105,
+            x: 0,
             y: 180,
             size: mainTexSize,
             color: "darkviolet",
@@ -228,7 +224,7 @@ class Player extends Character {
       
       socket.on("looseFame", (playerPos, serverfameCost) => {
          const text = {
-            x: -105,
+            x: 0,
             y: 180,
             size: mainTexSize,
             color: "red",
@@ -613,15 +609,15 @@ class Player extends Character {
    drawPlayer(ctx, serverPlayer) {
       
       ctx.drawImage(
-         this.character_Img,
+         this.player_Img,
 
          // Source
-         this.frameX * this.sprites.width,
-         (serverPlayer.frameY + this.animState) * this.sprites.height,
+         (serverPlayer.frameX + this.animState) * this.sprites.width,
+         this.frameY * this.sprites.height,
          this.sprites.width,
          this.sprites.height,      
          
-         // Destionation
+         // Destination
          this.pos(serverPlayer, "x") - this.sprites.width/2,
          this.pos(serverPlayer, "y") - this.sprites.height/2 - this.sprites.offsetY,
          this.sprites.height,
@@ -632,79 +628,108 @@ class Player extends Character {
    drawName(ctx, serverPlayer) {
       
       let offsetY = 95;
-      let namePos_X = this.pos(serverPlayer, "x") - (serverPlayer.name.length * 7);
+      let namePos_X = this.pos(serverPlayer, "x");
       let namePos_Y = this.pos(serverPlayer, "y") + offsetY;
       
+      ctx.textAlign = "center";
       ctx.fillStyle = "lime";
       ctx.font = "22px Orbitron-ExtraBold";
       ctx.fillText(serverPlayer.name, namePos_X, namePos_Y);
       ctx.strokeText(serverPlayer.name, namePos_X, namePos_Y);
    }
-   
+
+   // Animation
    animation(frame, index, spritesNumber) {
       
       if(frame % index === 0) {
-         if(this.frameX < spritesNumber) this.frameX++;
+         if(this.frameY < spritesNumber -1) this.frameY++;
 
          else {
-            this.frameX = 0;
+            this.frameY = 0;
             if(!this.isAnimable) this.isAnimable = true;
          }
       }
    }
 
-   // Animation State
-   playerState(serverPlayer, frame) {
-      
-      const frameToJump = 4;
+   playerState(frame, serverPlayer) {
 
       switch(serverPlayer.state) {
          case "walk": {
-            this.animState = frameToJump * 1;
-            this.animation(frame, this.animSpecs.walk.index, this.animSpecs.walk.spritesNumber);
-         };
+            
+            this.animState = this.frameToJump * 1;
+            this.animation(
+               frame,
+               this.animSpecs.walk.index,
+               this.animSpecs.walk.spritesNumber
+            );
+         }
          break;
 
          case "run": {
-            this.animState = frameToJump * 2;
-            this.animation(frame, this.animSpecs.run.index, this.animSpecs.run.spritesNumber);
-         };
+
+            this.animState = this.frameToJump * 2;
+            this.animation(
+               frame,
+               this.animSpecs.run.index,
+               this.animSpecs.run.spritesNumber
+            );
+         }
          break;
 
          case "attack": {
+         
             if(this.isAnimable) {
-               this.frameX = 0;
+               this.frameY = 0;
                this.isAnimable = false;
             }
-            this.animState = frameToJump * 3;
-            this.animation(frame, this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber);
+            
+            this.animState = this.frameToJump * 3;
+            this.animation(
+               frame,
+               this.animSpecs.attack.index,
+               this.animSpecs.attack.spritesNumber
+            );
          }
          break;
 
          case "heal": {
+
             if(this.isAnimable) {
-               this.frameX = 0;
+               this.frameY = 0;
                this.isAnimable = false;
             }
-            this.animState = frameToJump * 4;
-            this.animation(frame, this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber);
+
+            this.animState = this.frameToJump * 4;
+            this.animation(
+               frame,
+               this.animSpecs.heal.index,
+               this.animSpecs.heal.spritesNumber
+            );
          }
          break;
-
+      
          case "died": {
-            this.animState = frameToJump * 5;
-            this.animation(frame, this.animSpecs.died.index, this.animSpecs.died.spritesNumber);
+
+            this.animState = this.frameToJump * 5;
+            this.animation(
+               frame,
+               this.animSpecs.died.index,
+               this.animSpecs.died.spritesNumber
+            );
          }
          break;
 
          default: {
-            this.animState = frameToJump * 0;
-            this.animation(frame, this.animSpecs.idle.index, this.animSpecs.idle.spritesNumber);
+
+            this.animState = this.frameToJump * 0;
+            this.animation(frame,
+               this.animSpecs.idle.index,
+               this.animSpecs.idle.spritesNumber
+            );
          }
          break;
       }
    }
-
 
    // =====================================================================
    // Client Sync (Every frame)
@@ -712,7 +737,7 @@ class Player extends Character {
    render_ClientPlayer(serverPlayer, frame) {
 
       // Animation State
-      this.playerState(serverPlayer, frame);
+      this.playerState(frame, serverPlayer);
 
       // Camera 
       this.scrollCam(serverPlayer);
@@ -733,10 +758,7 @@ class Player extends Character {
       this.drawPlayer(this.ctxPlayer, serverPlayer);
 
       // Player Name
-      if(!this.isClientName) {
-         this.isClientName = true;
-         this.drawName(this.ctxFixedBack, serverPlayer);
-      }
+      this.drawName(this.ctxPlayer, serverPlayer);
 
       // this.DEBUG_Player(serverPlayer);
    }
@@ -746,9 +768,9 @@ class Player extends Character {
    // Other Players Sync (Every frame)
    // =====================================================================
    render_OtherPlayer(serverPlayer, frame) {
-
+      
       // Animation State
-      this.playerState(serverPlayer, frame);
+      this.playerState(frame, serverPlayer);
 
       // Mini Bars
       this.drawBars_OtherPlayer(serverPlayer);
@@ -776,7 +798,11 @@ class Player extends Character {
       
       this.ctxPlayer.fillStyle = "darkviolet";
       this.ctxPlayer.beginPath();
-      this.ctxPlayer.arc( this.pos(serverPlayer, "x"), this.pos(serverPlayer, "y"), serverPlayer.radius, 0, Math.PI * 2);
+      this.ctxPlayer.arc(
+         this.pos(serverPlayer, "x"),
+         this.pos(serverPlayer, "y"),
+         serverPlayer.radius, 0, Math.PI * 2
+      );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
    }
@@ -798,6 +824,10 @@ class Player extends Character {
 
       this.ctxPlayer.fillStyle = "black";
       this.ctxPlayer.font = "26px Orbitron-Regular";
-      this.ctxPlayer.fillText(Math.floor(serverPlayer.health), this.pos(serverPlayer, "x") -35, this.pos(serverPlayer, "y") -15);
+      this.ctxPlayer.fillText(
+         Math.round(serverPlayer.health),
+         this.pos(serverPlayer, "x"),
+         this.pos(serverPlayer, "y") -15
+      );
    }
 }

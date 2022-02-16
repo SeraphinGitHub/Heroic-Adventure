@@ -13,8 +13,8 @@ const io = new Server(server);
 // =====================================================================
 // Scrips import
 // =====================================================================
-const Player = require("./server/Player.js");
-const Enemy = require("./server/Enemy.js");
+const Player = require("./server/classes/Player.js");
+const enemiesHandler = require("./server/server_EnemiesHandler.js");
 
 
 // =====================================================================
@@ -36,16 +36,24 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 const playerMax = 300;
 let socketList = {};
+let initPack_PlayerList_ID = [];
+
+// Init Pack
+let initPack_PlayerList = {};
+let initPack_MobList = [];
+let initPack_NpcList = [];
+
+// Normal Pack
 let playerList = {};
 let mobList = [];
+let npcList = [];
 
 
-// *******************************
-let mobList_Light = [];
-let playerList_Light = [];
-let playerList_Coord = [];
-// *******************************
-
+// =====================================================================
+// Init Enemies
+// =====================================================================
+mobList = enemiesHandler.initEnemies();
+mobList.forEach(enemy => initPack_MobList.push( enemy.initPack() ));
 
 
 // =====================================================================
@@ -56,10 +64,12 @@ let playerList_Coord = [];
 io.on("connection", (socket) => {
    // console.log("User connected !");
    
+
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
    socketList[socket.id] = socket;
-   onConnect(socket, socketList, playerList);
+   onConnect(socket);
+
 
    // ==========  Debugging  ==========
    socket.on("evalServer", (data) => {
@@ -68,26 +78,31 @@ io.on("connection", (socket) => {
       socket.emit("evalResponse", response);
    });   
 
-   
+
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
       // console.log("User disconnected !");
-      onDisconnect(socket, playerList);
+      onDisconnect(socket);
       delete socketList[socket.id];
    });
 });
 
 // Player connection
 const onConnect = (socket) => {
+   
    const player = new Player(socket.id);
    playerList[socket.id] = player;
+   socket.emit("initEnemyPack", initPack_MobList);
 
    for(let i in playerList) {
       let player = playerList[i];
       let socket = socketList[player.id];
-      socket.emit("initPlayerPack", playerList);
+
+      // initPack_PlayerList[eachPlayer.id] = player.initPack();
+      initPack_PlayerList[player.id] = player;
+      socket.emit("initPlayerPack", initPack_PlayerList);
    };
-   
+
    // ================================
    // Init Player
    // ================================
@@ -182,81 +197,9 @@ const onDisconnect = (socket) => {
       socket.emit("removePlayerPack", loggedOutPlayer);
    };
 
+   delete initPack_PlayerList[socket.id];
    delete playerList[socket.id];
 }
-
-
-// =====================================================================
-// Enemies
-// =====================================================================
-const set_Minotaurs = () => {
-
-   const minotaursSpawns = [
-      {x: 700, y: 600},
-      // {x: 1500, y: 600},
-      // {x: 1000, y: 1200},
-   ];
-
-   const minotaursAnim = {
-      idle: {
-         index: 3,
-         spritesNumber: 11,
-      },
-   
-      walk: {
-         index: 2,
-         spritesNumber: 17,
-      },
-   
-      attack: {
-         index: 2,
-         spritesNumber: 11,
-      },
-   
-      died: {
-         index: 2,
-         spritesNumber: 14,
-      },
-   }
-
-   const minotaursSpecs = {
-
-      health: 150,
-      radius: 55,
-      wanderRange: 120,
-      wanderBreakTime: 2 *1000,
-      chasingRange: 200,
-      GcD: 60,
-      getFameCost: 100,
-      looseFameCost: 200,
-      hiddenTime: 4 *1000,
-      respawnTime: 10 *1000,
-      damages: 15,
-      attackDelay: 0.5,
-      damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
-      animArray: minotaursAnim,
-   }
-
-   cycleEnemiesPos(minotaursSpawns, minotaursSpecs);
-}
-
-// Init Enemies
-const cycleEnemiesPos = (enemySpawnObj, enemySpecs) => {
-
-   enemySpawnObj.forEach(position => {
-      const enemy = new Enemy(position.x, position.y, enemySpecs);
-      mobList.push(enemy);
-   });
-}
-
-const initEnemies = () => {
-
-   set_Minotaurs();   
-}
-
-initEnemies();
 
 
 // =====================================================================
@@ -266,84 +209,68 @@ let frame = 0
 
 setInterval(() => {
 
-
-   // *******************************
-
-   // let mobData = [];
-   // let otherPlayerData = [];
-
-   // playerList_Coord.forEach(player => {
-
-   //    mobList_Light.forEach(mob => {
-
-   //       // Collision square to circle ==> size of viewport
-   //       if(collision(player, mob)) {
-
-   //          mobData.push(mob);
-   //       }
-   //    });
-
-
-   //    playerList_Light.forEach(otherPlayer => {
-
-   //       // Collision square to circle ==> size of viewport
-   //       if(player !== otherPlayer
-   //       && collision(player, otherPlayer)) {
-            
-   //          otherPlayerData.push(otherPlayer);
-   //       }
-   //    });
-
-   //    let socket = socketList[player.id];
-   //    let clientIndex = playerList_Light.indexOf(player.id);
-   //    let clientData = playerList_Light[clientIndex];
-
-   //    socket.emit("mobData", mobData);
-   //    socket.emit("otherPlayerData", otherPlayerData);
-   //    socket.emit("clientData", clientData);
-   // });
+   // Light Update (draw enemies, player, NPC only inside viewport)
+   {
+      // *******************************
    
-   // *******************************
+      // let mobData = [];
+      // let otherPlayerData = [];
+   
+      // initPack_PlayerList_ID.forEach(player => {
+   
+      //    mobList_Light.forEach(mob => {
+   
+      //       // Collision square to circle ==> size of viewport
+      //       if(collision(player, mob)) {
+   
+      //          mobData.push(mob);
+      //       }
+      //    });
+   
+   
+      //    initPack_PlayerList_Light.forEach(otherPlayer => {
+   
+      //       // Collision square to circle ==> size of viewport
+      //       if(player !== otherPlayer
+      //       && collision(player, otherPlayer)) {
+               
+      //          otherPlayerData.push(otherPlayer);
+      //       }
+      //    });
+   
+      //    let socket = socketList[player.id];
+      //    let clientIndex = initPack_PlayerList_Light.indexOf(player.id);
+      //    let clientData = initPack_PlayerList_Light[clientIndex];
+   
+      //    socket.emit("mobData", mobData);
+      //    socket.emit("otherPlayerData", otherPlayerData);
+      //    socket.emit("clientData", clientData);
+      // });
+      
+      // *******************************
+   }
 
+   // Light Update Pack
+   let lightPack_PlayerList = [];
+   let lightPack_MobList = [];
+   let lightPack_NpcList = [];
 
+   // Init Light: MobList
+   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
 
-   let playerData = [];
-   let enemiesData = [];
-
-   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, mobList_Light, enemiesData));
-
+   // Init Light: PlayerList
    for(let i in playerList) {
       let player = playerList[i];
-      player.update(socketList, playerList, mobList, playerList_Coord, playerList_Light, playerData);
+      player.update(socketList, initPack_PlayerList_ID, playerList, mobList, lightPack_PlayerList);
    }
-   
-   playerData.forEach(player => {
-      
+
+   // Sending Light: PlayerList, MobList
+   lightPack_PlayerList.forEach(player => {
       let socket = socketList[player.id];
-      socket.emit("serverSync", playerData, enemiesData);
-
-      // Death Screen Event
-      if(player.isDead && !player.isRespawning) {
-         
-         socket.emit("playerScore", {
-            kills: player.kills,
-            died: player.died,
-            fame: player.fame,
-            fameCount: player.fameCount,
-         });
-
-         socket.emit("playerDeath", {
-            respawnTimer: player.respawnTimer,
-            deathCounts: player.deathCounts
-         });
-      }
-
-      else if(!player.isDead && player.isRespawning) {
-         player.isRespawning = false;
-         socket.emit("playerRespawn");
-      }
+      player.deathScreen(socket);
+      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList);
    });
-
+   
    frame++;
 
 }, 1000/process.env.FRAME_RATE);

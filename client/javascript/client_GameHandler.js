@@ -35,7 +35,7 @@ const set_Viewport = () => {
    };
 }
 
-const viewportSpecs = set_Viewport();
+const camera = set_Viewport();
 
 
 // =====================================================================
@@ -50,23 +50,23 @@ const set_Canvas = () => {
       let canvasIndexed = allCanvas[i];
       ctxArray.push(canvasIndexed.getContext("2d"));
    
-      canvasIndexed.height = viewportSpecs.viewSize.height;
-      canvasIndexed.width = viewportSpecs.viewSize.width;
+      canvasIndexed.height = camera.viewSize.height;
+      canvasIndexed.width = camera.viewSize.width;
       ctxArray[i].imageSmoothingEnabled = false;
    }
 
    return ctxArray;
 }
 
-const contexts = {
+const ctx = {
 
-   ctxMap:        set_Canvas()[0],
-   ctxEnemies:    set_Canvas()[1],
-   ctxOtherPlay:  set_Canvas()[2],
-   ctxPlayer:     set_Canvas()[3],
-   ctxFixedBack:  set_Canvas()[4],
-   ctxUI:         set_Canvas()[5],
-   ctxFixedFront: set_Canvas()[6],
+   map:        set_Canvas()[0],
+   enemies:    set_Canvas()[1],
+   otherPlay:  set_Canvas()[2],
+   player:     set_Canvas()[3],
+   fixedBack:  set_Canvas()[4],
+   UI:         set_Canvas()[5],
+   fixedFront: set_Canvas()[6],
 }
 
 
@@ -83,7 +83,7 @@ const canvasClearing = () => {
       let ctxIndexed = ctxArray[i];
       
       if(i === ctxFixedBack_index || i === ctxFixedFront_index) continue;
-      ctxIndexed.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
+      ctxIndexed.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
    }
 }
 
@@ -92,8 +92,8 @@ const canvasClearing = () => {
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-viewportSpecs.viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
-viewportSpecs.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
+camera.viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
+camera.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
@@ -105,86 +105,73 @@ const miniBarSpecs = {
    barHeight: 8,
 }
 
-const barsCoordinates = () => {
-   // Coordinates PNG file
-
+// Coordinates PNG file
+const barCoordArray = [
+   
    // Green
-   const greenCoord = {
+   {
       x: 474,
       y: 477,
       width: 16,
       height: 25,
-   };
+   },
 
    // Yellow
-   const yellowCoord = {
+   {
       x: 498,
       y: 477,
       width: 16,
       height: 25,
-   };
+   },
    
    // Orange
-   const orangeCoord = {
+   {
       x: 498,
       y: 509,
       width: 16,
       height: 25,
-   };
+   },
    
    // Red
-   const redCoord = {
+   {
       x: 498,
       y: 541,
       width: 16,
       height: 25,
-   };
+   },
 
    // blueGreen
-   const blueGreenCoord = {
+   {
       x: 474,
       y: 509,
       width: 16,
       height: 25,
-   };
+   },
 
    // Blue
-   const blueCoord = {
+   {
       x: 474,
       y: 541,
       width: 16,
       height: 25,
-   };
+   },
    
    // Dark Blue
-   const darkBlueCoord = {
+   {
       x: 474,
       y: 574,
       width: 16,
       height: 25,
-   };
+   },
    
    // Purple
-   const purpleCoord = {
+   {
       x: 498,
       y: 574,
       width: 16,
       height: 25,
-   };
-   
-   return [
-      greenCoord,    // 0
-      yellowCoord,   // 1
-      orangeCoord,   // 2
-      redCoord,      // 3
-      blueGreenCoord,// 4
-      blueCoord,     // 5
-      darkBlueCoord, // 6
-      purpleCoord,   // 7
-   ];
-}
-
-const barCoordArray = barsCoordinates();
+   },
+];
 
 
 // =====================================================================
@@ -194,10 +181,173 @@ const mapTile_Img = new Image();
 mapTile_Img.src = "client/images/map/map_tile_3_lands.png";
 
 const gameUI_Img = new Image();
-gameUI_Img.src = "client/images/playerUI/Game_UI.png";
+gameUI_Img.src = "client/images/playerUI/Game UI.png";
 
-const character_Img = new Image();
-character_Img.src = "client/images/playerAnimation/playerAnim_4x.png";
+const player_Img = new Image();
+player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
+
+
+// =====================================================================
+// Init Classes
+// =====================================================================
+const cl_PlayerObj = {
+
+   // Viewport
+   viewport:      camera.viewport,
+   viewport_HTML: camera.viewport_HTML,
+   viewSize:      camera.viewSize,
+   centerVp_X:    camera.centerVp_X,
+   centerVp_Y:    camera.centerVp_Y,
+
+   // Canvas
+   ctxMap:        ctx.map,
+   ctxEnemies:    ctx.enemies,
+   ctxOtherPlay:  ctx.otherPlay,
+   ctxPlayer:     ctx.player,
+   ctxFixedBack:  ctx.fixedBack,
+   ctxUI:         ctx.UI,
+   ctxFixedFront: ctx.fixedFront,
+
+   // PNG Files
+   mapTile_Img:   mapTile_Img,
+   gameUI_Img:    gameUI_Img,
+   player_Img:    player_Img,
+
+   // Map
+   mapSpecs:      mapSpecs,
+
+   // Game UI ==> Mini Bars
+   barWidth:      miniBarSpecs.barWidth,
+   barHeight:     miniBarSpecs.barHeight,
+   barCoordArray: barCoordArray,
+}
+
+const cl_EnemyObj = {
+
+   // Viewport
+   viewport:       camera.viewport,
+
+   // Canvas
+   ctxEnemies:       ctx.enemies,
+
+   // PNG Files
+   gameUI_Img:    gameUI_Img,
+
+   // Game UI ==> Mini Bars
+   barWidth:         miniBarSpecs.barWidth,
+   barHeight:        miniBarSpecs.barHeight,
+   barCoordArray:    barCoordArray,
+}
+
+const character = new Character();
+const clientPlayer = new Player(cl_PlayerObj, {});
+const clientEnemy = new Enemy(cl_EnemyObj, {});
+
+
+// =====================================================================
+// Client Sync with Server
+// =====================================================================
+let initPlayerList = [];
+let initMobList = [];
+let playerUpdateList = [];
+let mobUpdateList = [];
+
+
+// =====================================================================
+// Init Player
+// =====================================================================
+const initPlayer = (socket) => {
+      
+   clientPlayer.drawHUD_Frame();
+   clientPlayer.drawFame_Frame();
+   clientPlayer.initMapSpecs(socket);
+   clientPlayer.initFloatingText(socket);
+   handleGameUI(socket);
+   deathScreen(socket);
+   onKeyboardInput(socket);
+   onMouseInput(socket);
+   
+   // Set other players OnConnect
+   socket.on("initPlayerPack", (initPnitPack_PlayerList) => {
+      let playerTempList = [];     
+
+      for(let i in initPnitPack_PlayerList) {
+         let player = initPnitPack_PlayerList[i];
+         playerTempList.push(new Player(cl_PlayerObj, player));
+      }
+      initPlayerList = playerTempList;
+   });
+
+   // Set Enemies OnConnect
+   socket.on("initEnemyPack", (initPack_initMobList) => {
+      
+      let mobTempList = [];
+      initPack_initMobList.forEach(enemy => mobTempList.push( new Enemy(cl_EnemyObj, enemy) ));
+      initMobList = mobTempList;
+   });
+
+   // Sync players OnUpdate (Every Frame)
+   socket.on("serverSync", (lightPack_PlayerList, lightPack_initMobList ) => {
+      
+      playerUpdateList = lightPack_PlayerList;
+      mobUpdateList = lightPack_initMobList;  
+   });
+   
+   // Remove players OnDisconnect
+   socket.on("removePlayerPack", (loggedOutPlayer) => {
+
+      let playerIndex = initPlayerList.indexOf(loggedOutPlayer);
+      initPlayerList.splice(loggedOutPlayer, 1);
+      playerIndex--;
+   });
+}
+
+
+// =====================================================================
+// Client Update (Every frame)
+// =====================================================================
+let frame = 0;
+
+const clientUpdate = () => {
+
+   // Clear contexts
+   canvasClearing();
+
+   // Server Sync ==> Players
+   for(let i = 0; i < playerUpdateList.length; i++) {
+
+      let initPlayer = initPlayerList[i];
+      let serverPlayer = playerUpdateList[i];
+
+      // is Player exists
+      if(initPlayer) {
+         
+         // is Client
+         if(initPlayer.viewport_HTML.id === String(serverPlayer.id)) {
+            initPlayer.render_ClientPlayer(serverPlayer, frame);
+         }
+
+         // is Other players
+         else initPlayer.render_OtherPlayer(serverPlayer, frame);
+      }   
+   };
+
+   // Server Sync ==> Mobs
+   for(let i = 0; i < mobUpdateList.length; i++) {
+
+      let initEnemy = initMobList[i];
+      let serverEnemy = mobUpdateList[i];
+      initEnemy.render_Enemy(serverEnemy, frame);
+   };
+
+   // Draw floating text
+   clientPlayer.drawFloatingText();
+   frame++;
+
+   if(showFPS) frameRate++;
+
+   window.requestAnimationFrame(clientUpdate);
+}
 
 
 // =====================================================================
@@ -212,90 +362,3 @@ setInterval(() => {
       frameRate = 0;
    }
 }, 1000);
-
-
-// =====================================================================
-// Init Classes
-// =====================================================================
-const clientSpecs = {
-
-   // Viewport
-   viewport:      viewportSpecs.viewport,
-   viewport_HTML: viewportSpecs.viewport_HTML,
-   viewSize:      viewportSpecs.viewSize,
-   centerVp_X:    viewportSpecs.centerVp_X,
-   centerVp_Y:    viewportSpecs.centerVp_Y,
-
-   // Canvas
-   ctxMap:        contexts.ctxMap,
-   ctxEnemies:    contexts.ctxEnemies,
-   ctxOtherPlay:  contexts.ctxOtherPlay,
-   ctxPlayer:     contexts.ctxPlayer,
-   ctxFixedBack:  contexts.ctxFixedBack,
-   ctxUI:         contexts.ctxUI,
-   ctxFixedFront: contexts.ctxFixedFront,
-
-   // PNG Files
-   mapTile_Img:   mapTile_Img,
-   gameUI_Img:    gameUI_Img,
-   character_Img: character_Img,
-
-   // Map
-   mapSpecs: mapSpecs,
-
-   // Game UI ==> Mini Bars
-   barWidth:      miniBarSpecs.barWidth,
-   barHeight:     miniBarSpecs.barHeight,
-   barCoordArray: barCoordArray,
-}
-
-const character = new Character();
-const clientPlayer = new Player(clientSpecs);
-
-
-// =====================================================================
-// Client Sync with Server
-// =====================================================================
-let playerList = [];
-let playerSituation = [];
-let enemySituation = [];
-
-
-// =====================================================================
-// Client Update (Every frame)
-// =====================================================================
-let frame = 0;
-
-const clientUpdate = () => {
-
-   // Clear contexts
-   canvasClearing();
-
-   // Server Sync (Players)
-   for(let i = 0; i < playerSituation.length; i++) {
-      let initPlayer = playerList[i];
-      let serverPlayer = playerSituation[i];
-
-      // is Player exists
-      if(initPlayer) {
-
-         // is Client
-         if(initPlayer.viewport_HTML.id === String(serverPlayer.id)) {
-            initPlayer.render_ClientPlayer(serverPlayer, frame);
-         }
-
-         // is Other players
-         else initPlayer.render_OtherPlayer(serverPlayer, frame);
-      }
-   };
-
-   enemySituation.forEach(enemy => minotaurSync(enemy, frame));
-
-   // Draw floating text
-   clientPlayer.drawFloatingText();
-   frame++;
-
-   if(showFPS) frameRate++;
-
-   window.requestAnimationFrame(clientUpdate);
-}

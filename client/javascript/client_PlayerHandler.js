@@ -8,7 +8,7 @@ const playerStats = (data) => {
    const playerName = document.querySelector(".player-name");
    const playerStats = document.querySelector(".player-stats");
    
-   viewportSpecs.viewport_HTML.id = data.playerID;
+   camera.viewport_HTML.id = data.playerID;
    playerName.textContent = data.name;
 
    // Player infos
@@ -44,10 +44,23 @@ const playerScore = (data) => {
    fameCount.textContent = `F_Count: ${data.fameCount}`;
 }
 
-const initGameUI = (socket) => {
+
+// =====================================================================
+// Game UI Handler ==> Socket Listening
+// =====================================================================
+const handleGameUI = (socket) => {  
    
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
+   socket.on("fameCount+1", (fameCount) => {
+   
+      ctx.fixedBack.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
+      ctx.fixedFront.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
+      
+      clientPlayer.drawHUD_Frame();
+      clientPlayer.drawFame_Frame();
+      clientPlayer.drawFame_Count(fameCount);
+   });
 }
 
 
@@ -87,7 +100,6 @@ const playerCommand = (socket, event, ctrlObj, state) => {
          if(ctrlObj === controls.spells && isCasting !== state) {
             isCasting = state;
             socket.emit("casting", state);
-            // socket.on("animTimeOut", animSpecsObj.heal);
          }
       }
    });
@@ -118,7 +130,6 @@ const onKeyboardInput = (socket) => {
 const playerAttackCommand = (socket, event, state) => {
    if(event.which === 1 && insideCanvas) {
       socket.emit("attack", state);
-      // socket.emit("animTimeOut", animSpecsObj.attack);
    }
 }
 
@@ -154,57 +165,5 @@ const deathScreen = (socket) => {
    
    socket.on("playerRespawn", () => {
       deathScreen.style = "visibility: hidden";
-   });
-}
-
-
-// =====================================================================
-// Init Player
-// =====================================================================
-const initPlayer = (socket) => {
-      
-   clientPlayer.drawHUD_Frame();
-   clientPlayer.drawFame_Frame();
-   clientPlayer.initMapSpecs(socket);
-   clientPlayer.initFloatingText(socket);
-   initGameUI(socket);
-   deathScreen(socket);
-   onKeyboardInput(socket);
-   onMouseInput(socket);
-
-   // Set players OnConnect
-   socket.on("initPlayerPack", (data) => {
-
-      let tempList = [];
-
-      for(let i in data) {
-         let player = data[i];
-         tempList.push(new Player(clientSpecs, player.animSpecs));
-      }
-      playerList = tempList;
-   });
-
-   // Remove players OnDisconnect
-   socket.on("removePlayerPack", (loggedOutPlayer) => {
-
-      let playerIndex = playerList.indexOf(loggedOutPlayer);
-      playerList.splice(loggedOutPlayer, 1);
-      playerIndex--;
-   });
-
-   // Sync players OnUpdate
-   socket.on("serverSync", (playerData, minotaurData ) => {
-      playerSituation = playerData;
-      enemySituation = minotaurData;  
-   });
-   
-   socket.on("fameCount+1", (fameCount) => {
-   
-      contexts.ctxFixedBack.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
-      contexts.ctxFixedFront.clearRect(0, 0, viewportSpecs.viewSize.width, viewportSpecs.viewSize.height);
-      
-      clientPlayer.drawHUD_Frame();
-      clientPlayer.drawFame_Frame();
-      clientPlayer.drawFame_Count(fameCount);
    });
 }
