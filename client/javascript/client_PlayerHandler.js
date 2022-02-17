@@ -167,3 +167,65 @@ const deathScreen = (socket) => {
       deathScreen.style = "visibility: hidden";
    });
 }
+
+
+// =====================================================================
+// Client State ==> (Init Pack, Sync, Disconnect)
+// =====================================================================
+const clientState = (socket) => {
+   
+   // Set other players OnConnect
+   socket.on("initPlayerPack", (initPack_PlayerList) => {
+
+      let playerTempList = [];  
+      
+      for(let i in initPack_PlayerList) {
+
+         let initPlayer = initPack_PlayerList[i];
+         const newPlayer = new Player(cl_PlayerObj, initPlayer);
+         playerTempList.push(newPlayer);
+      }
+      
+      initPlayerList = playerTempList;
+   });
+
+   // Set Enemies OnConnect
+   socket.on("initEnemyPack", (initPack_MobList) => {
+      
+      let mobTempList = [];
+      initPack_MobList.forEach(enemy => mobTempList.push( new Enemy(cl_EnemyObj, enemy) ));
+      initMobList = mobTempList;
+   });
+
+   // Sync players OnUpdate (Every Frame)
+   socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList ) => {
+      
+      playerUpdateList = lightPack_PlayerList;
+      mobUpdateList = lightPack_MobList;  
+   });
+   
+   // Remove players OnDisconnect
+   socket.on("removePlayerPack", (loggedOutPlayer) => {
+
+      clientPlayer.removeIndex(initPlayerList, loggedOutPlayer);
+   });
+}
+
+
+// =====================================================================
+// Init Player
+// =====================================================================
+const initPlayer = (socket) => {
+   
+   // Init Pack, Sync, Disconnect
+   clientState(socket);
+
+   clientPlayer.drawHUD_Frame();
+   clientPlayer.drawFame_Frame();
+   clientPlayer.initMapSpecs(socket);
+   clientPlayer.initFloatingText(socket);
+   handleGameUI(socket);
+   deathScreen(socket);
+   onKeyboardInput(socket);
+   onMouseInput(socket);
+}

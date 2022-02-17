@@ -9,9 +9,9 @@ const Enemy = require("./classes/Enemy.js");
 const set_Minotaurs = () => {
 
    const minotaursSpawns = [
-      {x: 700, y: 600},
-      // {x: 1500, y: 600},
-      // {x: 1000, y: 800}
+      {x: 650, y: 500},
+      {x: 1500, y: 500},
+      {x: 750, y: 1150}
    ];
 
    const minotaursSpecs = {
@@ -19,9 +19,9 @@ const set_Minotaurs = () => {
       name: "Plains Minotaur",
       health: 150,
       radius: 55,
-      wanderRange: 120,
+      wanderRange: 150,
       wanderBreakTime: 2 *1000,
-      chasingRange: 270,
+      chasingRange: 200,
       GcD: 60,
       getFameCost: 100,
       looseFameCost: 200,

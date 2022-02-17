@@ -92,7 +92,7 @@ const canvasClearing = () => {
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-camera.viewport_HTML.addEventListener("mouseover", () => insideCanvas = true);
+camera.viewport_HTML.addEventListener("mouseenter", () => insideCanvas = true);
 camera.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
@@ -101,7 +101,7 @@ camera.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 // =====================================================================
 const miniBarSpecs = {
    
-   barWidth: 110,
+   barWidth: 115,
    barHeight: 8,
 }
 
@@ -254,56 +254,6 @@ let mobUpdateList = [];
 
 
 // =====================================================================
-// Init Player
-// =====================================================================
-const initPlayer = (socket) => {
-      
-   clientPlayer.drawHUD_Frame();
-   clientPlayer.drawFame_Frame();
-   clientPlayer.initMapSpecs(socket);
-   clientPlayer.initFloatingText(socket);
-   handleGameUI(socket);
-   deathScreen(socket);
-   onKeyboardInput(socket);
-   onMouseInput(socket);
-   
-   // Set other players OnConnect
-   socket.on("initPlayerPack", (initPnitPack_PlayerList) => {
-      let playerTempList = [];     
-
-      for(let i in initPnitPack_PlayerList) {
-         let player = initPnitPack_PlayerList[i];
-         playerTempList.push(new Player(cl_PlayerObj, player));
-      }
-      initPlayerList = playerTempList;
-   });
-
-   // Set Enemies OnConnect
-   socket.on("initEnemyPack", (initPack_initMobList) => {
-      
-      let mobTempList = [];
-      initPack_initMobList.forEach(enemy => mobTempList.push( new Enemy(cl_EnemyObj, enemy) ));
-      initMobList = mobTempList;
-   });
-
-   // Sync players OnUpdate (Every Frame)
-   socket.on("serverSync", (lightPack_PlayerList, lightPack_initMobList ) => {
-      
-      playerUpdateList = lightPack_PlayerList;
-      mobUpdateList = lightPack_initMobList;  
-   });
-   
-   // Remove players OnDisconnect
-   socket.on("removePlayerPack", (loggedOutPlayer) => {
-
-      let playerIndex = initPlayerList.indexOf(loggedOutPlayer);
-      initPlayerList.splice(loggedOutPlayer, 1);
-      playerIndex--;
-   });
-}
-
-
-// =====================================================================
 // Client Update (Every frame)
 // =====================================================================
 let frame = 0;
@@ -319,17 +269,12 @@ const clientUpdate = () => {
       let initPlayer = initPlayerList[i];
       let serverPlayer = playerUpdateList[i];
 
-      // is Player exists
       if(initPlayer) {
-         
-         // is Client
          if(initPlayer.viewport_HTML.id === String(serverPlayer.id)) {
             initPlayer.render_ClientPlayer(serverPlayer, frame);
          }
-
-         // is Other players
          else initPlayer.render_OtherPlayer(serverPlayer, frame);
-      }   
+      }
    };
 
    // Server Sync ==> Mobs

@@ -39,8 +39,8 @@ const initClientScripts = () => {
    const scripts = [
       
       // Classes
-      "classes/Character.js",
-      "classes/Enemy.js",
+      "classes/ClientCharacter.js",
+      "classes/ClientEnemy.js",
       "classes/ClientPlayer.js",
       "classes/FloatingText.js",
       "classes/GameBar.js",

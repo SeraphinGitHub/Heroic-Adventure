@@ -234,8 +234,11 @@ class Enemy extends Character {
          
          // Animation State
          this.enemyState(frame, serverEnemy);
-
+         
+         // ******************************
          // this.DEBUG_enemy(serverEnemy);
+         // ******************************
+
          this.drawName(serverEnemy);
          this.drawMiniBar(serverEnemy);
          this.drawShadow(serverEnemy);

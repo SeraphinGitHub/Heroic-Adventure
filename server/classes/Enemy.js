@@ -8,6 +8,8 @@ class Enemy extends Character {
    constructor(spawnX, spawnY, enemySpecs) {
 
       super();
+
+      this.id;
       
       this.x = spawnX;
       this.y = spawnY;
@@ -27,7 +29,7 @@ class Enemy extends Character {
       this.wanderRange = enemySpecs.wanderRange;
       this.baseChasingRange = enemySpecs.chasingRange;
       this.chasingRange = this.baseChasingRange;
-      this.maxChaseRange = this.wanderRange * 5;
+      this.maxChaseRange = this.wanderRange * 4;
 
       // Health
       this.baseHealth = enemySpecs.health;
@@ -242,7 +244,7 @@ class Enemy extends Character {
                
                this.isChasing = true;
                this.speed = this.runSpeed;
-               player.death(socket, this.looseFameCost);
+               player.death(this.looseFameCost);
          
                // Player Score
                socket.emit("playerScore", {
@@ -268,11 +270,11 @@ class Enemy extends Character {
       this.moveToPosition(this.spawnX, this.spawnY);
       
       if(this.x === this.spawnX && this.y === this.spawnY) {
+
          this.isWandering = true;
          this.isChasing = false;
          this.chasingRange = this.baseChasingRange;
-         
-         player.hasBeenChased = false;
+         this.removeIndex(player.chased_By, this.id);
       }
    }
    
@@ -288,9 +290,9 @@ class Enemy extends Character {
 
          if(this.circle_toCircle(this, player, 0, 0, this.chasingRange) && !player.isDead) {
             this.calcAggroPlayers(player, aggroArray);
-            player.hasBeenChased = true;
+            if(!player.chased_By.includes(this.id)) player.chased_By.push(this.id);
          }
-         else if(player.hasBeenChased) this.backToSpawn(player);
+         else if(player.chased_By.includes(this.id)) this.backToSpawn(player);
       }
       let nearestPlayer = this.calcNearestPlayer(aggroArray);
 
@@ -364,7 +366,7 @@ class Enemy extends Character {
    // Update (Sync)
    update(frame, socketList, playerList, lightPack_MobList) {
 
-      this.animState(frame);      
+      this.animState(frame);
       
       if(!this.isDead) {
 
@@ -373,8 +375,7 @@ class Enemy extends Character {
          this.sateMachine(socketList, playerList);
       }
 
-      // lightPack_MobList.push(this.(Var Allégées ));
-      lightPack_MobList.push(this);
+      lightPack_MobList.push( this.lightPack() );
    }
 
    initPack() {
@@ -384,11 +385,8 @@ class Enemy extends Character {
          name: this.name,
          radius: this.radius,
          wanderRange: this.wanderRange,
-         chasingRange: this.baseChasingRange,
          maxChaseRange: this.maxChaseRange,
          baseHealth: this.health,
-         hiddenTime: this.hiddenTime,
-         respawnTime: this.respawnTime,
          imageSrc: this.imageSrc,
          animSpecs: this.animSpecs,
          sprites: this.sprites,
@@ -397,7 +395,16 @@ class Enemy extends Character {
 
    lightPack() {
       return {
-
+         x: this.x,
+         y: this.y,
+         calcX: this.calcX,
+         calcY: this.calcY,
+         health: this.health,
+         // chasingRange: this.chasingRange,  // <== DEBUG Only
+         isDead: this.isDead,
+         isHidden: this.isHidden,
+         state: this.state,
+         frameX: this.frameX
       }
    }
 }

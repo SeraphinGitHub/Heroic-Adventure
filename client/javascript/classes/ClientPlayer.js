@@ -84,16 +84,16 @@ class Player extends Character {
       this.animSpecs = initPlayer.animSpecs;
    }
    
-   pos(serverPlayer, coord) {
+   pos(serverPlayer) {
       
-      if(this.viewport_HTML.id === String(serverPlayer.id)) {
-         if(coord === "x") return this.viewSize.width/2;
-         if(coord === "y") return this.viewSize.height/2;
+      if(this.isClient) return {
+         x: this.viewSize.width/2,
+         y: this.viewSize.height/2
       }
 
-      else {
-         if(coord === "x") return serverPlayer.x - this.viewport.x;
-         if(coord === "y") return serverPlayer.y - this.viewport.y;
+      else return {
+         x: serverPlayer.x - this.viewport.x,
+         y: serverPlayer.y - this.viewport.y
       }
    }
 
@@ -154,8 +154,8 @@ class Player extends Character {
       
       const newText = new FloatingText(
          this.ctxPlayer,
-         this.pos(serverPlayer, "x"),
-         this.pos(serverPlayer, "y"),
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y,
          textObj.x,
          textObj.y,
          textObj.size,
@@ -262,7 +262,7 @@ class Player extends Character {
 
    drawFame_Bar(serverPlayer) {
 
-      let fameBarWidth = (serverPlayer.fameValue / serverPlayer.baseFame) * (this.fame.width - (65 * this.fameScale_X));
+      let fameBarWidth = (serverPlayer.fameValue / this.initPlayer.baseFame) * (this.fame.width - (65 * this.fameScale_X));
    
       // Fame Bar
       this.ctxUI.drawImage(this.gameUI_Img,
@@ -424,10 +424,10 @@ class Player extends Character {
 
    drawHUD_Mana(serverPlayer) {
       
-      let manaRatio = serverPlayer.mana / serverPlayer.baseMana;
+      let manaRatio = serverPlayer.mana / this.initPlayer.baseMana;
       
       // Still Castable Mana
-      if(serverPlayer.mana >= serverPlayer.healCost) {
+      if(serverPlayer.mana >= this.initPlayer.healCost) {
 
          this.drawHUD_BaseBar(
             manaRatio,
@@ -448,10 +448,10 @@ class Player extends Character {
 
    drawHUD_Health(serverPlayer) {
       
-      let healthRatio = serverPlayer.health / serverPlayer.baseHealth;
+      let healthRatio = serverPlayer.health / this.initPlayer.baseHealth;
 
       // if Health Over 30%
-      if(serverPlayer.health > serverPlayer.baseHealth * this.minHealthRatio) {
+      if(serverPlayer.health > this.initPlayer.baseHealth * this.minHealthRatio) {
 
          // Normal Bar
          this.drawHUD_BaseBar(
@@ -489,7 +489,7 @@ class Player extends Character {
 
    drawHUD_Energy(serverPlayer) {
       
-      let energyRatio = serverPlayer.energy / serverPlayer.baseEnergy;
+      let energyRatio = serverPlayer.energy / this.initPlayer.baseEnergy;
 
       // Yellow Bar
       this.drawHUD_BaseBar(
@@ -510,7 +510,7 @@ class Player extends Character {
          height: this.barHeight,
       }
       
-      const attackBar = new GameBar(clientPlayerBar, 0, 65, serverPlayer.GcD, serverPlayer.speedGcD);
+      const attackBar = new GameBar(clientPlayerBar, 0, 65, this.initPlayer.GcD, serverPlayer.speedGcD);
       const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
@@ -528,19 +528,19 @@ class Player extends Character {
       const barValueArray = [
          {
             name: "health",
-            maxValue: serverPlayer.baseHealth,
+            maxValue: this.initPlayer.baseHealth,
             value: serverPlayer.health,
          },
 
          {
             name: "mana",
-            maxValue: serverPlayer.baseMana,
+            maxValue: this.initPlayer.baseMana,
             value: serverPlayer.mana,
          },
 
          {
             name: "energy",
-            maxValue: serverPlayer.baseEnergy,
+            maxValue: this.initPlayer.baseEnergy,
             value: serverPlayer.energy,
          }
       ];
@@ -567,13 +567,13 @@ class Player extends Character {
          // Health Bar
          if(bar.name === "health") {
             index = 0;
-            if(serverPlayer.health <= serverPlayer.baseHealth * this.minHealthRatio) index = 3;
+            if(serverPlayer.health <= this.initPlayer.baseHealth * this.minHealthRatio) index = 3;
          }
 
          // Mana Bar
          if(bar.name === "mana") {
             index = 5;
-            if(serverPlayer.mana < serverPlayer.healCost) index = 6;
+            if(serverPlayer.mana < this.initPlayer.healCost) index = 6;
          }
 
          // Energy Bar
@@ -598,8 +598,8 @@ class Player extends Character {
       ctx.fillStyle = "rgba(30, 30, 30, 0.6)";
       ctx.beginPath();
       ctx.ellipse(
-         this.pos(serverPlayer, "x"),
-         this.pos(serverPlayer, "y") + this.sprites.radius,
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y + this.sprites.radius,
          this.sprites.radius * 0.8, this.sprites.radius * 0.4, 0, 0, Math.PI * 2
       );
       ctx.fill();
@@ -618,8 +618,8 @@ class Player extends Character {
          this.sprites.height,      
          
          // Destination
-         this.pos(serverPlayer, "x") - this.sprites.width/2,
-         this.pos(serverPlayer, "y") - this.sprites.height/2 - this.sprites.offsetY,
+         this.pos(serverPlayer).x - this.sprites.width/2,
+         this.pos(serverPlayer).y - this.sprites.height/2 - this.sprites.offsetY,
          this.sprites.height,
          this.sprites.width,
       );
@@ -628,20 +628,22 @@ class Player extends Character {
    drawName(ctx, serverPlayer) {
       
       let offsetY = 95;
-      let namePos_X = this.pos(serverPlayer, "x");
-      let namePos_Y = this.pos(serverPlayer, "y") + offsetY;
+      let namePos_X = this.pos(serverPlayer).x;
+      let namePos_Y = this.pos(serverPlayer).y + offsetY;
       
+      if(this.isClient) ctx.fillStyle = "lime";
+      else ctx.fillStyle = "darkorange";
+
       ctx.textAlign = "center";
-      ctx.fillStyle = "lime";
       ctx.font = "22px Orbitron-ExtraBold";
-      ctx.fillText(serverPlayer.name, namePos_X, namePos_Y);
-      ctx.strokeText(serverPlayer.name, namePos_X, namePos_Y);
+      ctx.fillText(this.initPlayer.name, namePos_X, namePos_Y);
+      ctx.strokeText(this.initPlayer.name, namePos_X, namePos_Y);
    }
 
    // Animation
    animation(frame, index, spritesNumber) {
       
-      if(frame % index === 0) {
+      if(frame % index === 0) {         
          if(this.frameY < spritesNumber -1) this.frameY++;
 
          else {
@@ -760,7 +762,9 @@ class Player extends Character {
       // Player Name
       this.drawName(this.ctxPlayer, serverPlayer);
 
+      // ******************************
       // this.DEBUG_Player(serverPlayer);
+      // ******************************
    }
 
 
@@ -782,7 +786,9 @@ class Player extends Character {
       // Player Name
       this.drawName(this.ctxOtherPlay, serverPlayer);
 
+      // ******************************
       // this.DEBUG_Player(serverPlayer);
+      // ******************************
    }
 
 
@@ -799,9 +805,9 @@ class Player extends Character {
       this.ctxPlayer.fillStyle = "darkviolet";
       this.ctxPlayer.beginPath();
       this.ctxPlayer.arc(
-         this.pos(serverPlayer, "x"),
-         this.pos(serverPlayer, "y"),
-         serverPlayer.radius, 0, Math.PI * 2
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y,
+         this.initPlayer.radius, 0, Math.PI * 2
       );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
@@ -812,9 +818,9 @@ class Player extends Character {
       this.ctxPlayer.fillStyle = "orangered";
       this.ctxPlayer.beginPath();
       this.ctxPlayer.arc(
-         this.pos(serverPlayer, "x") + serverPlayer.attkOffset_X,
-         this.pos(serverPlayer, "y") + serverPlayer.attkOffset_Y,
-         serverPlayer.attkRadius, 0, Math.PI * 2
+         this.pos(serverPlayer).x + serverPlayer.attkOffset_X,
+         this.pos(serverPlayer).y + serverPlayer.attkOffset_Y,
+         this.initPlayer.attkRadius, 0, Math.PI * 2
       );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
@@ -826,8 +832,8 @@ class Player extends Character {
       this.ctxPlayer.font = "26px Orbitron-Regular";
       this.ctxPlayer.fillText(
          Math.round(serverPlayer.health),
-         this.pos(serverPlayer, "x"),
-         this.pos(serverPlayer, "y") -15
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y -15
       );
    }
 }

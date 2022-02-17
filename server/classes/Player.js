@@ -93,7 +93,10 @@ class Player extends Character {
       this.isRunning = false;
       this.isRunnable = false;
       this.isAttacking = false;
-      this.hasBeenChased = false;
+      this.hasLostFame = false;
+
+      // Enemies ID Array
+      this.chased_By = [];
 
       // Anim States
       this.attack_isAnimable = false;
@@ -428,7 +431,7 @@ class Player extends Character {
       mobList.forEach(mob => {
    
          if(!mob.isDead
-         && this.circle_toCircle(this, mob, 0, 0, this.radius)) {
+         && this.circle_toCircle(this, mob, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
             
             mob.calcDamage = this.damageRnG();
             mob.health -= mob.calcDamage;
@@ -483,19 +486,26 @@ class Player extends Character {
    death(fameCost) {
 
       const respawnRange = 600;
-
-      this.health = 0;
-      this.isDead = true;
-      this.died++;
-
-      this.deathCounts++;
-      if(this.deathCounts === 10) this.deathCounts = 0;
-
-      this.fame -= fameCost;
-      if(this.fame <= 0) this.fame = 0;
       
-      this.fameValue -= fameCost;
-      if(this.fameValue <= 0) this.fameValue = 0;
+      if(!this.isDead) {
+         this.isDead = true;
+         
+         this.health = 0;
+         this.died++;
+         this.deathCounts++;
+
+         if(this.deathCounts === 10) this.deathCounts = 0;
+      }
+
+      if(!this.hasLostFame) {
+         this.hasLostFame = true;
+
+         this.fame -= fameCost;
+         this.fameValue -= fameCost;
+         
+         if(this.fame <= 0) this.fame = 0;
+         if(this.fameValue <= 0) this.fameValue = 0;
+      }
       
       const respawnCooldown = setInterval(() => {
          this.respawnTimer --;
@@ -504,6 +514,7 @@ class Player extends Character {
 
             this.isDead = false;
             this.isRespawning = true;
+            this.hasLostFame = false;
 
             // Reset Player Bars
             this.health = this.baseHealth;
@@ -574,7 +585,7 @@ class Player extends Character {
    }
 
    // Update (Sync)
-   update(socketList, initPack_PlayerList_ID, playerList, mobList, lightPack_PlayerList) {
+   update(socketList, initPack_PlayerID, playerList, mobList, lightPack_PlayerList) {
 
       if(!this.isDead) {
 
@@ -585,7 +596,6 @@ class Player extends Character {
          this.casting(socketList);
          this.animState();
       }
-
       else this.state = "died";
 
 
@@ -593,8 +603,41 @@ class Player extends Character {
       //    id: this.id
       // });
 
-      // lightPack_PlayerList.push(this.(Var Allégées ));
-      lightPack_PlayerList.push(this);
+      lightPack_PlayerList.push( this.lightPack() );
+   }
+
+   initPack() {
+      return {
+         name: this.name,
+         radius: this.radius,
+         attkRadius: this.attkRadius,
+         healCost: this.healCost,
+         GcD: this.GcD,
+         baseHealth: this.baseHealth,
+         baseEnergy: this.baseEnergy,
+         baseMana: this.baseMana,
+         baseFame: this.baseFame,
+         animSpecs: this.animSpecs,
+         sprites: this.sprites
+      }
+   }
+
+   lightPack() {
+      return {
+         id: this.id,
+         x: this.x,
+         y: this.y,
+         attkOffset_X: this.attkOffset_X,
+         attkOffset_Y: this.attkOffset_Y,
+         speedGcD: this.speedGcD,
+         health: this.health,
+         energy: this.energy,
+         mana: this.mana,
+         fame: this.fame,
+         fameValue: this.fameValue,
+         state: this.state,
+         frameX: this.frameX
+      }
    }
 }
 

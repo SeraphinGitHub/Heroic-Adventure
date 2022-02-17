@@ -36,7 +36,7 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 const playerMax = 300;
 let socketList = {};
-let initPack_PlayerList_ID = [];
+let initPack_PlayerID = [];
 
 // Init Pack
 let initPack_PlayerList = {};
@@ -52,8 +52,14 @@ let npcList = [];
 // =====================================================================
 // Init Enemies
 // =====================================================================
+let enemyID = 0;
 mobList = enemiesHandler.initEnemies();
-mobList.forEach(enemy => initPack_MobList.push( enemy.initPack() ));
+
+mobList.forEach(enemy => {
+   enemyID++;
+   enemy.id = enemyID;
+   initPack_MobList.push(enemy.initPack());
+});
 
 
 // =====================================================================
@@ -89,19 +95,10 @@ io.on("connection", (socket) => {
 
 // Player connection
 const onConnect = (socket) => {
-   
+
    const player = new Player(socket.id);
    playerList[socket.id] = player;
    socket.emit("initEnemyPack", initPack_MobList);
-
-   for(let i in playerList) {
-      let player = playerList[i];
-      let socket = socketList[player.id];
-
-      // initPack_PlayerList[eachPlayer.id] = player.initPack();
-      initPack_PlayerList[player.id] = player;
-      socket.emit("initPlayerPack", initPack_PlayerList);
-   };
 
    // ================================
    // Init Player
@@ -131,6 +128,18 @@ const onConnect = (socket) => {
       });
       
       socket.emit("fameCount+1", player.fameCount);
+
+      // ================================
+      // Sending initPack Player
+      // ================================
+      for(let i in playerList) {
+
+         let player = playerList[i];
+         let socket = socketList[player.id];
+
+         initPack_PlayerList[player.id] = player.initPack();
+         socket.emit("initPlayerPack", initPack_PlayerList);
+      };
    });
    
 
@@ -216,7 +225,7 @@ setInterval(() => {
       // let mobData = [];
       // let otherPlayerData = [];
    
-      // initPack_PlayerList_ID.forEach(player => {
+      // initPack_PlayerID.forEach(player => {
    
       //    mobList_Light.forEach(mob => {
    
@@ -250,6 +259,8 @@ setInterval(() => {
       // *******************************
    }
 
+   let socketsArray = [];
+   
    // Light Update Pack
    let lightPack_PlayerList = [];
    let lightPack_MobList = [];
@@ -260,16 +271,17 @@ setInterval(() => {
 
    // Init Light: PlayerList
    for(let i in playerList) {
+
       let player = playerList[i];
-      player.update(socketList, initPack_PlayerList_ID, playerList, mobList, lightPack_PlayerList);
+      let socket = socketList[player.id];
+      socketsArray.push(socket);
+      
+      player.update(socketList, initPack_PlayerID, playerList, mobList, lightPack_PlayerList);
+      player.deathScreen(socket);
    }
 
    // Sending Light: PlayerList, MobList
-   lightPack_PlayerList.forEach(player => {
-      let socket = socketList[player.id];
-      player.deathScreen(socket);
-      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList);
-   });
+   socketsArray.forEach(socket => socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList));
    
    frame++;
 
