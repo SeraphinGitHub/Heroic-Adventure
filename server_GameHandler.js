@@ -36,7 +36,6 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 const playerMax = 300;
 let socketList = {};
-let initPack_PlayerID = [];
 
 // Init Pack
 let initPack_PlayerList = {};
@@ -100,6 +99,7 @@ const onConnect = (socket) => {
    playerList[socket.id] = player;
    socket.emit("initEnemyPack", initPack_MobList);
 
+
    // ================================
    // Init Player
    // ================================
@@ -108,8 +108,9 @@ const onConnect = (socket) => {
       player.name = data;
 
       socket.emit("playerStats", {
-   
+         
          playerID: player.id,
+
          name: data,
          health: player.baseHealth,
          mana: player.baseMana,
@@ -136,7 +137,7 @@ const onConnect = (socket) => {
 
          let player = playerList[i];
          let socket = socketList[player.id];
-
+         
          initPack_PlayerList[player.id] = player.initPack();
          socket.emit("initPlayerPack", initPack_PlayerList);
       };
@@ -218,70 +219,108 @@ let frame = 0
 
 setInterval(() => {
 
-   // Light Update (draw enemies, player, NPC only inside viewport)
-   {
-      // *******************************
-   
-      // let mobData = [];
-      // let otherPlayerData = [];
-   
-      // initPack_PlayerID.forEach(player => {
-   
-      //    mobList_Light.forEach(mob => {
-   
-      //       // Collision square to circle ==> size of viewport
-      //       if(collision(player, mob)) {
-   
-      //          mobData.push(mob);
-      //       }
-      //    });
-   
-   
-      //    initPack_PlayerList_Light.forEach(otherPlayer => {
-   
-      //       // Collision square to circle ==> size of viewport
-      //       if(player !== otherPlayer
-      //       && collision(player, otherPlayer)) {
-               
-      //          otherPlayerData.push(otherPlayer);
-      //       }
-      //    });
-   
-      //    let socket = socketList[player.id];
-      //    let clientIndex = initPack_PlayerList_Light.indexOf(player.id);
-      //    let clientData = initPack_PlayerList_Light[clientIndex];
-   
-      //    socket.emit("mobData", mobData);
-      //    socket.emit("otherPlayerData", otherPlayerData);
-      //    socket.emit("clientData", clientData);
-      // });
-      
-      // *******************************
-   }
-
    let socketsArray = [];
    
-   // Light Update Pack
+   // LightPack (Every frame)
    let lightPack_PlayerList = [];
    let lightPack_MobList = [];
    let lightPack_NpcList = [];
+   
 
-   // Init Light: MobList
-   mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
 
-   // Init Light: PlayerList
+
+   // Light Update (draw enemies, player, NPC only inside viewport)   
+   let otherPlayerData = [];
+   let mobData = [];
+
+   // mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
+
    for(let i in playerList) {
-
+      
       let player = playerList[i];
       let socket = socketList[player.id];
-      socketsArray.push(socket);
       
-      player.update(socketList, initPack_PlayerID, playerList, mobList, lightPack_PlayerList);
+      socketsArray.push(socket);
+
+      // let clientIndex = lightPack_PlayerList.indexOf(player.id);
+      // let clientData = lightPack_PlayerList[clientIndex];
+
+      const square = {
+         x: player.x -player.detectViewport.width /2,
+         y: player.y -player.detectViewport.height /2,
+         height: player.detectViewport.height,
+         width: player.detectViewport.width,
+      }
+
+      mobList.forEach(mob => {
+
+         const circle = {
+            x: mob.spawnX,
+            y: mob.spawnY,
+            radius: mob.wanderRange + mob.radius,
+         }
+   
+         if(player.square_toCircle(square, circle)) {
+            
+            mob.update(frame, socketList, playerList, lightPack_MobList)
+         }      
+      });
+
+
+      for(let i in playerList) {
+         let otherPlayer = playerList[i];
+
+         // Collision square to circle ==> size of viewport
+         if(player !== otherPlayer) {
+            
+            const circle = {
+               x: otherPlayer.x,
+               y: otherPlayer.y,
+               raduis: otherPlayer.radius,
+            }
+
+            if(player.square_toCircle(square, circle)) {
+               
+               // otherPlayerData.push(otherPlayer);
+
+               // otherPlayer.update(socketList, playerList, mobList, lightPack_PlayerList);
+               // otherPlayer.deathScreen(socket);
+            }
+         }
+      }
+
+      player.update(socketList, playerList, mobList, lightPack_PlayerList);
       player.deathScreen(socket);
+       
+
+      // socket.emit("mobData", mobData);
+      // socket.emit("otherPlayerData", otherPlayerData);
+      // socket.emit("clientData", clientData);
    }
 
-   // Sending Light: PlayerList, MobList
+   
    socketsArray.forEach(socket => socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList));
+   // *******************************
+   // *******************************
+
+   
+
+   // // Init LightPack: Mobs
+   // mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
+
+   // // Init LightPack: Players
+   // for(let i in playerList) {
+
+   //    let player = playerList[i];
+   //    let socket = socketList[player.id];
+   //    socketsArray.push(socket);
+      
+   //    player.update(socketList, playerList, mobList, lightPack_PlayerList);
+   //    player.deathScreen(socket);      
+   // }
+
+   // // Sending LightPack: Players, Mobs
+   // socketsArray.forEach(socket => socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList));
    
    frame++;
 

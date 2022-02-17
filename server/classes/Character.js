@@ -22,20 +22,33 @@ class Character {
       }
    }
 
-   circle_toSquare(cirX, cirY, cirRadius, sqrX, sqrY, sqrW, sqrH) {
+   square_toCircle(square, circle) {
 
-      let distX = Math.abs(cirX - (sqrX + sqrW /2));
-      let distY = Math.abs(cirY - (sqrY + sqrH /2));
+      // const square = {
+      //    x: sqrX,
+      //    y: sqrY,
+      //    height: sqrH,
+      //    width: sqrW,
+      // }
+      
+      // const circle = {
+      //    x: cirX,
+      //    y: cirY,
+      //    radius: cirRadius,
+      // }
 
-      if(distX > cirRadius + sqrW /2) { return false };
-      if(distY > cirRadius + sqrH /2) { return false };
-      if(distX <= sqrW) { return false };
-      if(distY <= sqrH) { return false };
-
-      distX -= sqrW;
-      distY -= sqrH;
-
-      return (distX *distX + distY *distY <= cirRadius * cirRadius);
+      if(  (circle.x + circle.radius > square.x
+         && circle.x - circle.radius < square.x + square.width
+         || circle.x - circle.radius < square.x + square.width
+         && circle.x + circle.radius > square.x)
+         
+         &&(circle.y + circle.radius > square.y
+         && circle.y - circle.radius < square.y + square.height
+         || circle.y - circle.radius < square.y + square.height
+         && circle.y + circle.radius > square.y) ) {
+         
+         return true;
+      }
    }
    
    circle_toCircle(first, second, offsetX, offsetY, radius) {

@@ -11,7 +11,7 @@ const set_Minotaurs = () => {
    const minotaursSpawns = [
       {x: 650, y: 500},
       {x: 1500, y: 500},
-      {x: 750, y: 1150}
+      {x: 750, y: 1150},
    ];
 
    const minotaursSpecs = {

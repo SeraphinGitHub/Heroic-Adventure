@@ -5,13 +5,15 @@
 // DOM Player UI
 // =====================================================================
 const playerStats = (data) => {
-   const playerName = document.querySelector(".player-name");
-   const playerStats = document.querySelector(".player-stats");
-   
-   camera.viewport_HTML.id = data.playerID;
-   playerName.textContent = data.name;
 
+   viewport_HTML.id = data.playerID;
+   
+   const playerName = document.querySelector(".player-name");
+   playerName.textContent = data.name;
+   
    // Player infos
+   const playerStats = document.querySelector(".player-stats");
+
    const health = playerStats.querySelector(".health");
    const mana = playerStats.querySelector(".mana");
    const regenMana = playerStats.querySelector(".mana-regen");
@@ -48,14 +50,14 @@ const playerScore = (data) => {
 // =====================================================================
 // Game UI Handler ==> Socket Listening
 // =====================================================================
-const handleGameUI = (socket) => {  
-   
+const handleGameUI = (socket) => {
+
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
    socket.on("fameCount+1", (fameCount) => {
    
-      ctx.fixedBack.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
-      ctx.fixedFront.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
+      ctx.fixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
+      ctx.fixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
       
       clientPlayer.drawHUD_Frame();
       clientPlayer.drawFame_Frame();

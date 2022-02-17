@@ -14,6 +14,20 @@ class Player extends Character {
       
       this.x = 1080;
       this.y = 800;
+
+      this.testCollide_DetectViewport = false;
+
+      // Detect Viewport ==> Bigger than Viewport size in CSS & JS
+      this.detectViewport = {
+         // height: 900,
+         // width: 1300,
+
+         // height: 500,
+         // width: 900,
+         
+         height: 200,
+         width: 300,
+      }
       
       // Env Variables
       this.frameRate = process.env.FRAME_RATE;
@@ -148,6 +162,13 @@ class Player extends Character {
          offsetY: 5,
          radius: 45,
       }
+   }
+
+   DEBUG_PlayerPosition() {
+
+      console.log("*************** attacking() method *****");
+      console.log({ x: this.x });
+      console.log({ y: this.y });
    }
 
    // Calc Rng
@@ -314,6 +335,10 @@ class Player extends Character {
       if(this.isAttacking
       && !this.attack_isAnimable
       && this.speedGcD >= this.GcD) {
+
+         // ***************************
+         this.DEBUG_PlayerPosition();
+         // ***************************
 
          let socket = socketList[this.id];
 
@@ -585,7 +610,7 @@ class Player extends Character {
    }
 
    // Update (Sync)
-   update(socketList, initPack_PlayerID, playerList, mobList, lightPack_PlayerList) {
+   update(socketList, playerList, mobList, lightPack_PlayerList) {
 
       if(!this.isDead) {
 
@@ -598,11 +623,6 @@ class Player extends Character {
       }
       else this.state = "died";
 
-
-      // initPack_PlayerList_ID.push({
-      //    id: this.id
-      // });
-
       lightPack_PlayerList.push( this.lightPack() );
    }
 
@@ -610,6 +630,7 @@ class Player extends Character {
       return {
          name: this.name,
          radius: this.radius,
+         detectViewport: this.detectViewport,
          attkRadius: this.attkRadius,
          healCost: this.healCost,
          GcD: this.GcD,
@@ -624,6 +645,9 @@ class Player extends Character {
 
    lightPack() {
       return {
+
+         detectViewport: this.detectViewport,
+
          id: this.id,
          x: this.x,
          y: this.y,

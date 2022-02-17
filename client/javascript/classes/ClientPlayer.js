@@ -11,13 +11,16 @@ class Player extends Character {
 
       // Init Server Player
       this.initPlayer = initPlayer;
-
+      this.isClient = false;
+      
       // Viewport
-      this.viewport = cl_PlayerObj.viewport;
-      this.viewport_HTML = cl_PlayerObj.viewport_HTML;
+      this.detectViewport = initPlayer.detectViewport;
       this.viewSize = cl_PlayerObj.viewSize;
-      this.centerVp_X = cl_PlayerObj.centerVp_X;
-      this.centerVp_Y = cl_PlayerObj.centerVp_Y;
+      this.viewport = cl_PlayerObj.viewport;
+      this.centerVp = {
+         x: this.viewSize.width/2 - this.viewport.width/2,
+         y: this.viewSize.height/2 - this.viewport.height/2,
+      };
      
       // Canvas
       this.ctxMap = cl_PlayerObj.ctxMap;
@@ -44,8 +47,8 @@ class Player extends Character {
       this.HUD_scale_X = 1.2;
       this.HUD_scale_Y = 1;
       this.HUD = {
-         x: this.viewport.width/2 -400/2 * this.HUD_scale_X,
-         y: this.viewport.height -110 * this.HUD_scale_Y,
+         x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
+         y: this.viewSize.height -110 * this.HUD_scale_Y,
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
@@ -63,7 +66,7 @@ class Player extends Character {
       this.fameScale_Y = 1;
       this.fame = {
          x: this.viewSize.width/2 -900/2 * this.fameScale_X,
-         y: this.viewport.height -805,
+         y: this.viewSize.height -805,
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
@@ -125,26 +128,24 @@ class Player extends Character {
       if(vpBottomRow_Nbr > this.rows) vpBottomRow_Nbr = this.rows;
       
       // ======== Temporary ========
-      // this.ctxPlayer.strokeStyle = "black";
-      // this.ctxPlayer.strokeRect(this.centerVp_X, this.centerVp_Y, viewport.width, viewport.height);
+      // this.ctxPlayer.strokeStyle = "red";
+      // this.ctxPlayer.strokeRect(this.centerVp.x, this.centerVp.y, this.viewport.width, this.viewport.height);
       // ======== Temporary ========
 
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
          for(let y = vpTopRow_Nbr; y < vpBottomRow_Nbr; y++) {
             
-            let tileIndex = y * this.columns + x;
+            let tileIndex = y *this.columns +x;
             let tileToDraw = this.mapScheme[tileIndex];
             
-            let tile_X = x * this.cellSize - this.viewport.x + this.centerVp_X;
-            let tile_Y = y * this.cellSize - this.viewport.y + this.centerVp_Y;
+            let tile_X = x *this.cellSize -this.viewport.x +this.centerVp.x;
+            let tile_Y = y *this.cellSize -this.viewport.y +this.centerVp.y;
             
             this.ctxMap.drawImage(
                this.mapTile_Img,
-               (tileToDraw -1) * this.mapSpriteSize, 0, this.mapSpriteSize, this.mapSpriteSize,
+               (tileToDraw -1) *this.mapSpriteSize, 0, this.mapSpriteSize, this.mapSpriteSize,
                tile_X, tile_Y, this.cellSize, this.cellSize
             );
-
-            // ==> Still need to hide other players and enemies when leave viewport
          }
       }
    }
@@ -763,7 +764,7 @@ class Player extends Character {
       this.drawName(this.ctxPlayer, serverPlayer);
 
       // ******************************
-      // this.DEBUG_Player(serverPlayer);
+      this.DEBUG_GENERAL(serverPlayer);
       // ******************************
    }
 
@@ -787,17 +788,43 @@ class Player extends Character {
       this.drawName(this.ctxOtherPlay, serverPlayer);
 
       // ******************************
-      // this.DEBUG_Player(serverPlayer);
+      // this.DEBUG_GENERAL(serverPlayer);
       // ******************************
    }
 
 
    // ==>  DEBUG MODE  <==
-   DEBUG_Player(serverPlayer) {
+   DEBUG_GENERAL(serverPlayer) {
 
-      this.DEBUG_DrawPlayer(serverPlayer);
-      this.DEBUG_DrawAttackArea(serverPlayer);
-      this.DEBUG_DrawHealthNumber(serverPlayer);
+      this.DEBUG_DrawDetectViewport(serverPlayer);
+      // this.DEBUG_DrawPlayer(serverPlayer);
+      // this.DEBUG_DrawAttackArea(serverPlayer);
+      // this.DEBUG_DrawHealthNumber(serverPlayer);
+   }
+
+   DEBUG_DrawDetectViewport(serverPlayer) {
+
+      this.ctxFixedBack.strokeStyle = "yellow";
+      this.ctxFixedBack.lineWidth = 4;
+      
+      this.ctxFixedBack.strokeRect(
+
+         this.viewSize.width/2 - this.detectViewport.width/2,
+         this.viewSize.height/2 - this.detectViewport.height/2,
+         this.detectViewport.width,
+         this.detectViewport.height,
+      );
+
+      // this.ctxPlayer.strokeStyle = "yellow";
+      // this.ctxPlayer.lineWidth = 4;
+      
+      // this.ctxPlayer.strokeRect(
+
+      //    serverPlayer.x - this.detectViewport.width/2,
+      //    serverPlayer.y - this.detectViewport.height/2,
+      //    this.detectViewport.width,
+      //    this.detectViewport.height,
+      // );
    }
 
    DEBUG_DrawPlayer(serverPlayer) {

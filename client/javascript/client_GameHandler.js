@@ -9,33 +9,21 @@
 // =====================================================================
 // Set Viewport
 // =====================================================================
-const set_Viewport = () => {
+const viewport_HTML = document.querySelector(".viewport");
+const viewSize = {
+   height: 800, // ==> Check to match with viewport size in CSS
+   width: 1200,
+};
+const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
+// const viewport = new Viewport(0, 0, 800, 400);
 
-   const viewport_HTML = document.querySelector(".viewport");
-   
-   const viewSize = { // ==> Check to match with viewport size in CSS
-      height: 800,
-      width: 1200,
-   }
-   
-   const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
-   const centerVp_X = viewSize.width/2 - viewport.width/2;
-   const centerVp_Y = viewSize.height/2 - viewport.height/2;
-   
-   // const viewport = new Viewport(0, 0, 900, 500);
-   // const centerVp_X = viewSize.width/2 - 900/2;
-   // const centerVp_Y = viewSize.height/2 - 500/2;
 
-   return {
-      viewport_HTML: viewport_HTML,
-      viewSize: viewSize,
-      viewport: viewport,
-      centerVp_X: centerVp_X,
-      centerVp_Y: centerVp_Y
-   };
-}
-
-const camera = set_Viewport();
+// =====================================================================
+// Inside Canvas Detection
+// =====================================================================
+let insideCanvas = false;
+viewport_HTML.addEventListener("mouseenter", () => insideCanvas = true);
+viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
@@ -50,8 +38,8 @@ const set_Canvas = () => {
       let canvasIndexed = allCanvas[i];
       ctxArray.push(canvasIndexed.getContext("2d"));
    
-      canvasIndexed.height = camera.viewSize.height;
-      canvasIndexed.width = camera.viewSize.width;
+      canvasIndexed.height = viewSize.height;
+      canvasIndexed.width = viewSize.width;
       ctxArray[i].imageSmoothingEnabled = false;
    }
 
@@ -83,17 +71,9 @@ const canvasClearing = () => {
       let ctxIndexed = ctxArray[i];
       
       if(i === ctxFixedBack_index || i === ctxFixedFront_index) continue;
-      ctxIndexed.clearRect(0, 0, camera.viewSize.width, camera.viewSize.height);
+      ctxIndexed.clearRect(0, 0, viewSize.width, viewSize.height);
    }
 }
-
-
-// =====================================================================
-// Inside Canvas Detection
-// =====================================================================
-let insideCanvas = false;
-camera.viewport_HTML.addEventListener("mouseenter", () => insideCanvas = true);
-camera.viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
 
 
 // =====================================================================
@@ -193,11 +173,8 @@ player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
 const cl_PlayerObj = {
 
    // Viewport
-   viewport:      camera.viewport,
-   viewport_HTML: camera.viewport_HTML,
-   viewSize:      camera.viewSize,
-   centerVp_X:    camera.centerVp_X,
-   centerVp_Y:    camera.centerVp_Y,
+   viewSize:      viewSize,
+   viewport:      viewport,
 
    // Canvas
    ctxMap:        ctx.map,
@@ -225,7 +202,7 @@ const cl_PlayerObj = {
 const cl_EnemyObj = {
 
    // Viewport
-   viewport:       camera.viewport,
+   viewport:      viewport,
 
    // Canvas
    ctxEnemies:       ctx.enemies,
@@ -270,7 +247,9 @@ const clientUpdate = () => {
       let serverPlayer = playerUpdateList[i];
 
       if(initPlayer) {
-         if(initPlayer.viewport_HTML.id === String(serverPlayer.id)) {
+
+         if(viewport_HTML.id === String(serverPlayer.id)) {
+            initPlayer.isClient = true;
             initPlayer.render_ClientPlayer(serverPlayer, frame);
          }
          else initPlayer.render_OtherPlayer(serverPlayer, frame);
