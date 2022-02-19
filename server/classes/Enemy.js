@@ -9,12 +9,7 @@ class Enemy extends Character {
 
       super();
 
-      this.id;
-
-      // ****************************
-      this.testCollide_DetectViewport = false;
-      // ****************************
-      
+      this.id;      
       this.x = spawnX;
       this.y = spawnY;
       this.spawnX = spawnX;
@@ -376,7 +371,7 @@ class Enemy extends Character {
 
          this.movements();
          this.calcGcD();
-         // this.sateMachine(socketList, playerList);
+         this.sateMachine(socketList, playerList);
       }
 
       lightPack_MobList.push( this.lightPack() );
@@ -399,10 +394,6 @@ class Enemy extends Character {
 
    lightPack() {
       return {
-
-         testCollide_DetectViewport: this.testCollide_DetectViewport,
-
-
          x: this.x,
          y: this.y,
          calcX: this.calcX,

@@ -226,8 +226,14 @@ const clientEnemy = new Enemy(cl_EnemyObj, {});
 // =====================================================================
 let initPlayerList = [];
 let initMobList = [];
+
 let playerUpdateList = [];
 let mobUpdateList = [];
+
+
+// ******************
+let singlePlayerUpdate = [];
+// ******************
 
 
 // =====================================================================
@@ -240,21 +246,52 @@ const clientUpdate = () => {
    // Clear contexts
    canvasClearing();
 
-   // Server Sync ==> Players
-   for(let i = 0; i < playerUpdateList.length; i++) {
+   // *************************************
+   initPlayerList.forEach(initPlayer => {
 
-      let initPlayer = initPlayerList[i];
-      let serverPlayer = playerUpdateList[i];
+      if(singlePlayerUpdate[0]) {
+         
+         let singlePlayer = singlePlayerUpdate[0];
 
-      if(initPlayer) {
-
-         if(viewport_HTML.id === String(serverPlayer.id)) {
+         // if(singlePlayer.id === initPlayer.id) {
+         
             initPlayer.isClient = true;
-            initPlayer.render_ClientPlayer(serverPlayer, frame);
-         }
-         else initPlayer.render_OtherPlayer(serverPlayer, frame);
+            initPlayer.render_ClientPlayer(singlePlayer, frame);
+         // }
       }
-   };
+
+
+      playerUpdateList.forEach(serverPlayer => {
+   
+         if(serverPlayer) {
+
+            if(serverPlayer.id === initPlayer.id) {
+
+               initPlayer.render_OtherPlayer(serverPlayer, frame);
+            }
+         }
+      });
+   });
+
+
+
+
+   // // Server Sync ==> Players
+   // for(let i = 0; i < playerUpdateList.length; i++) {
+
+   //    let initPlayer = initPlayerList[i];
+   //    let serverPlayer = playerUpdateList[i];
+
+   //    if(initPlayer) {
+   //       if(viewport_HTML.id === String(serverPlayer.id)) {
+         
+   //          initPlayer.isClient = true;
+   //          initPlayer.render_ClientPlayer(serverPlayer, frame);
+   //       }
+   //       else initPlayer.render_OtherPlayer(serverPlayer, frame);
+   //    }
+   // };
+   
 
    // Server Sync ==> Mobs
    for(let i = 0; i < mobUpdateList.length; i++) {
@@ -263,6 +300,7 @@ const clientUpdate = () => {
       let serverEnemy = mobUpdateList[i];
       initEnemy.render_Enemy(serverEnemy, frame);
    };
+
 
    // Draw floating text
    clientPlayer.drawFloatingText();

@@ -200,8 +200,12 @@ const clientState = (socket) => {
    });
 
    // Sync players OnUpdate (Every Frame)
-   socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList ) => {
+   socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList, singleArray) => {
       
+      // **************************
+      singlePlayerUpdate = singleArray;
+      // **************************
+
       playerUpdateList = lightPack_PlayerList;
       mobUpdateList = lightPack_MobList;  
    });

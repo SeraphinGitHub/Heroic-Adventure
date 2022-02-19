@@ -764,7 +764,8 @@ class Player extends Character {
       this.drawName(this.ctxPlayer, serverPlayer);
 
       // ******************************
-      this.DEBUG_GENERAL(serverPlayer);
+      // this.DEBUG_GENERAL(serverPlayer);
+      this.DEBUG_DrawDetectViewport();
       // ******************************
    }
 
@@ -795,14 +796,13 @@ class Player extends Character {
 
    // ==>  DEBUG MODE  <==
    DEBUG_GENERAL(serverPlayer) {
-
-      this.DEBUG_DrawDetectViewport(serverPlayer);
-      // this.DEBUG_DrawPlayer(serverPlayer);
-      // this.DEBUG_DrawAttackArea(serverPlayer);
-      // this.DEBUG_DrawHealthNumber(serverPlayer);
+      
+      this.DEBUG_DrawPlayer(serverPlayer);
+      this.DEBUG_DrawAttackArea(serverPlayer);
+      this.DEBUG_DrawHealthNumber(serverPlayer);
    }
 
-   DEBUG_DrawDetectViewport(serverPlayer) {
+   DEBUG_DrawDetectViewport() {
 
       this.ctxFixedBack.strokeStyle = "yellow";
       this.ctxFixedBack.lineWidth = 4;
@@ -814,17 +814,6 @@ class Player extends Character {
          this.detectViewport.width,
          this.detectViewport.height,
       );
-
-      // this.ctxPlayer.strokeStyle = "yellow";
-      // this.ctxPlayer.lineWidth = 4;
-      
-      // this.ctxPlayer.strokeRect(
-
-      //    serverPlayer.x - this.detectViewport.width/2,
-      //    serverPlayer.y - this.detectViewport.height/2,
-      //    this.detectViewport.width,
-      //    this.detectViewport.height,
-      // );
    }
 
    DEBUG_DrawPlayer(serverPlayer) {

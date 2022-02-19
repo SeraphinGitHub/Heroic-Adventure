@@ -11,22 +11,16 @@ class Player extends Character {
       
       this.id = id;
       this.name = "";
-      
       this.x = 1080;
       this.y = 800;
-
-      this.testCollide_DetectViewport = false;
 
       // Detect Viewport ==> Bigger than Viewport size in CSS & JS
       this.detectViewport = {
          // height: 900,
          // width: 1300,
 
-         // height: 500,
-         // width: 900,
-         
-         height: 200,
-         width: 300,
+         height: 300,
+         width: 500,
       }
       
       // Env Variables
@@ -337,7 +331,7 @@ class Player extends Character {
       && this.speedGcD >= this.GcD) {
 
          // ***************************
-         this.DEBUG_PlayerPosition();
+         // this.DEBUG_PlayerPosition();
          // ***************************
 
          let socket = socketList[this.id];
@@ -628,6 +622,7 @@ class Player extends Character {
 
    initPack() {
       return {
+         id: this.id,
          name: this.name,
          radius: this.radius,
          detectViewport: this.detectViewport,
@@ -645,9 +640,6 @@ class Player extends Character {
 
    lightPack() {
       return {
-
-         detectViewport: this.detectViewport,
-
          id: this.id,
          x: this.x,
          y: this.y,

@@ -236,7 +236,7 @@ class Enemy extends Character {
          this.enemyState(frame, serverEnemy);
          
          // ******************************
-         this.DEBUG_GENERAL(serverEnemy);
+         // this.DEBUG_GENERAL(serverEnemy);
          // ******************************
 
          this.drawName(serverEnemy);
@@ -251,12 +251,12 @@ class Enemy extends Character {
    DEBUG_GENERAL(serverEnemy) {
    
       if(!serverEnemy.isDead) {
-         // this.DEBUG_MaxChaseRange();
+         this.DEBUG_MaxChaseRange();
          this.DEBUG_WanderRange(serverEnemy);
-         // this.DEBUG_ChasingRange(serverEnemy);
-         // this.DEBUG_DrawEnemy(serverEnemy);
-         // this.DEBUG_PathLine(serverEnemy);
-         // this.DEBUG_ReachPoint(serverEnemy);
+         this.DEBUG_ChasingRange(serverEnemy);
+         this.DEBUG_DrawEnemy(serverEnemy);
+         this.DEBUG_PathLine(serverEnemy);
+         this.DEBUG_ReachPoint(serverEnemy);
       }
    }
    
@@ -276,13 +276,10 @@ class Enemy extends Character {
       this.ctxEnemies.globalAlpha = 1;
    }
    
-   DEBUG_WanderRange(serverEnemy) {
-   
-      if(serverEnemy.testCollide_DetectViewport) this.ctxEnemies.fillStyle = "blue";
-      else this.ctxEnemies.fillStyle = "darkviolet";
+   DEBUG_WanderRange() {
 
       // Circle
-      // this.ctxEnemies.fillStyle = "darkviolet";
+      this.ctxEnemies.fillStyle = "darkviolet";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.arc(
          this.spawnPos().x,

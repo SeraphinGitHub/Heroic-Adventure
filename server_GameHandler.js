@@ -221,31 +221,29 @@ setInterval(() => {
 
    let socketsArray = [];
    
-   // LightPack (Every frame)
-   let lightPack_PlayerList = [];
-   let lightPack_MobList = [];
-   let lightPack_NpcList = [];
+   // // LightPack (Every frame)
+   // let lightPack_PlayerList = [];
+   // let lightPack_MobList = [];
+   // let lightPack_NpcList = [];
    
 
 
 
-   // Light Update (draw enemies, player, NPC only inside viewport)   
-   let otherPlayerData = [];
-   let mobData = [];
-
-   // mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
+   // Light Update (draw enemies, player, NPC only inside viewport)
 
    for(let i in playerList) {
+
+      // LightPack (Every frame)
+      let singleArray = [];
+      
+      let lightPack_PlayerList = [];
+      let lightPack_MobList = [];
+      let lightPack_NpcList = [];
       
       let player = playerList[i];
       let socket = socketList[player.id];
-      
-      socketsArray.push(socket);
 
-      // let clientIndex = lightPack_PlayerList.indexOf(player.id);
-      // let clientData = lightPack_PlayerList[clientIndex];
-
-      const square = {
+      const playerViewport = {
          x: player.x -player.detectViewport.width /2,
          y: player.y -player.detectViewport.height /2,
          height: player.detectViewport.height,
@@ -254,52 +252,46 @@ setInterval(() => {
 
       mobList.forEach(mob => {
 
-         const circle = {
-            x: mob.spawnX,
-            y: mob.spawnY,
+         const mobHitBox = {
+            x: mob.x,
+            y: mob.y,
             radius: mob.wanderRange + mob.radius,
          }
    
-         if(player.square_toCircle(square, circle)) {
-            
-            mob.update(frame, socketList, playerList, lightPack_MobList)
-         }      
+         if(player.square_toCircle(playerViewport, mobHitBox)) {
+            mob.update(frame, socketList, playerList, lightPack_MobList);
+         }
       });
 
 
-      for(let i in playerList) {
-         let otherPlayer = playerList[i];
+      // for(let i in playerList) {
 
-         // Collision square to circle ==> size of viewport
-         if(player !== otherPlayer) {
+      //    let otherPlayer = playerList[i];
+      //    let otherSocket = socketList[player.id];
+         
+      //    if(player !== otherPlayer) {
             
-            const circle = {
-               x: otherPlayer.x,
-               y: otherPlayer.y,
-               raduis: otherPlayer.radius,
-            }
+      //       const otherPlayerHitBox = {
+      //          x: otherPlayer.x,
+      //          y: otherPlayer.y,
+      //          raduis: otherPlayer.radius,
+      //       }
 
-            if(player.square_toCircle(square, circle)) {
+      //       if(player.square_toCircle(playerViewport, otherPlayerHitBox)) {
                
-               // otherPlayerData.push(otherPlayer);
+      //          otherPlayer.update(socketList, playerList, mobList, lightPack_PlayerList);
+      //          otherPlayer.deathScreen(otherSocket);
+      //       }
+      //    }
+      // }
 
-               // otherPlayer.update(socketList, playerList, mobList, lightPack_PlayerList);
-               // otherPlayer.deathScreen(socket);
-            }
-         }
-      }
-
-      player.update(socketList, playerList, mobList, lightPack_PlayerList);
+      player.update(socketList, playerList, mobList, singleArray);
       player.deathScreen(socket);
-       
-
-      // socket.emit("mobData", mobData);
-      // socket.emit("otherPlayerData", otherPlayerData);
-      // socket.emit("clientData", clientData);
+      
+      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList, singleArray);
    }
 
    
-   socketsArray.forEach(socket => socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList));
    // *******************************
    // *******************************
 
