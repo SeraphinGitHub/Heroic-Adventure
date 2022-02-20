@@ -214,20 +214,41 @@ let frame = 0
 
 setInterval(() => {
    
-   let mob_Collision = [];
-   let player_Collision = [];
+   // ===================================
+   // Init Light Packs
+   // ===================================
+   let lightPack_PlayerList = {};
    let lightPack_MobList = [];
-   let lightPack_PlayerList = [];
+   
+   // Mobs
+   mobList.forEach(mob => mob.update(frame, socketList, playerList, lightPack_MobList));
 
-   // Set Detected Viewport Collisions
+   // Players
    for(let i in playerList) {
+
       let player = playerList[i];
       let socket = socketList[player.id];
 
-      const playerAlone = {
-         player: player,
-         socket: socket,
-      }
+      player.update(socketList, playerList, mobList, lightPack_PlayerList);
+      player.deathScreen(socket);      
+   }
+
+
+   // ===================================
+   // Sending Light Packs
+   // ( Update: Enemies, Players, NPCs only inside Client viewport )
+   // ===================================
+   for(let i in playerList) {
+      
+      let playersToRender = [];
+      let mobsToRender = [];
+
+      let player = playerList[i];
+      let lightPlayer = lightPack_PlayerList[i];
+      let socket = socketList[player.id];      
+      
+      // Add first player to Render
+      playersToRender.push(lightPlayer);
 
       const playerViewport = {
          x: player.x -player.detectViewport.width /2,
@@ -236,88 +257,43 @@ setInterval(() => {
          width: player.detectViewport.width,
       }
 
-      // Parse mobList ==> Player collide Mobs
-      mobList.forEach(mob => {
-
+      // Set Mobs to Render in Client
+      for(let i = 0; i < mobList.length; i++) {
+      
+         let mob = mobList[i];
+         let lightMob = lightPack_MobList[i];
+   
          const mobHitBox = {
             x: mob.x,
             y: mob.y,
             radius: mob.wanderRange + mob.radius,
          }
+   
+         if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender.push(lightMob);
+      }
 
-         const collision = {
-            player: player,
-            socket: socketList[player.id],
-            mob: mob,
-         }
-         
-         // Mob enter inside Detect Viewport
-         if(player.square_toCircle(playerViewport, mobHitBox)) {
-            if(!mob_Collision.includes(collision)) mob_Collision.push(collision);
-         }
-      });
-
-      // Parse playerList ==> Player collide otherPlayers
+      // Set Players to Render in Client
       for(let i in playerList) {
-         let otherPlayer = playerList[i];
+      
+         let other_player = playerList[i];
+         let other_LightPlayer = lightPack_PlayerList[i];
          
-         if(player !== otherPlayer) {
+         if(player !== other_player) {
+            
             const otherPlayerHitBox = {
-               x: otherPlayer.x,
-               y: otherPlayer.y,
-               radius: otherPlayer.radius,
+               x: other_player.x,
+               y: other_player.y,
+               radius: other_player.radius,
             }
 
-            const collision = {
-               player: player,
-               socket: socket,
-               otherPlayer: otherPlayer,
-               otherSocket: socketList[otherPlayer.id],
-            }
-            
-            // Other Player enter inside Detect Viewport
-            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) {
-               if(!player_Collision.includes(collision)) player_Collision.push(collision);
-            }
-            else if(!player_Collision.includes(playerAlone)) player_Collision.push(playerAlone);
+            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) playersToRender.push(other_LightPlayer);
          }
       }
-
-      // Only one player connected
-      if(Object.keys(playerList).length === 1) {
-         if(!player_Collision.includes(playerAlone)) player_Collision.push(playerAlone);
-      }
+      
+      // Sending Light Packs: Players, Mobs
+      socket.emit("serverSync", playersToRender, mobsToRender);
    }
-
-   // Mobs to Render in Client 
-   mob_Collision.forEach(collision => {
-      collision.mob.update(frame, collision.socket, collision.player, lightPack_MobList);
-   });
-
-   // Players to Render in Client
-   player_Collision.forEach(collision => {
-      
-      if(!collision.otherPlayer) {
-         collision.player.update(collision.socket, {}, {}, mob_Collision, lightPack_PlayerList);
-         collision.player.deathScreen(collision.socket);
-      }
-      
-      else {
-         collision.otherPlayer.update(collision.otherSocket, collision.socket, collision.player, mob_Collision, lightPack_PlayerList);
-         collision.otherPlayer.deathScreen(collision.socket);
-      }
-   });
-
-
-   // Sending Light Packs: Players, Mobs
-   for(let i in playerList) {
-      
-      let player = playerList[i];
-      let socket = socketList[player.id];
-            
-      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList);
-   };
-
+   
    frame++;
 
 }, 1000/process.env.FRAME_RATE);

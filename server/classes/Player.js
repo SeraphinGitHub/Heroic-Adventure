@@ -8,19 +8,16 @@ class Player extends Character {
    constructor(id) {
       
       super();
-
+      
       this.id = id;
       this.name = "";
       this.x = 1080;
       this.y = 800;
 
-      // Detect Viewport ==> Bigger than Viewport size in CSS & JS
+      // Viewport size in CSS & JS +200 for both
       this.detectViewport = {
-         // height: 800 +200,
-         // width: 1200 +200,
-
-         height: 300,
-         width: 500,
+         height: 1000,
+         width: 1400,
       }
       
       // Env Variables
@@ -323,7 +320,7 @@ class Player extends Character {
       }
    }
    
-   attacking(socket, collideSocket, collidePlayer, mob_Collision) {
+   attacking(socketList, playerList, mobList) {
    
       // Player Attack
       if(this.isAttacking
@@ -333,34 +330,37 @@ class Player extends Character {
          // ***************************
          // this.DEBUG_PlayerPosition();
          // ***************************
-
+         
          this.speedGcD = 0;
          this.isAttacking = false;
          this.attack_isAnimable = true;
-
+         
          setTimeout(() => {
             this.attack_isAnimable = false;
          }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));
-
-         this.damagingOtherPlayers(socket, collideSocket, collidePlayer);
-         this.damagingMobs(socket, mob_Collision);
+         
+         let socket = socketList[this.id];
+         this.damagingOtherPlayers(socket, socketList, playerList);
+         this.damagingMobs(socketList, mobList);
       }
    }
    
-   casting(socket) {
+   casting(socketList) {
       
       if(this.isCasting && this.speedGcD >= this.GcD) {
          
          this.isCasting = false;
-         this.healing(socket);
+         this.healing(socketList);
       }
    }
    
-   healing(socket) {
+   healing(socketList) {
       
       if(this.cast_Heal
       && this.mana >= this.healCost
       && this.health < this.baseHealth) {
+
+         let socket = socketList[this.id];
 
          this.speedGcD = 0;
          this.cast_Heal = false;
@@ -386,16 +386,20 @@ class Player extends Character {
    }
    
    // Damaging
-   damagingOtherPlayers(socket, collideSocket, collidePlayer) {
-      
-      if(Object.keys(collidePlayer).length !== 0
-      && Object.keys(collideSocket).length !== 0) {
-   
-         if(this.circle_toCircle(this, collidePlayer, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
-            if(!collidePlayer.isDead) {
+   damagingOtherPlayers(socket, socketList, playerList) {
 
-               collidePlayer.calcDamage = this.damageRnG();
-               collidePlayer.health -= collidePlayer.calcDamage;
+      for(let i in playerList) {
+   
+         let otherPlayer = playerList[i];
+         let otherSocket = socketList[otherPlayer.id];
+   
+         if(this.circle_toCircle(this, otherPlayer, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
+   
+            if(this !== otherPlayer
+            && !otherPlayer.isDead) {
+               
+               otherPlayer.calcDamage = this.damageRnG();
+               otherPlayer.health -= otherPlayer.calcDamage;
                
                const playerPos = {
                   id: this.id,
@@ -404,20 +408,20 @@ class Player extends Character {
                };
    
                const otherPlayerPos = {
-                  id: collidePlayer.id,
-                  x: collidePlayer.x,
-                  y: collidePlayer.y,
+                  id: otherPlayer.id,
+                  x: otherPlayer.x,
+                  y: otherPlayer.y,
                };
                
-               socket.emit("giveDamage", otherPlayerPos, collidePlayer.calcDamage);
-               collideSocket.emit("getDamage", otherPlayerPos, collidePlayer.calcDamage);
+               socket.emit("giveDamage", otherPlayerPos, otherPlayer.calcDamage);
+               otherSocket.emit("getDamage", otherPlayerPos, otherPlayer.calcDamage);
    
                // Other player's Death
-               if(collidePlayer.health <= 0) {
+               if(otherPlayer.health <= 0) {
                   
                   this.kills++;
                   this.calcfame(this.getFameCost, socket);
-                  collidePlayer.death(this.looseFameCost);
+                  otherPlayer.death(this.looseFameCost);
                   
                   // Player Score
                   socket.emit("playerScore", {
@@ -428,22 +432,24 @@ class Player extends Character {
                   });
                   
                   socket.emit("getFame", playerPos, this.getFameCost);
-                  collideSocket.emit("looseFame", otherPlayerPos, this.looseFameCost);
+                  otherSocket.emit("looseFame", otherPlayerPos, this.looseFameCost);
                }
             }
          }
       }
    }
    
-   damagingMobs(socket, mob_Collision) {
+   damagingMobs(socketList, mobList) {
+   
+      let socket = socketList[this.id];
       
-      mob_Collision.forEach(collision => {
-         
-         if(!collision.mob.isDead
-         && this.circle_toCircle(this, collision.mob, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
+      mobList.forEach(mob => {
+   
+         if(!mob.isDead
+         && this.circle_toCircle(this, mob, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
             
-            collision.mob.calcDamage = this.damageRnG();
-            collision.mob.health -= collision.mob.calcDamage;
+            mob.calcDamage = this.damageRnG();
+            mob.health -= mob.calcDamage;
             
             const playerPos = {
                id: this.id,
@@ -452,17 +458,17 @@ class Player extends Character {
             };
             
             const mobPos = {
-               x: collision.mob.x,
-               y: collision.mob.y,
+               x: mob.x,
+               y: mob.y,
             };
             
-            socket.emit("giveDamage", mobPos, collision.mob.calcDamage);
+            socket.emit("giveDamage", mobPos, mob.calcDamage);
    
             // Mob's Death
-            if(collision.mob.health <= 0) {
+            if(mob.health <= 0) {
                
-               collision.mob.death();
-               this.calcfame(collision.mob.getFameCost, socket);
+               mob.death();
+               this.calcfame(mob.getFameCost, socket);
    
                socket.emit("playerScore", {
                   kills: this.kills,
@@ -471,7 +477,7 @@ class Player extends Character {
                   fameCount: this.fameCount,
                });
                
-               socket.emit("getFame", playerPos, collision.mob.getFameCost);
+               socket.emit("getFame", playerPos, mob.getFameCost);
             }
          }
       });
@@ -594,20 +600,20 @@ class Player extends Character {
    }
 
    // Update (Sync)
-   update(socket, collideSocket, collidePlayer, mob_Collision, lightPack_PlayerList) {
+   update(socketList, playerList, mobList, lightPack_PlayerList) {
 
       if(!this.isDead) {
 
          this.movements();
          this.running();
          this.calcGcD();
-         this.attacking(socket, collideSocket, collidePlayer, mob_Collision);
-         this.casting(socket);
+         this.attacking(socketList, playerList, mobList);
+         this.casting(socketList);
          this.animState();
       }
       else this.state = "died";
-      
-      if(!lightPack_PlayerList.includes( this.lightPack() )) lightPack_PlayerList.push( this.lightPack() );
+
+      lightPack_PlayerList[this.id] = this.lightPack();
    }
 
    initPack() {

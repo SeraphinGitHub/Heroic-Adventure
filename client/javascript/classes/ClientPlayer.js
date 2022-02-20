@@ -765,7 +765,7 @@ class Player extends Character {
 
       // ******************************
       // this.DEBUG_GENERAL(serverPlayer);
-      this.DEBUG_DrawDetectViewport();
+      // this.DEBUG_DrawDetectViewport();
       // ******************************
    }
 
