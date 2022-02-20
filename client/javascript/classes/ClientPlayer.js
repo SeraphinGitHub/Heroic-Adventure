@@ -127,10 +127,10 @@ class Player extends Character {
       if(vpRightCol_Nbr > this.columns) vpRightCol_Nbr = this.columns;
       if(vpBottomRow_Nbr > this.rows) vpBottomRow_Nbr = this.rows;
       
-      // ======== Temporary ========
+      // ================ DEBUG ================
       // this.ctxPlayer.strokeStyle = "red";
       // this.ctxPlayer.strokeRect(this.centerVp.x, this.centerVp.y, this.viewport.width, this.viewport.height);
-      // ======== Temporary ========
+      // ================ DEBUG ================
 
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
          for(let y = vpTopRow_Nbr; y < vpBottomRow_Nbr; y++) {
@@ -808,7 +808,6 @@ class Player extends Character {
       this.ctxFixedBack.lineWidth = 4;
       
       this.ctxFixedBack.strokeRect(
-
          this.viewSize.width/2 - this.detectViewport.width/2,
          this.viewSize.height/2 - this.detectViewport.height/2,
          this.detectViewport.width,

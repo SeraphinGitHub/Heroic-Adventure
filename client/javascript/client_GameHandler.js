@@ -157,14 +157,30 @@ const barCoordArray = [
 // =====================================================================
 // PNG Image Files
 // =====================================================================
-const mapTile_Img = new Image();
-mapTile_Img.src = "client/images/map/map_tile_3_lands.png";
+const set_ImageFiles = () => {
 
-const gameUI_Img = new Image();
-gameUI_Img.src = "client/images/playerUI/Game UI.png";
+   const mapTile_Img = new Image();
+   mapTile_Img.src = "client/images/map/map_tile_3_lands.png";
+   
+   const gameUI_Img = new Image();
+   gameUI_Img.src = "client/images/playerUI/Game UI.png";
+   
+   const player_Img = new Image();
+   player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
 
-const player_Img = new Image();
-player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
+   return [
+      mapTile_Img,
+      gameUI_Img,
+      player_Img,
+   ];
+}
+
+const imgPNG = {
+
+   mapTile_Img:   set_ImageFiles()[0],
+   gameUI_Img:    set_ImageFiles()[1],
+   player_Img:    set_ImageFiles()[2],
+}
 
 
 // =====================================================================
@@ -186,9 +202,9 @@ const cl_PlayerObj = {
    ctxFixedFront: ctx.fixedFront,
 
    // PNG Files
-   mapTile_Img:   mapTile_Img,
-   gameUI_Img:    gameUI_Img,
-   player_Img:    player_Img,
+   mapTile_Img:   imgPNG.mapTile_Img,
+   gameUI_Img:    imgPNG.gameUI_Img,
+   player_Img:    imgPNG.player_Img,
 
    // Map
    mapSpecs:      mapSpecs,
@@ -208,7 +224,7 @@ const cl_EnemyObj = {
    ctxEnemies:       ctx.enemies,
 
    // PNG Files
-   gameUI_Img:    gameUI_Img,
+   gameUI_Img:    imgPNG.gameUI_Img,
 
    // Game UI ==> Mini Bars
    barWidth:         miniBarSpecs.barWidth,
@@ -226,14 +242,8 @@ const clientEnemy = new Enemy(cl_EnemyObj, {});
 // =====================================================================
 let initPlayerList = [];
 let initMobList = [];
-
-let playerUpdateList = [];
-let mobUpdateList = [];
-
-
-// ******************
-let singlePlayerUpdate = [];
-// ******************
+let updatePlayerList = [];
+let updateMobList = [];
 
 
 // =====================================================================
@@ -246,61 +256,30 @@ const clientUpdate = () => {
    // Clear contexts
    canvasClearing();
 
-   // *************************************
-   initPlayerList.forEach(initPlayer => {
+   // Server Sync ==> Players
+   for(let i = 0; i < updatePlayerList.length; i++) {
 
-      if(singlePlayerUpdate[0]) {
+      let initPlayer = initPlayerList[i];
+      let serverPlayer = updatePlayerList[i];
+      
+      if(initPlayer) {
          
-         let singlePlayer = singlePlayerUpdate[0];
-
-         // if(singlePlayer.id === initPlayer.id) {
-         
+         if(viewport_HTML.id === String(serverPlayer.id)) {
             initPlayer.isClient = true;
-            initPlayer.render_ClientPlayer(singlePlayer, frame);
-         // }
-      }
-
-
-      playerUpdateList.forEach(serverPlayer => {
-   
-         if(serverPlayer) {
-
-            if(serverPlayer.id === initPlayer.id) {
-
-               initPlayer.render_OtherPlayer(serverPlayer, frame);
-            }
+            initPlayer.render_ClientPlayer(serverPlayer, frame);
          }
-      });
-   });
-
-
-
-
-   // // Server Sync ==> Players
-   // for(let i = 0; i < playerUpdateList.length; i++) {
-
-   //    let initPlayer = initPlayerList[i];
-   //    let serverPlayer = playerUpdateList[i];
-
-   //    if(initPlayer) {
-   //       if(viewport_HTML.id === String(serverPlayer.id)) {
-         
-   //          initPlayer.isClient = true;
-   //          initPlayer.render_ClientPlayer(serverPlayer, frame);
-   //       }
-   //       else initPlayer.render_OtherPlayer(serverPlayer, frame);
-   //    }
-   // };
-   
-
-   // Server Sync ==> Mobs
-   for(let i = 0; i < mobUpdateList.length; i++) {
-
-      let initEnemy = initMobList[i];
-      let serverEnemy = mobUpdateList[i];
-      initEnemy.render_Enemy(serverEnemy, frame);
+         else initPlayer.render_OtherPlayer(serverPlayer, frame);
+      }
    };
 
+   // Server Sync ==> Mobs
+   for(let i = 0; i < updateMobList.length; i++) {
+
+      let initEnemy = initMobList[i];
+      let serverEnemy = updateMobList[i];
+
+      if(initEnemy) initEnemy.render_Enemy(serverEnemy, frame);
+   };
 
    // Draw floating text
    clientPlayer.drawFloatingText();

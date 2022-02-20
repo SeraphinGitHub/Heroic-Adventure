@@ -40,12 +40,10 @@ let socketList = {};
 // Init Pack
 let initPack_PlayerList = {};
 let initPack_MobList = [];
-let initPack_NpcList = [];
 
 // Normal Pack
 let playerList = {};
 let mobList = [];
-let npcList = [];
 
 
 // =====================================================================
@@ -62,13 +60,10 @@ mobList.forEach(enemy => {
 
 
 // =====================================================================
-// Players connections
+// Init Players
 // =====================================================================
-
-// Handle sockets connections
 io.on("connection", (socket) => {
    // console.log("User connected !");
-   
 
    // ==========  Generate ID  ==========
    socket.id = Math.floor(playerMax * Math.random());
@@ -218,30 +213,21 @@ const onDisconnect = (socket) => {
 let frame = 0
 
 setInterval(() => {
-
-   let socketsArray = [];
    
-   // // LightPack (Every frame)
-   // let lightPack_PlayerList = [];
-   // let lightPack_MobList = [];
-   // let lightPack_NpcList = [];
-   
+   let mob_Collision = [];
+   let player_Collision = [];
+   let lightPack_MobList = [];
+   let lightPack_PlayerList = [];
 
-
-
-   // Light Update (draw enemies, player, NPC only inside viewport)
-
+   // Set Detected Viewport Collisions
    for(let i in playerList) {
-
-      // LightPack (Every frame)
-      let singleArray = [];
-      
-      let lightPack_PlayerList = [];
-      let lightPack_MobList = [];
-      let lightPack_NpcList = [];
-      
       let player = playerList[i];
       let socket = socketList[player.id];
+
+      const playerAlone = {
+         player: player,
+         socket: socket,
+      }
 
       const playerViewport = {
          x: player.x -player.detectViewport.width /2,
@@ -250,6 +236,7 @@ setInterval(() => {
          width: player.detectViewport.width,
       }
 
+      // Parse mobList ==> Player collide Mobs
       mobList.forEach(mob => {
 
          const mobHitBox = {
@@ -257,63 +244,80 @@ setInterval(() => {
             y: mob.y,
             radius: mob.wanderRange + mob.radius,
          }
-   
+
+         const collision = {
+            player: player,
+            socket: socketList[player.id],
+            mob: mob,
+         }
+         
+         // Mob enter inside Detect Viewport
          if(player.square_toCircle(playerViewport, mobHitBox)) {
-            mob.update(frame, socketList, playerList, lightPack_MobList);
+            if(!mob_Collision.includes(collision)) mob_Collision.push(collision);
          }
       });
 
-
-      // for(let i in playerList) {
-
-      //    let otherPlayer = playerList[i];
-      //    let otherSocket = socketList[player.id];
+      // Parse playerList ==> Player collide otherPlayers
+      for(let i in playerList) {
+         let otherPlayer = playerList[i];
          
-      //    if(player !== otherPlayer) {
+         if(player !== otherPlayer) {
+            const otherPlayerHitBox = {
+               x: otherPlayer.x,
+               y: otherPlayer.y,
+               radius: otherPlayer.radius,
+            }
+
+            const collision = {
+               player: player,
+               socket: socket,
+               otherPlayer: otherPlayer,
+               otherSocket: socketList[otherPlayer.id],
+            }
             
-      //       const otherPlayerHitBox = {
-      //          x: otherPlayer.x,
-      //          y: otherPlayer.y,
-      //          raduis: otherPlayer.radius,
-      //       }
+            // Other Player enter inside Detect Viewport
+            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) {
+               if(!player_Collision.includes(collision)) player_Collision.push(collision);
+            }
+            else if(!player_Collision.includes(playerAlone)) player_Collision.push(playerAlone);
+         }
+      }
 
-      //       if(player.square_toCircle(playerViewport, otherPlayerHitBox)) {
-               
-      //          otherPlayer.update(socketList, playerList, mobList, lightPack_PlayerList);
-      //          otherPlayer.deathScreen(otherSocket);
-      //       }
-      //    }
-      // }
-
-      player.update(socketList, playerList, mobList, singleArray);
-      player.deathScreen(socket);
-      
-      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList, singleArray);
+      // Only one player connected
+      if(Object.keys(playerList).length === 1) {
+         if(!player_Collision.includes(playerAlone)) player_Collision.push(playerAlone);
+      }
    }
 
-   
-   // *******************************
-   // *******************************
+   // Mobs to Render in Client 
+   mob_Collision.forEach(collision => {
+      collision.mob.update(frame, collision.socket, collision.player, lightPack_MobList);
+   });
 
-   
-
-   // // Init LightPack: Mobs
-   // mobList.forEach(enemy => enemy.update(frame, socketList, playerList, lightPack_MobList));
-
-   // // Init LightPack: Players
-   // for(let i in playerList) {
-
-   //    let player = playerList[i];
-   //    let socket = socketList[player.id];
-   //    socketsArray.push(socket);
+   // Players to Render in Client
+   player_Collision.forEach(collision => {
       
-   //    player.update(socketList, playerList, mobList, lightPack_PlayerList);
-   //    player.deathScreen(socket);      
-   // }
+      if(!collision.otherPlayer) {
+         collision.player.update(collision.socket, {}, {}, mob_Collision, lightPack_PlayerList);
+         collision.player.deathScreen(collision.socket);
+      }
+      
+      else {
+         collision.otherPlayer.update(collision.otherSocket, collision.socket, collision.player, mob_Collision, lightPack_PlayerList);
+         collision.otherPlayer.deathScreen(collision.socket);
+      }
+   });
 
-   // // Sending LightPack: Players, Mobs
-   // socketsArray.forEach(socket => socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList));
-   
+
+   // Sending Light Packs: Players, Mobs
+   for(let i in playerList) {
+      
+      let player = playerList[i];
+      let socket = socketList[player.id];
+            
+      socket.emit("serverSync", lightPack_PlayerList, lightPack_MobList);
+   };
+
    frame++;
 
 }, 1000/process.env.FRAME_RATE);

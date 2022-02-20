@@ -270,6 +270,8 @@ class Enemy extends Character {
       
       if(this.x === this.spawnX && this.y === this.spawnY) {
 
+         if(this.health !== this.baseHealth) this.health = this.baseHealth;
+
          this.isWandering = true;
          this.isChasing = false;
          this.chasingRange = this.baseChasingRange;
@@ -278,39 +280,31 @@ class Enemy extends Character {
    }
    
    // State Machine
-   sateMachine(socketList, playerList) {
+   sateMachine(collideSocket, collidePlayer) {
       let aggroArray = [];
       
       // ===========================================
       // Chasing ==> Players enter Chasing range
       // ===========================================
-      for(let i in playerList) {
-         let player = playerList[i];
+      if(this.circle_toCircle(this, collidePlayer, 0, 0, this.chasingRange) && !collidePlayer.isDead) {
 
-         if(this.circle_toCircle(this, player, 0, 0, this.chasingRange) && !player.isDead) {
-            this.calcAggroPlayers(player, aggroArray);
-            if(!player.chased_By.includes(this.id)) player.chased_By.push(this.id);
-         }
-         else if(player.chased_By.includes(this.id)) this.backToSpawn(player);
+         this.calcAggroPlayers(collidePlayer, aggroArray);
+         if(!collidePlayer.chased_By.includes(this.id)) collidePlayer.chased_By.push(this.id);
       }
+      else if(collidePlayer.chased_By.includes(this.id)) this.backToSpawn(collidePlayer);
+      
       let nearestPlayer = this.calcNearestPlayer(aggroArray);
-
       
       // ===========================================
       // Attacking ==> Players collide with enemy
       // ===========================================
       if(nearestPlayer !== undefined) {
-         for(let i in playerList) {
-           
-            let player = playerList[i];
-            let socket = socketList[player.id];
+         if(nearestPlayer.id === collidePlayer.id) {
 
-            if(nearestPlayer.id === player.id) {
-               if(this.circle_toCircle(this, player, 0, 0, this.radius)) {
-                  this.attacking(socket, player);
-               }
-               else this.chasing(player);
+            if(this.circle_toCircle(this, collidePlayer, 0, 0, this.radius)) {
+               this.attacking(collideSocket, collidePlayer);
             }
+            else this.chasing(collidePlayer);
          }
       }
       
@@ -363,7 +357,7 @@ class Enemy extends Character {
    }
 
    // Update (Sync)
-   update(frame, socketList, playerList, lightPack_MobList) {
+   update(frame, collideSocket, collidePlayer, lightPack_MobList) {
 
       this.animState(frame);
       
@@ -371,10 +365,10 @@ class Enemy extends Character {
 
          this.movements();
          this.calcGcD();
-         this.sateMachine(socketList, playerList);
+         this.sateMachine(collideSocket, collidePlayer);
       }
 
-      lightPack_MobList.push( this.lightPack() );
+      if(!lightPack_MobList.includes( this.lightPack() )) lightPack_MobList.push( this.lightPack() );
    }
 
    initPack() {
@@ -396,6 +390,7 @@ class Enemy extends Character {
       return {
          x: this.x,
          y: this.y,
+         radius: this.radius,
          calcX: this.calcX,
          calcY: this.calcY,
          health: this.health,

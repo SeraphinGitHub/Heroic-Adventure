@@ -184,8 +184,8 @@ const clientState = (socket) => {
       for(let i in initPack_PlayerList) {
 
          let initPlayer = initPack_PlayerList[i];
-         const newPlayer = new Player(cl_PlayerObj, initPlayer);
-         playerTempList.push(newPlayer);
+         const newClient = new Player(cl_PlayerObj, initPlayer);
+         playerTempList.push(newClient);
       }
       
       initPlayerList = playerTempList;
@@ -200,14 +200,10 @@ const clientState = (socket) => {
    });
 
    // Sync players OnUpdate (Every Frame)
-   socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList, singleArray) => {
-      
-      // **************************
-      singlePlayerUpdate = singleArray;
-      // **************************
+   socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList) => {
 
-      playerUpdateList = lightPack_PlayerList;
-      mobUpdateList = lightPack_MobList;  
+      updatePlayerList = lightPack_PlayerList;
+      updateMobList = lightPack_MobList;
    });
    
    // Remove players OnDisconnect
