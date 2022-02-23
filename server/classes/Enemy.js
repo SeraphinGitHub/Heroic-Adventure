@@ -18,8 +18,10 @@ class Enemy extends Character {
       this.radius = enemySpecs.radius;
 
       // Env Variables
-      this.frameRate = process.env.FRAME_RATE;
+      this.devFPS = process.env.DEV_FRAME_RATE;
+      this.deployFPS = process.env.DEPLOY_FRAME_RATE;
       this.syncCoeff = process.env.SYNC_COEFF;
+      this.syncFormula = this.syncCoeff *this.devFPS /this.deployFPS;
 
       // State Machine
       this.calcX = spawnX;
@@ -40,7 +42,7 @@ class Enemy extends Character {
 
       // GcD
       this.baseGcD = enemySpecs.GcD;
-      this.GcD = this.syncCoeff * this.baseGcD;
+      this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
       this.speedGcD = this.GcD;
 
       // Damages
@@ -54,8 +56,8 @@ class Enemy extends Character {
       this.looseFameCost = enemySpecs.looseFameCost;
 
       // Movements Speed
-      this.walkSpeed = Math.round(this.syncCoeff * enemySpecs.walkSpeed) /2; // <== WalkSpeed
-      this.runSpeed = Math.round(this.syncCoeff * enemySpecs.runSpeed) /2; // <== RunSpeed
+      this.walkSpeed = Math.round(enemySpecs.walkSpeed *this.syncFormula) /2;
+      this.runSpeed = Math.round(enemySpecs.runSpeed *this.syncFormula) /2;
       this.speed;
 
       // States
@@ -161,9 +163,9 @@ class Enemy extends Character {
       
       // Regen GcD
       if(this.speedGcD < this.GcD) {
-         this.speedGcD += this.syncCoeff *1;
+         this.speedGcD = Math.floor(this.speedGcD + this.syncFormula);
          if(this.isAttacking) this.isAttacking = false;
-      }
+      }      
    }   
 
    // Enemy States
@@ -243,7 +245,8 @@ class Enemy extends Character {
                
                this.isChasing = true;
                this.speed = this.runSpeed;
-               player.death(this.looseFameCost);
+               player.death();
+               player.calcfame(this.looseFameCost, socket);
          
                // Player Score
                socket.emit("playerScore", {
@@ -254,7 +257,7 @@ class Enemy extends Character {
                });
          
                // Toggle Fame Text
-               socket.emit("looseFame", playerPos, this.looseFameCost);
+               socket.emit("looseFame", playerPos, player.baseFame, this.looseFameCost, player.fameValue);
             }
 
          }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));

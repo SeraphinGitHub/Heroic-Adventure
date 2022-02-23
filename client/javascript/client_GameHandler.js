@@ -15,7 +15,6 @@ const viewSize = {
    width: 1200,
 };
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
-// const viewport = new Viewport(0, 0, 800, 400);
 
 
 // =====================================================================
@@ -24,6 +23,10 @@ const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 let insideCanvas = false;
 viewport_HTML.addEventListener("mouseenter", () => insideCanvas = true);
 viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
+viewport_HTML.oncontextmenu = (event) => {
+   event.preventDefault();
+   event.stopPropagation();
+}
 
 
 // =====================================================================
@@ -257,13 +260,14 @@ const clientUpdate = () => {
    canvasClearing();
 
    // Server Sync ==> Players
+   // for(let i = 0; i < initPlayerList.length; i++) {
    for(let i = 0; i < updatePlayerList.length; i++) {
 
       let initPlayer = initPlayerList[i];
       let serverPlayer = updatePlayerList[i];
       
       if(initPlayer) {
-         
+
          if(viewport_HTML.id === String(serverPlayer.id)) {
             initPlayer.isClient = true;
             initPlayer.render_ClientPlayer(serverPlayer, frame);
@@ -283,6 +287,7 @@ const clientUpdate = () => {
 
    // Draw floating text
    clientPlayer.drawFloatingText();
+   clientPlayer.drawFluidBar();
    frame++;
 
    if(showFPS) frameRate++;
@@ -297,9 +302,9 @@ const clientUpdate = () => {
 let showFPS = false;
 let frameRate = 0;
 
-setInterval(() => {
-   if(showFPS) {
+if(showFPS) {
+   setInterval(() => {
       console.log(frameRate);
       frameRate = 0;
-   }
-}, 1000);
+   }, 1000);
+}

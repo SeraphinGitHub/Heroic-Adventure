@@ -54,7 +54,7 @@ const handleGameUI = (socket) => {
 
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
-   socket.on("fameCount+1", (fameCount) => {
+   socket.on("fameCount", (fameCount) => {
    
       ctx.fixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
       ctx.fixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
@@ -178,16 +178,15 @@ const clientState = (socket) => {
    
    // Set other players OnConnect
    socket.on("initPlayerPack", (initPack_PlayerList) => {
+      let playerTempList = [];
 
-      let playerTempList = [];  
-      
       for(let i in initPack_PlayerList) {
-
+         
          let initPlayer = initPack_PlayerList[i];
          const newClient = new Player(cl_PlayerObj, initPlayer);
          playerTempList.push(newClient);
       }
-      
+
       initPlayerList = playerTempList;
    });
 

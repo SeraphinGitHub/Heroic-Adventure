@@ -123,7 +123,7 @@ const onConnect = (socket) => {
          fameCount: player.fameCount,
       });
       
-      socket.emit("fameCount+1", player.fameCount);
+      socket.emit("fameCount", player.fameCount);
 
       // ================================
       // Sending initPack Player
@@ -194,15 +194,16 @@ const onConnect = (socket) => {
 // Player disconnection
 const onDisconnect = (socket) => {
 
-   let loggedOutPlayer = playerList[socket.id];
+   let player = playerList[socket.id];
+   let lightPlayer = initPack_PlayerList[player.id];
    
    for(let i in playerList) {
       let player = playerList[i];
       let socket = socketList[player.id];
-      socket.emit("removePlayerPack", loggedOutPlayer);
+      socket.emit("removePlayerPack", lightPlayer);
    };
 
-   delete initPack_PlayerList[socket.id];
+   delete initPack_PlayerList[player.id];
    delete playerList[socket.id];
 }
 
@@ -212,6 +213,15 @@ const onDisconnect = (socket) => {
 // =====================================================================
 let frame = 0
 
+const set_DetectViewport = (player) => {
+   return {
+      x: player.x -player.detectViewport.width /2,
+      y: player.y -player.detectViewport.height /2,
+      height: player.detectViewport.height,
+      width: player.detectViewport.width,
+   }
+}
+
 setInterval(() => {
    
    // ===================================
@@ -220,8 +230,36 @@ setInterval(() => {
    let lightPack_PlayerList = {};
    let lightPack_MobList = [];
    
+   let mob_Collision = [];
+   let mob_PlayerList = {};
+   let mob_SocketList = {};
+
+
    // Mobs
-   mobList.forEach(mob => mob.update(frame, socketList, playerList, lightPack_MobList));
+   mobList.forEach(mob => {
+      for(let i in playerList) {
+   
+         let player = playerList[i];
+         let socket = socketList[player.id];
+         
+         const playerViewport = set_DetectViewport(player);
+
+         const mobHitBox = {
+            x: mob.x,
+            y: mob.y,
+            radius: mob.wanderRange + mob.radius,
+         }
+      
+         if(player.square_toCircle(playerViewport, mobHitBox)) {
+         
+            if(!mob_Collision.includes(mob)) mob_Collision.push(mob);
+            mob_PlayerList[socket.id] = player;
+            mob_SocketList[player.id] = socket;
+         }
+      }
+
+      mob.update(frame, mob_SocketList, mob_PlayerList, lightPack_MobList);
+   });
 
    // Players
    for(let i in playerList) {
@@ -229,7 +267,7 @@ setInterval(() => {
       let player = playerList[i];
       let socket = socketList[player.id];
 
-      player.update(socketList, playerList, mobList, lightPack_PlayerList);
+      player.update(socketList, playerList, mob_Collision, lightPack_PlayerList);
       player.deathScreen(socket);      
    }
 
@@ -250,12 +288,7 @@ setInterval(() => {
       // Add first player to Render
       playersToRender.push(lightPlayer);
 
-      const playerViewport = {
-         x: player.x -player.detectViewport.width /2,
-         y: player.y -player.detectViewport.height /2,
-         height: player.detectViewport.height,
-         width: player.detectViewport.width,
-      }
+      const playerViewport = set_DetectViewport(player);
 
       // Set Mobs to Render in Client
       for(let i = 0; i < mobList.length; i++) {
@@ -288,12 +321,23 @@ setInterval(() => {
 
             if(player.square_toCircle(playerViewport, otherPlayerHitBox)) playersToRender.push(other_LightPlayer);
          }
-      }
-      
+      }      
+
       // Sending Light Packs: Players, Mobs
       socket.emit("serverSync", playersToRender, mobsToRender);
    }
    
    frame++;
+   if(process.env.SHOW_FPS) frameRate++;
 
-}, 1000/process.env.FRAME_RATE);
+}, 1000/process.env.DEPLOY_FRAME_RATE);
+
+
+let frameRate = 0;
+
+if(process.env.SHOW_FPS === "true") {
+   setInterval(() => {
+      console.log(frameRate);
+      frameRate = 0;
+   }, 1000);
+}

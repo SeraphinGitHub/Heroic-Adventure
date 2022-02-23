@@ -4,6 +4,7 @@
 class Character {
    constructor() {
       this.floatTextArray = [];
+      this.fluidBarList = {};
    }
 
    removeIndex(array, item) {
@@ -18,5 +19,15 @@ class Character {
          text.drawText();
          if(text.displayDuration <= 0) this.removeIndex(this.floatTextArray, text);
       });
+   }
+
+   drawFluidBar() {
+
+      for(let i in this.fluidBarList) {
+         let fluidBar = this.fluidBarList[i];
+
+         if(fluidBar.stateStr === "getFame") fluidBar.getFameFluid();
+         if(fluidBar.stateStr === "looseFame") fluidBar.looseFameFluid();
+      }
    }
 }

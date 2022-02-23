@@ -26,6 +26,9 @@ class Enemy extends Character {
       this.barHeight = cl_EnemyObj.barHeight;
       this.barCoordArray = cl_EnemyObj.barCoordArray;
 
+      this.shadowSize = 0.7;
+      this.ringSize = 8;
+
       // Animation
       this.frameY = 0;
       this.frameToJump = 2;
@@ -52,7 +55,7 @@ class Enemy extends Character {
 
    // Draw Mini Bars
    drawMiniBar(serverEnemy) {
-
+      
       const colorBar = {
          yellow: 0.7,   // 70%
          orange: 0.5,   // 50%
@@ -86,20 +89,54 @@ class Enemy extends Character {
       );
    }
 
-   // Draw Player, Shadow, Name
-   drawShadow(serverEnemy) {
+   // Draw Player, Ring, Shadow, Name
+   drawRing(serverEnemy) {
+      
+      // Shadow Ring
+      this.ctxEnemies.lineWidth = "2";
+      this.ctxEnemies.fillStyle = "rgb(160, 0, 0, 0.5)";
+      this.ctxEnemies.strokeStyle = "red";
 
-      this.ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.6)";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.ellipse(
          this.pos(serverEnemy).x,
          this.pos(serverEnemy).y +this.sprites.radius,
-         this.sprites.radius * 0.8, this.sprites.radius * 0.4, 0, 0, Math.PI * 2
+         this.sprites.radius *this.shadowSize +this.ringSize,
+         this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
+         0, 0, Math.PI * 2
+      );
+      this.ctxEnemies.fill();
+      this.ctxEnemies.closePath();
+      
+      // Color Ring
+      this.ctxEnemies.beginPath();
+      this.ctxEnemies.ellipse(
+         this.pos(serverEnemy).x,
+         this.pos(serverEnemy).y +this.sprites.radius,
+         this.sprites.radius *this.shadowSize +this.ringSize,
+         this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
+         0, 0, Math.PI * 2
+      );
+      this.ctxEnemies.stroke();
+      this.ctxEnemies.closePath();
+   }
+
+   drawShadow(serverEnemy) {
+
+      // Shadow
+      this.ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.7)";
+      this.ctxEnemies.beginPath();
+      this.ctxEnemies.ellipse(
+         this.pos(serverEnemy).x,
+         this.pos(serverEnemy).y +this.sprites.radius,
+         this.sprites.radius *this.shadowSize,
+         this.sprites.radius *this.shadowSize/2,
+         0, 0, Math.PI * 2
       );
       this.ctxEnemies.fill();
       this.ctxEnemies.closePath();
    }
-
+      
    drawEnemy(serverEnemy) {
       
       const enemy_Img = new Image();
@@ -127,8 +164,11 @@ class Enemy extends Character {
       let offsetY = 87;
       
       this.ctxEnemies.textAlign = "center";
-      this.ctxEnemies.fillStyle = "red";
       this.ctxEnemies.font = "20px Orbitron-ExtraBold";
+      
+      this.ctxEnemies.lineWidth = "1";
+      this.ctxEnemies.strokeStyle = "black";
+      this.ctxEnemies.fillStyle = "red";
 
       this.ctxEnemies.fillText(
          this.initEnemy.name,
@@ -239,10 +279,11 @@ class Enemy extends Character {
          // this.DEBUG_GENERAL(serverEnemy);
          // ******************************
 
-         this.drawName(serverEnemy);
-         this.drawMiniBar(serverEnemy);
+         this.drawRing(serverEnemy)
          this.drawShadow(serverEnemy);
          this.drawEnemy(serverEnemy);
+         this.drawMiniBar(serverEnemy);
+         this.drawName(serverEnemy);
       }
    }
 

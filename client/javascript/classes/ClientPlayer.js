@@ -12,7 +12,7 @@ class Player extends Character {
       // Init Server Player
       this.initPlayer = initPlayer;
       this.isClient = false;
-      
+
       // Viewport
       this.detectViewport = initPlayer.detectViewport;
       this.viewSize = cl_PlayerObj.viewSize;
@@ -45,7 +45,7 @@ class Player extends Character {
       
       // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
-      this.HUD_scale_Y = 1;
+      this.HUD_scale_Y = 0.9;
       this.HUD = {
          x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
          y: this.viewSize.height -110 * this.HUD_scale_Y,
@@ -70,14 +70,16 @@ class Player extends Character {
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
-      this.fameCost = 0;
-      this.getFameFluid = 0;
-      this.looseFameFluid = 0;
-      this.isGettingFame = false;
-      this.isLoosingFame = false;
+      // this.fameCost = 0;
+      // this.getFameFluid = 0;
+      // this.looseFameFluid = 0;
+      // this.isGettingFame = false;
+      // this.isLoosingFame = false;
 
       // Player Sprites
       this.sprites = initPlayer.sprites;
+      this.shadowSize = 0.75;
+      this.ringSize = 7;
 
       // Animation
       this.frameY = 0;
@@ -167,75 +169,87 @@ class Player extends Character {
       this.floatTextArray.push(newText);
    }
 
+   // Fluidity
+   baseFluidity(barSpecs) {
+      
+      const newFluidBar = new Fluidity(this.ctxUI, this.gameUI_Img, barSpecs);
+      this.fluidBarList[barSpecs.stateStr] = newFluidBar;
+   }
+
    initFloatingText(socket) {
    
       const mainTexSize = 34;
    
       socket.on("getHeal", (serverPlayer) => {
-   
-         const text = {
+
+         this.toggleFloatingText(serverPlayer, {
             x: -5,
             y: -75,
             size: mainTexSize,
             color: "lime",
             value: `+${serverPlayer.calcHealing}`,
-         }
-         
-         this.toggleFloatingText(serverPlayer, text);
+         });
       });
    
       socket.on("giveDamage", (playerPos, calcDamage) => {
-   
-         const text = {
+            
+         this.toggleFloatingText(playerPos, {
             x: -5,
             y: -100,
             size: mainTexSize,
             color: "yellow",
             value: `-${calcDamage}`,
-         }
-         
-         this.toggleFloatingText(playerPos, text);
+         });
       });
    
       socket.on("getDamage", (playerPos, calcDamage) => {
-         const text = {
+         
+         this.toggleFloatingText(playerPos, {
             x: -5,
             y: -85,
             size: mainTexSize,
             color: "red",
             value: `-${calcDamage}`,
-         }
-         
-         this.toggleFloatingText(playerPos, text);
+         });
       });
       
-      socket.on("getFame", (playerPos, serverfameCost) => {
-         const text = {
+      socket.on("getFame", (playerPos, baseFame, fameCost, fameValue) => {
+
+         this.toggleFloatingText(playerPos, {
             x: 0,
             y: 180,
             size: mainTexSize,
             color: "darkviolet",
-            value: `+${serverfameCost} Fame`,
-         }
+            value: `+${fameCost} Fame`,
+         });
          
-         this.toggleFloatingText(playerPos, text);
-         this.isGettingFame = true;
-         this.fameCost = serverfameCost;
+         this.baseFluidity({
+            stateStr: "getFame",
+            baseFame: baseFame,
+            fameValue: fameValue,
+            fameCost: fameCost,
+            fameFluid: 0,
+            fameScale_X: this.fameScale_X,
+            x: this.fame.x,
+            y: this.fame.y,
+            width: this.fame.width,
+            height: this.fame.height,
+         });
       });
       
       socket.on("looseFame", (playerPos, serverfameCost) => {
-         const text = {
+
+         this.toggleFloatingText(playerPos, {
             x: 0,
             y: 180,
             size: mainTexSize,
             color: "red",
             value: `-${serverfameCost} Fame`,
-         }
-         
-         this.toggleFloatingText(playerPos, text);
-         this.isLoosingFame = true;
-         this.fameCost = serverfameCost;
-         this.looseFameFluid = serverfameCost;
+         });
+
+         this.baseFluidity("looseFame",{
+            fameCost: serverfameCost,
+         });
       });
    }
 
@@ -262,7 +276,7 @@ class Player extends Character {
    }
 
    drawFame_Bar(serverPlayer) {
-
+      
       let fameBarWidth = (serverPlayer.fameValue / this.initPlayer.baseFame) * (this.fame.width - (65 * this.fameScale_X));
    
       // Fame Bar
@@ -284,114 +298,12 @@ class Player extends Character {
       this.ctxFixedFront.strokeText(fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
    }
    
-   // ******************
-   fameFluidity = (player, fameFluid, state, stateName) => {
-   
-      // if(state) {
-   
-      //    let origin_X;
-      //    const fluidSpeed = 15;
-   
-      //    let fullBarWidth = fame.width - (65 *fameScale_X);
-      //    let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
-      //    let calcWidth = (fameFluid / fameCost) * miniBarWidth;
-         
-      //    if(calcWidth <= 0) calcWidth = 0;
-   
-      //    if(stateName === "get") {
-      //       fameFluid += fluidSpeed;
-      //       origin_X = player.fameValue / player.baseFame * fullBarWidth;
-   
-      //       if(fameFluid >= fameCost) {
-      //          fameFluid = 0;
-      //          state = false;
-      //       }
-      //    }
-   
-      //    if(stateName === "loose") {
-      //       fameFluid -= fluidSpeed;
-      //       origin_X = player.fameValue / player.baseFame * fullBarWidth;
-   
-      //       if(fameFluid <= -fameCost) {
-      //          fameFluid = 0;
-      //          state = false;
-      //       }
-      //    }
-   
-      //    ctxUI.drawImage(
-      //       gameUIimage,
-      //       522, 529, 26, 48,
-      //       origin_X,
-      //       fame.y +19 +50,
-      //       calcWidth,
-      //       fame.height - 27
-      //    );
-      // }
-   
-      if(isGettingFame) {
-      
-         let fullBarWidth = fame.width - (83 *fameScale_X);
-         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
-         let fameBarWidth = player.fameValue / player.baseFame * fullBarWidth;
-         let origin_X = fame.x + (41 *fameScale_X) + fameBarWidth;
-   
-         let calcWidth = (getFameFluid / fameCost) * miniBarWidth;
-         if(calcWidth <= 0) calcWidth = 0;
-   
-         // Value Bar
-         ctxUI.drawImage(
-            gameUIimage,
-            // 522, 529, 26, 48,
-            552, 477, 26, 48,
-            origin_X,
-            fame.y +19 +20,
-            calcWidth,
-            fame.height - 27
-         );
-   
-         const ratio = 3;
-         getFameFluid += ratio;
-         
-         if(getFameFluid >= fameCost) {
-            getFameFluid = fameCost;
-            // getFameFluid = 0;
-            // isGettingFame = false;
-         }
-      }
-   
-      if(isLoosingFame) {
-   
-         let fullBarWidth = fame.width - (83 *fameScale_X);
-         let origin_X = player.fameValue / player.baseFame * fullBarWidth;
-         let miniBarWidth = fameCost / player.baseFame * fullBarWidth;
-   
-         let calcWidth = (looseFameFluid / fameCost) * miniBarWidth;
-         if(calcWidth <= 0) calcWidth = 0;
-   
-         // Value Bar
-         ctxUI.drawImage(
-            gameUIimage,
-            522, 529, 26, 48,
-            origin_X,
-            fame.y +19 +30,
-            calcWidth,
-            fame.height - 27
-         );
-   
-         const ratio = 15;
-         looseFameFluid -= ratio;
-         
-         if(looseFameFluid <= -fameCost) {
-            looseFameFluid = 0;
-            isLoosingFame = false;
-         }
-      }
-   }
-   // ******************
-   
    // Draw HUD
    drawHUD_Frame() {
-      
+
+      this.ctxFixedFront.shadowBlur = "2";
+      this.ctxFixedFront.shadowColor = "black";
+
       // Background
       this.ctxFixedBack.drawImage(this.gameUI_Img,
          5, 181, 729, 141,
@@ -593,15 +505,55 @@ class Player extends Character {
       };
    }
 
-   // Draw Player, Shadow, Name
+   // Draw Player, Ring, Shadow, Name
+   drawRing(ctx, serverPlayer) {
+
+      if(this.isClient) {
+         ctx.fillStyle = "rgb(0, 85, 0, 0.5)";
+         ctx.strokeStyle = "lime";
+      }
+      else {
+         ctx.fillStyle = "rgb(170, 90, 0, 0.5)";
+         ctx.strokeStyle = "darkorange";
+      }
+
+      // Shadow Ring
+      ctx.lineWidth = "2";
+      ctx.beginPath();
+      ctx.ellipse(
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y +this.sprites.radius,
+         this.sprites.radius *this.shadowSize +this.ringSize,
+         this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
+         0, 0, Math.PI * 2
+      );
+      ctx.fill();
+      ctx.closePath();
+
+      // Color Ring
+      ctx.lineWidth = "2";
+      ctx.beginPath();
+      ctx.ellipse(
+         this.pos(serverPlayer).x,
+         this.pos(serverPlayer).y +this.sprites.radius,
+         this.sprites.radius *this.shadowSize +this.ringSize,
+         this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
+         0, 0, Math.PI * 2
+      );
+      ctx.stroke();
+      ctx.closePath();
+   }
+
    drawShadow(ctx, serverPlayer) {
       
-      ctx.fillStyle = "rgba(30, 30, 30, 0.6)";
+      ctx.fillStyle = "rgba(30, 30, 30, 0.7)";
       ctx.beginPath();
       ctx.ellipse(
          this.pos(serverPlayer).x,
          this.pos(serverPlayer).y + this.sprites.radius,
-         this.sprites.radius * 0.8, this.sprites.radius * 0.4, 0, 0, Math.PI * 2
+         this.sprites.radius * this.shadowSize,
+         this.sprites.radius * this.shadowSize/2,
+         0, 0, Math.PI * 2
       );
       ctx.fill();
       ctx.closePath();
@@ -637,6 +589,9 @@ class Player extends Character {
 
       ctx.textAlign = "center";
       ctx.font = "22px Orbitron-ExtraBold";
+      
+      ctx.lineWidth = "1";
+      ctx.strokeStyle = "black";
       ctx.fillText(this.initPlayer.name, namePos_X, namePos_Y);
       ctx.strokeText(this.initPlayer.name, namePos_X, namePos_Y);
    }
@@ -741,26 +696,26 @@ class Player extends Character {
 
       // Animation State
       this.playerState(frame, serverPlayer);
-
+      
       // Camera 
       this.scrollCam(serverPlayer);
-
+      
       // UI
       this.drawFame_Bar(serverPlayer);
-      // this.fameFluidity(serverPlayer, getFameFluid, isGettingFame, "get");
-      // this.fameFluidity(serverPlayer, looseFameFluid, isLoosingFame, "loose");
       this.drawHUD_Mana(serverPlayer);
       this.drawHUD_Health(serverPlayer);
       this.drawHUD_Energy(serverPlayer);
       
-      // Mini Bars
-      this.drawBars_Client(serverPlayer);
+      // ***************************
+      // console.log(this.isGettingFame);
+      // console.log(this.fameCost);
+      // ***************************
       
       // Player
+      this.drawRing(this.ctxPlayer, serverPlayer);
       this.drawShadow(this.ctxPlayer, serverPlayer);
       this.drawPlayer(this.ctxPlayer, serverPlayer);
-
-      // Player Name
+      this.drawBars_Client(serverPlayer);
       this.drawName(this.ctxPlayer, serverPlayer);
 
       // ******************************
@@ -777,15 +732,12 @@ class Player extends Character {
       
       // Animation State
       this.playerState(frame, serverPlayer);
-
-      // Mini Bars
-      this.drawBars_OtherPlayer(serverPlayer);
-
+      
       // Player
+      this.drawRing(this.ctxOtherPlay, serverPlayer);
       this.drawShadow(this.ctxOtherPlay, serverPlayer);
       this.drawPlayer(this.ctxOtherPlay, serverPlayer);
-
-      // Player Name
+      this.drawBars_OtherPlayer(serverPlayer);
       this.drawName(this.ctxOtherPlay, serverPlayer);
 
       // ******************************

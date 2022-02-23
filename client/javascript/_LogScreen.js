@@ -43,6 +43,7 @@ const initClientScripts = () => {
       "classes/ClientEnemy.js",
       "classes/ClientPlayer.js",
       "classes/FloatingText.js",
+      "classes/Fluidity.js",
       "classes/GameBar.js",
       "classes/Tile.js",
       "classes/Viewport.js",

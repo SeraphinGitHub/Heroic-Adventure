@@ -21,8 +21,10 @@ class Player extends Character {
       }
       
       // Env Variables
-      this.frameRate = process.env.FRAME_RATE;
+      this.devFPS = process.env.DEV_FRAME_RATE;
+      this.deployFPS = process.env.DEPLOY_FRAME_RATE;
       this.syncCoeff = process.env.SYNC_COEFF;
+      this.syncFormula = this.syncCoeff *this.devFPS /this.deployFPS;
 
       // Player Hitbox
       this.radius = 42;
@@ -39,7 +41,7 @@ class Player extends Character {
       
       // GcD
       this.baseGcD = 30;
-      this.GcD = this.syncCoeff * this.baseGcD; // More high ==> more slow
+      this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
       this.speedGcD = this.GcD;
 
       // Player Health
@@ -51,13 +53,13 @@ class Player extends Character {
       this.energy = this.baseEnergy;
       this.energyCost = 0.7;
       this.baseRegenEnergy = 0.15;
-      this.regenEnergy = this.syncCoeff * this.baseRegenEnergy;
+      this.regenEnergy = Math.floor(this.baseRegenEnergy *this.syncCoeff *100) /100;
 
       // Player Mana
       this.baseMana = 150;
       this.mana = this.baseMana;
       this.baseRegenMana = 0.12;
-      this.regenMana = this.syncCoeff * this.baseRegenMana;
+      this.regenMana = Math.floor(this.baseRegenMana *this.syncCoeff *100) /100;
 
       // Fame
       this.getFameCost = 500;
@@ -67,22 +69,23 @@ class Player extends Character {
       this.fameValue = this.fame;
       this.fameCount = 0;
 
+      // Damages
+      // this.baseDamage = 23;
+      this.baseDamage = 1000;
+      this.calcDamage;
+
       // Spells cast
       this.cast_Heal = false;
       
       // Spell - Healing
-      this.healCost = 70;
-      this.baseHealing = this.baseHealth * 0.25; // <== Healing = 25% from MaxHealth
+      this.healCost = 45;
+      this.baseHealing = this.baseHealth * 0.15; // <== Healing = 25% from MaxHealth
       this.calcHealing;
-
-      // Damages
-      this.baseDamage = 23;
-      this.calcDamage;
       
       // Movements Speed
-      this.walkSpeed = Math.round(this.syncCoeff * 3); // <== WalkSpeed
+      this.walkSpeed = Math.floor( 3 *this.syncFormula);
+      this.runSpeed = Math.floor( 7 *this.syncFormula);
       this.baseWalkSpeed = this.walkSpeed;
-      this.runSpeed = Math.round(this.syncCoeff * 7); // <== RunSpeed
       this.baseRunSpeed = this.runSpeed;
       
       // Movements Axis
@@ -294,12 +297,12 @@ class Player extends Character {
 
    running() {
 
-      if(this.energy < this.baseEnergy) this.energy += this.regenEnergy;
+      if(this.energy < this.baseEnergy) this.energy = Math.floor((this.energy + this.regenEnergy) *100) /100;
       if(this.energy >= this.baseEnergy) this.energy = this.baseEnergy;
-   
+      
       if(this.isRunning && this.isRunnable) {
          
-         this.energy -= this.energyCost;
+         this.energy = Math.floor(this.energy -this.energyCost);
          if(this.energy <= 0) this.energy = 0;
          if(this.energy < this.energyCost) this.isRunnable = false;
       }
@@ -311,13 +314,13 @@ class Player extends Character {
    calcGcD() {
    
       // Regen Mana
-      if(this.mana < this.baseMana) this.mana += this.regenMana;
+      if(this.mana < this.baseMana) this.mana = Math.floor((this.mana + this.regenMana) *100) /100;
       
       // Regen GcD
       if(this.speedGcD < this.GcD) {
-         this.speedGcD += this.syncCoeff * 1;
+         this.speedGcD = Math.floor(this.speedGcD + this.syncFormula);
          if(this.isAttacking) this.isAttacking = false;
-      }
+      }  
    }
    
    attacking(socketList, playerList, mobList) {
@@ -421,7 +424,8 @@ class Player extends Character {
                   
                   this.kills++;
                   this.calcfame(this.getFameCost, socket);
-                  otherPlayer.death(this.looseFameCost);
+                  otherPlayer.death();
+                  otherPlayer.calcfame(this.looseFameCost, otherSocket);
                   
                   // Player Score
                   socket.emit("playerScore", {
@@ -431,8 +435,8 @@ class Player extends Character {
                      fameCount: this.fameCount,
                   });
                   
-                  socket.emit("getFame", playerPos, this.getFameCost);
-                  otherSocket.emit("looseFame", otherPlayerPos, this.looseFameCost);
+                  socket.emit("getFame", playerPos, this.baseFame, this.getFameCost, this.fameValue);
+                  otherSocket.emit("looseFame", otherPlayerPos, otherPlayer.baseFame, this.looseFameCost, otherPlayer.fameValue);
                }
             }
          }
@@ -477,7 +481,7 @@ class Player extends Character {
                   fameCount: this.fameCount,
                });
                
-               socket.emit("getFame", playerPos, mob.getFameCost);
+               socket.emit("getFame", playerPos, this.baseFame, mob.getFameCost, this.fameValue);
             }
          }
       });
@@ -486,19 +490,40 @@ class Player extends Character {
    // Fame
    calcfame(fameCost, socket) {
    
-      this.fame += fameCost;
-      this.fameValue += fameCost;
+      // Get Fame / Famecount +
+      if(!this.isDead) {
+         this.fame += fameCost;
+         this.fameValue += fameCost;
+      
+         if(this.fame / this.baseFame >= 1) {
    
-      if(this.fame / this.baseFame >= 1) {
-         this.fameCount += Math.floor(this.fameValue / this.baseFame);
-         this.fameValue = this.fame - (this.baseFame * this.fameCount);
-   
-         socket.emit("fameCount+1", this.fameCount);
+            this.fameCount += Math.floor(this.fameValue / this.baseFame);
+            this.fameValue = this.fame - (this.baseFame * this.fameCount);
+            socket.emit("fameCount", this.fameCount);
+         }
+      }
+
+      // Loose Fame / FameCount -
+      else if(!this.hasLostFame) {
+         this.hasLostFame = true;
+
+         this.fame -= fameCost;
+         this.fameValue -= fameCost;
+         
+         if(this.fame <= 0) this.fame = 0;
+         if(this.fameValue <= 0) this.fameValue = 0;
+
+         if(this.fame / this.baseFame < 1) {
+
+            this.fameValue = this.fame;
+            this.fameCount -= Math.ceil(this.fameValue / this.baseFame);            
+            socket.emit("fameCount", this.fameCount);
+         }
       }
    }
 
    // Death
-   death(fameCost) {
+   death() {
 
       const respawnRange = 600;
       
@@ -510,16 +535,6 @@ class Player extends Character {
          this.deathCounts++;
 
          if(this.deathCounts === 10) this.deathCounts = 0;
-      }
-
-      if(!this.hasLostFame) {
-         this.hasLostFame = true;
-
-         this.fame -= fameCost;
-         this.fameValue -= fameCost;
-         
-         if(this.fame <= 0) this.fame = 0;
-         if(this.fameValue <= 0) this.fameValue = 0;
       }
       
       const respawnCooldown = setInterval(() => {
