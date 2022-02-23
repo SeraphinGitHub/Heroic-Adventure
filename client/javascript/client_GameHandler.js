@@ -53,11 +53,10 @@ const ctx = {
 
    map:        set_Canvas()[0],
    enemies:    set_Canvas()[1],
-   otherPlay:  set_Canvas()[2],
-   player:     set_Canvas()[3],
-   fixedBack:  set_Canvas()[4],
-   UI:         set_Canvas()[5],
-   fixedFront: set_Canvas()[6],
+   player:     set_Canvas()[2],
+   fixedBack:  set_Canvas()[3],
+   UI:         set_Canvas()[4],
+   fixedFront: set_Canvas()[5],
 }
 
 

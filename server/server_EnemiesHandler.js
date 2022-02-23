@@ -9,9 +9,9 @@ const Enemy = require("./classes/Enemy.js");
 const set_Minotaurs = () => {
 
    const minotaursSpawns = [
-      {x: 650, y: 500},
-      {x: 1500, y: 500},
-      {x: 750, y: 1150},
+      {x: 500, y: 500},
+      // {x: 1500, y: 500},
+      // {x: 750, y: 1150},
    ];
 
    const minotaursSpecs = {
@@ -23,10 +23,16 @@ const set_Minotaurs = () => {
       wanderBreakTime: 2 *1000,
       chasingRange: 200,
       GcD: 60,
-      getFameCost: 100,
-      looseFameCost: 200,
-      hiddenTime: 4 *1000,
-      respawnTime: 10 *1000,
+
+      // getFameCost: 100,
+      // looseFameCost: 200,
+      // hiddenTime: 4 *1000,
+      // respawnTime: 10 *1000,
+      getFameCost: 3000,
+      looseFameCost: 2000,
+      hiddenTime: 1 *1000,
+      respawnTime: 1 *1000,
+
       damages: 15,
       attackDelay: 0.5,
       damageRatio: 0.5,

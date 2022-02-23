@@ -245,19 +245,18 @@ class Enemy extends Character {
                
                this.isChasing = true;
                this.speed = this.runSpeed;
+
                player.death();
-               player.calcfame(this.looseFameCost, socket);
+               player.calcfame("loose", this.looseFameCost, socket);
          
-               // Player Score
-               socket.emit("playerScore", {
-                  kills: player.kills,
-                  died: player.died,
-                  fame: player.fame,
-                  fameCount: player.fameCount,
-               });
-         
-               // Toggle Fame Text
-               socket.emit("looseFame", playerPos, player.baseFame, this.looseFameCost, player.fameValue);
+               const serverFame = {
+                  baseFame: player.baseFame,
+                  fameValue: player.fameValue,
+                  fameCost: this.looseFameCost,
+                  fluidSpeed: player.fluidSpeed,
+               }
+               
+               if(player.fame >= this.looseFameCost) socket.emit("looseFame", playerPos, serverFame);
             }
 
          }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));

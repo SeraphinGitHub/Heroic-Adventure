@@ -5,12 +5,23 @@ class Character {
    constructor() {
       this.floatTextArray = [];
       this.fluidBarList = {};
+      this.clientFrameRate = 1000/60;
    }
 
    removeIndex(array, item) {
       let index = array.indexOf(item);
       array.splice(index, 1);
       index--;
+   }
+   
+   circle_toCircle(first, second, offsetX, offsetY, radius) {
+      
+      let distX = second.x - (first.x + offsetX);
+      let distY = second.y - (first.y + offsetY);
+      let distance = Math.sqrt(distX * distX + distY * distY);
+      let sumRadius = radius + second.radius;
+   
+      if(distance <= sumRadius) return true;
    }
    
    drawFloatingText() {

@@ -33,11 +33,6 @@ class Player extends Character {
       this.attkOffset_X = 0;
       this.attkOffset_Y = 45;
       this.attkRadius = 32;
-
-      // Respawn Time
-      this.baseRespawnTimer = 10; //<== seconds
-      this.respawnTimer = this.baseRespawnTimer;
-      this.deathCounts = 0;
       
       // GcD
       this.baseGcD = 30;
@@ -62,16 +57,26 @@ class Player extends Character {
       this.regenMana = Math.floor(this.baseRegenMana *this.syncCoeff *100) /100;
 
       // Fame
-      this.getFameCost = 500;
-      this.looseFameCost = 300;
+      // this.getFameCost = 500;
+      // this.looseFameCost = 300;
+
+      this.getFameCost = 2000;
+      this.looseFameCost = 2000;
+
       this.baseFame = 10000;
-      this.fame = 0;
+      this.fame = 8000;
       this.fameValue = this.fame;
       this.fameCount = 0;
+      this.totalFameCost = 0;
+
+      // Death
+      this.baseRespawnTimer = 1; //<== seconds
+      // this.baseRespawnTimer = 10; //<== seconds
+      this.respawnTimer = this.baseRespawnTimer;
+      this.deathCounts = 0;
 
       // Damages
-      // this.baseDamage = 23;
-      this.baseDamage = 1000;
+      this.baseDamage = 23;
       this.calcDamage;
 
       // Spells cast
@@ -101,7 +106,7 @@ class Player extends Character {
       this.isRunning = false;
       this.isRunnable = false;
       this.isAttacking = false;
-      this.hasLostFame = false;
+      this.isCtxPlayer = true;
 
       // Enemies ID Array
       this.chased_By = [];
@@ -113,6 +118,9 @@ class Player extends Character {
       // Score
       this.kills = 0;
       this.died = 0;
+
+      // Fluidity
+      this.fluidSpeed = 20;
 
       // Animation
       this.state;
@@ -345,6 +353,26 @@ class Player extends Character {
          let socket = socketList[this.id];
          this.damagingOtherPlayers(socket, socketList, playerList);
          this.damagingMobs(socketList, mobList);
+
+         this.calcfame("get", this.totalFameCost, socket);
+         
+         const playerPos = {
+            id: this.id,
+            x: this.x,
+            y: this.y,
+         };
+
+         const serverFame = {
+            baseFame: this.baseFame,
+            fameValue: this.fameValue,
+            totalFameCost: this.totalFameCost,
+            fluidSpeed: this.fluidSpeed,
+         }
+
+         if(this.totalFameCost !== 0) {
+            socket.emit("getFame", playerPos, serverFame);
+            this.totalFameCost = 0;
+         }
       }
    }
    
@@ -392,7 +420,6 @@ class Player extends Character {
    damagingOtherPlayers(socket, socketList, playerList) {
 
       for(let i in playerList) {
-   
          let otherPlayer = playerList[i];
          let otherSocket = socketList[otherPlayer.id];
    
@@ -403,12 +430,6 @@ class Player extends Character {
                
                otherPlayer.calcDamage = this.damageRnG();
                otherPlayer.health -= otherPlayer.calcDamage;
-               
-               const playerPos = {
-                  id: this.id,
-                  x: this.x,
-                  y: this.y,
-               };
    
                const otherPlayerPos = {
                   id: otherPlayer.id,
@@ -421,22 +442,20 @@ class Player extends Character {
    
                // Other player's Death
                if(otherPlayer.health <= 0) {
-                  
+
                   this.kills++;
-                  this.calcfame(this.getFameCost, socket);
+                  this.totalFameCost += this.getFameCost;
+                  
+                  const otherFame = {
+                     baseFame: otherPlayer.baseFame,
+                     fameValue: otherPlayer.fameValue,
+                     fameCost: this.looseFameCost,
+                     fluidSpeed: otherPlayer.fluidSpeed,
+                  }
+                  
+                  if(otherPlayer.fame >= this.looseFameCost) otherSocket.emit("looseFame", otherPlayerPos, otherFame);
                   otherPlayer.death();
-                  otherPlayer.calcfame(this.looseFameCost, otherSocket);
-                  
-                  // Player Score
-                  socket.emit("playerScore", {
-                     kills: this.kills,
-                     died: this.died,
-                     fame: this.fame,
-                     fameCount: this.fameCount,
-                  });
-                  
-                  socket.emit("getFame", playerPos, this.baseFame, this.getFameCost, this.fameValue);
-                  otherSocket.emit("looseFame", otherPlayerPos, otherPlayer.baseFame, this.looseFameCost, otherPlayer.fameValue);
+                  otherPlayer.calcfame("loose", this.looseFameCost, otherSocket);
                }
             }
          }
@@ -455,12 +474,6 @@ class Player extends Character {
             mob.calcDamage = this.damageRnG();
             mob.health -= mob.calcDamage;
             
-            const playerPos = {
-               id: this.id,
-               x: this.x,
-               y: this.y,
-            };
-            
             const mobPos = {
                x: mob.x,
                y: mob.y,
@@ -470,56 +483,69 @@ class Player extends Character {
    
             // Mob's Death
             if(mob.health <= 0) {
-               
+
                mob.death();
-               this.calcfame(mob.getFameCost, socket);
-   
-               socket.emit("playerScore", {
-                  kills: this.kills,
-                  died: this.died,
-                  fame: this.fame,
-                  fameCount: this.fameCount,
-               });
-               
-               socket.emit("getFame", playerPos, this.baseFame, mob.getFameCost, this.fameValue);
+               this.totalFameCost += mob.getFameCost;
             }
          }
       });
    }
    
    // Fame
-   calcfame(fameCost, socket) {
-   
-      // Get Fame / Famecount +
-      if(!this.isDead) {
-         this.fame += fameCost;
-         this.fameValue += fameCost;
+   calcfame(stateStr, fameCost, socket) {
       
-         if(this.fame / this.baseFame >= 1) {
-   
-            this.fameCount += Math.floor(this.fameValue / this.baseFame);
-            this.fameValue = this.fame - (this.baseFame * this.fameCount);
+      // Get Fame / Famecount +
+      if(stateStr === "get") {
+         
+         let delayedFameValue = this.fameValue;
+         delayedFameValue += fameCost;
+         
+         this.fame += fameCost;
+         
+         if(this.fame /this.baseFame >= 1) {
+            
+            this.fameCount += Math.floor(delayedFameValue /this.baseFame);
+            delayedFameValue = this.fame - (this.baseFame *this.fameCount);
             socket.emit("fameCount", this.fameCount);
          }
+
+         const latency = 50;
+         const clientFrameRate = 1000/60;
+         const animTimeOut = Math.floor((clientFrameRate *fameCost /this.fluidSpeed) -latency);
+
+         setTimeout(() => this.fameValue = delayedFameValue, animTimeOut);
       }
 
       // Loose Fame / FameCount -
-      else if(!this.hasLostFame) {
-         this.hasLostFame = true;
-
+      if(stateStr === "loose") {
+         
          this.fame -= fameCost;
-         this.fameValue -= fameCost;
+
+         if(this.fameValue < fameCost) this.fameValue = this.baseFame - (fameCost -this.fameValue);
+         else this.fameValue -= fameCost;
          
          if(this.fame <= 0) this.fame = 0;
          if(this.fameValue <= 0) this.fameValue = 0;
 
-         if(this.fame / this.baseFame < 1) {
+         // if(this.fameValue <= 0 && this.fameCount >= 1) this.fameValue = 100;
+         // if(this.fameValue < fameCost) this.fameValue = 100;
+
+
+
+         if(this.fame /this.baseFame < 1) {
 
             this.fameValue = this.fame;
-            this.fameCount -= Math.ceil(this.fameValue / this.baseFame);            
+            this.fameCount -= Math.ceil(this.fameValue /this.baseFame);            
             socket.emit("fameCount", this.fameCount);
          }
       }
+
+      socket.emit("playerScore", {
+         kills: this.kills,
+         died: this.died,
+         fame: this.fame,
+         fameCount: this.fameCount,
+      });
    }
 
    // Death
@@ -614,6 +640,29 @@ class Player extends Character {
       else return this.state = "idle";
    }
 
+   sortingLayer(playerList, mobList) {
+
+      mobList.forEach(mob => {
+         if(this.circle_toCircle(this, mob, 0, 0, mob.radius)) {
+            
+            if(this.y > mob.y) this.isCtxPlayer = true;
+            else this.isCtxPlayer = false;
+         }
+      });
+
+      for(let i in playerList) {
+         let otherPlayer = playerList[i];
+
+         if(this !== otherPlayer) {
+            if(this.circle_toCircle(this, otherPlayer, 0, 0, otherPlayer.radius)) {
+               
+               if(this.y > otherPlayer.y) this.isCtxPlayer = true;
+               else this.isCtxPlayer = false;
+            }
+         }
+      };
+   }
+
    // Update (Sync)
    update(socketList, playerList, mobList, lightPack_PlayerList) {
 
@@ -625,6 +674,8 @@ class Player extends Character {
          this.attacking(socketList, playerList, mobList);
          this.casting(socketList);
          this.animState();
+         this.sortingLayer(playerList, mobList);
+
       }
       else this.state = "died";
 
@@ -661,6 +712,7 @@ class Player extends Character {
          mana: this.mana,
          fame: this.fame,
          fameValue: this.fameValue,
+         isCtxPlayer: this.isCtxPlayer,
          state: this.state,
          frameX: this.frameX
       }
