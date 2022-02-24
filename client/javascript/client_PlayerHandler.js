@@ -5,8 +5,6 @@
 // DOM Player UI
 // =====================================================================
 const playerStats = (data) => {
-
-   viewport_HTML.id = data.playerID;
    
    const playerName = document.querySelector(".player-name");
    playerName.textContent = data.name;
@@ -174,28 +172,28 @@ const deathScreen = (socket) => {
 // =====================================================================
 // Client State ==> (Init Pack, Sync, Disconnect)
 // =====================================================================
-const clientState = (socket) => {
+const clientState = (socket, playerID) => {
    
+   // Set Enemies OnConnect
+   socket.on("initEnemyPack", (initPack_MobList) => {
+
+      initPack_MobList.forEach(enemy => initMobList.push( new Enemy(cl_EnemyObj, enemy) ));
+   });
+
    // Set other players OnConnect
    socket.on("initPlayerPack", (initPack_PlayerList) => {
+      
+      initPlayerID = playerID;
       let playerTempList = [];
-
+   
       for(let i in initPack_PlayerList) {
-         
+      
          let initPlayer = initPack_PlayerList[i];
          const newClient = new Player(cl_PlayerObj, initPlayer);
          playerTempList.push(newClient);
       }
 
       initPlayerList = playerTempList;
-   });
-
-   // Set Enemies OnConnect
-   socket.on("initEnemyPack", (initPack_MobList) => {
-      
-      let mobTempList = [];
-      initPack_MobList.forEach(enemy => mobTempList.push( new Enemy(cl_EnemyObj, enemy) ));
-      initMobList = mobTempList;
    });
 
    // Sync players OnUpdate (Every Frame)
@@ -208,6 +206,7 @@ const clientState = (socket) => {
    // Remove players OnDisconnect
    socket.on("removePlayerPack", (loggedOutPlayer) => {
 
+      clientPlayer.removeIndex(playerID_List, loggedOutPlayer.id);
       clientPlayer.removeIndex(initPlayerList, loggedOutPlayer);
    });
 }
@@ -216,11 +215,12 @@ const clientState = (socket) => {
 // =====================================================================
 // Init Player
 // =====================================================================
-const initPlayer = (socket) => {
+const initPlayer = (socket, playerID) => {
    
    // Init Pack, Sync, Disconnect
-   clientState(socket);
+   clientState(socket, playerID);
 
+   // Client UI, Stats, Controls
    clientPlayer.drawHUD_Frame();
    clientPlayer.drawFame_Frame();
    clientPlayer.initMapSpecs(socket);
@@ -229,4 +229,7 @@ const initPlayer = (socket) => {
    deathScreen(socket);
    onKeyboardInput(socket);
    onMouseInput(socket);
+
+   // Client Sync
+   clientUpdate();
 }

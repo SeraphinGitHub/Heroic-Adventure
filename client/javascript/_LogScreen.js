@@ -9,13 +9,25 @@
 const easyLogin = () => {
    
    setTimeout(() => {
+      isSocket = true;
+      const logScreen = document.querySelector(".log-screen");
+      
+      // Send player's name
       const socket = io();
-      const logFormInput = document.querySelector(".log-form input");
-   
-      socket.emit("playerName", "Séraphin");
-      loadClient(socket);
-      logFormInput.blur();
-   }, 100);
+      socket.emit("send_initClient", "Séraphin");
+      
+      // Await for server response
+      socket.on("received_initClient", (playerID) => {
+
+         initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
+         initChat(socket);             // ==> Client_ChatHandler.js
+
+         // Reset inputField's value
+         logFormInput.value = ""
+         logFormInput.blur();
+         logScreen.classList.add("hide-LogScreen");
+      });
+   }, 300);
 }
 
 easyLogin();
@@ -66,12 +78,30 @@ const initClientScripts = () => {
    });
 }
 
-// Load Client
-const loadClient = (socket) => {
 
-   initPlayer(socket);
-   initChat(socket);
-   clientUpdate();
+// =====================================================================
+// Load Client
+// =====================================================================
+const loadClient = () => {
+   
+   isSocket = true;
+   const logScreen = document.querySelector(".log-screen");
+   
+   // Send player's name
+   const socket = io();
+   socket.emit("send_initClient", logFormInput.value);
+   
+   // Await for server response
+   socket.on("received_initClient", (playerID) => {
+
+      initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
+      initChat(socket);             // ==> Client_ChatHandler.js
+
+      // Reset inputField's value
+      logFormInput.value = ""
+      logFormInput.blur();
+      logScreen.classList.add("hide-LogScreen");
+   });
 }
 
 
@@ -80,7 +110,6 @@ const loadClient = (socket) => {
 // =====================================================================
 const logFormInput = document.querySelector(".log-form input");
 let isSocket = false;
-let logged_PlayerName;
 
 // Login Form & Button
 const loginForm = () => {
@@ -98,18 +127,9 @@ const loginForm = () => {
    });
 }
 
-// Get Logged Player's Name
-const loggedPlayer = (socket) => {
-   
-   logged_PlayerName = logFormInput.value;
-   socket.emit("playerName", logged_PlayerName);
-   setTimeout(() => logFormInput.value = "", 200);
-}
-
 // Form Validation
 const formValidation = () => {
    
-   const logScreen = document.querySelector(".log-screen");
    const emptyFieldAlert = document.querySelector(".empty-field");
    const invalidAlert = document.querySelector(".invalid-chars");
    const whiteSpaceAlert = document.querySelector(".white-space");
@@ -139,16 +159,7 @@ const formValidation = () => {
    else if(!playerNameRegEx.test(logFormInput.value)) alertMessage(invalidAlert);
 
    // if everything's fine ==> Connect Player
-   else if(!isSocket) {
-
-      isSocket = true;
-      const socket = io();
-      loggedPlayer(socket);
-      loadClient(socket);
-      
-      logFormInput.blur();
-      logScreen.classList.add("hide-LogScreen");
-   }
+   else if(!isSocket) loadClient();
 }
 
 // Pop Up Alert Messages

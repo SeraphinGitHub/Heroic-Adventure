@@ -76,7 +76,8 @@ class Player extends Character {
       this.deathCounts = 0;
 
       // Damages
-      this.baseDamage = 23;
+      // this.baseDamage = 23;
+      this.baseDamage = 1000;
       this.calcDamage;
 
       // Spells cast
@@ -120,7 +121,8 @@ class Player extends Character {
       this.died = 0;
 
       // Fluidity
-      this.fluidSpeed = 20;
+      this.fluidSpeed = 10;
+      // this.fluidSpeed = 20;
 
       // Animation
       this.state;
@@ -364,7 +366,9 @@ class Player extends Character {
 
          const serverFame = {
             baseFame: this.baseFame,
+            fame: this.fame,
             fameValue: this.fameValue,
+            fameCount: this.fameCount,
             totalFameCost: this.totalFameCost,
             fluidSpeed: this.fluidSpeed,
          }
@@ -510,7 +514,7 @@ class Player extends Character {
          }
 
          const latency = 50;
-         const clientFrameRate = 1000/60;
+         const clientFrameRate = Math.floor(1000/60);
          const animTimeOut = Math.floor((clientFrameRate *fameCost /this.fluidSpeed) -latency);
 
          setTimeout(() => this.fameValue = delayedFameValue, animTimeOut);

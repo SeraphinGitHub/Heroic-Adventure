@@ -251,7 +251,9 @@ class Enemy extends Character {
          
                const serverFame = {
                   baseFame: player.baseFame,
+                  fame: player.fame,
                   fameValue: player.fameValue,
+                  fameCount: player.fameCount,
                   fameCost: this.looseFameCost,
                   fluidSpeed: player.fluidSpeed,
                }

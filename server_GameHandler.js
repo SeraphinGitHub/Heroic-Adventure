@@ -62,11 +62,15 @@ mobList.forEach(enemy => {
 // =====================================================================
 // Init Players
 // =====================================================================
+let playersID = 0;
+
 io.on("connection", (socket) => {
    // console.log("User connected !");
 
    // ==========  Generate ID  ==========
-   socket.id = Math.floor(playerMax * Math.random());
+   // socket.id = Math.floor(playerMax * Math.random());
+   socket.id = playersID++;
+
    socketList[socket.id] = socket;
    onConnect(socket);
 
@@ -92,20 +96,19 @@ const onConnect = (socket) => {
 
    const player = new Player(socket.id);
    playerList[socket.id] = player;
-   socket.emit("initEnemyPack", initPack_MobList);
-
 
    // ================================
    // Init Player
    // ================================
-   socket.on("playerName", (data) =>  {
+   socket.on("send_initClient", (data) =>  {
+      socket.emit("received_initClient", player.id);
       
       player.name = data;
+      socket.emit("initEnemyPack", initPack_MobList);
+      socket.emit("fameCount", player.fameCount);
 
       socket.emit("playerStats", {
          
-         playerID: player.id,
-
          name: data,
          health: player.baseHealth,
          mana: player.baseMana,
@@ -123,17 +126,18 @@ const onConnect = (socket) => {
          fameCount: player.fameCount,
       });
       
-      socket.emit("fameCount", player.fameCount);
 
       // ================================
       // Sending initPack Player
       // ================================
       for(let i in playerList) {
+         let player = playerList[i];         
+         initPack_PlayerList[player.id] = player.initPack();
+      };
 
+      for(let i in playerList) {
          let player = playerList[i];
          let socket = socketList[player.id];
-         
-         initPack_PlayerList[player.id] = player.initPack();
          socket.emit("initPlayerPack", initPack_PlayerList);
       };
    });
@@ -195,19 +199,19 @@ const onConnect = (socket) => {
 const onDisconnect = (socket) => {
 
    let player = playerList[socket.id];
-   let lightPlayer = initPack_PlayerList[player.id];
+   let initPlayer = initPack_PlayerList[player.id];
    
    for(let i in playerList) {
       let player = playerList[i];
       let socket = socketList[player.id];
-      socket.emit("removePlayerPack", lightPlayer);
+      socket.emit("removePlayerPack", initPlayer);
    };
 
    delete initPack_PlayerList[player.id];
    delete playerList[socket.id];
 }
 
-
+ 
 // =====================================================================
 // Server Sync
 // =====================================================================
@@ -325,6 +329,8 @@ setInterval(() => {
 
       // Sending Light Packs: Players, Mobs
       socket.emit("serverSync", playersToRender, mobsToRender);
+
+      // console.log(playersToRender.length); // ******************************************************
    }
    
    frame++;

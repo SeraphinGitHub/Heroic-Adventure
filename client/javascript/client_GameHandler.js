@@ -242,6 +242,8 @@ const clientEnemy = new Enemy(cl_EnemyObj, {});
 // =====================================================================
 // Client Sync with Server
 // =====================================================================
+let initPlayerID;
+
 let initPlayerList = [];
 let initMobList = [];
 let updatePlayerList = [];
@@ -258,30 +260,29 @@ const clientUpdate = () => {
    // Clear contexts
    canvasClearing();
 
-   // Server Sync ==> Players
-   // for(let i = 0; i < initPlayerList.length; i++) {
+   // Players Update
    for(let i = 0; i < updatePlayerList.length; i++) {
-
-      let initPlayer = initPlayerList[i];
-      let serverPlayer = updatePlayerList[i];
       
+      let initPlayer = initPlayerList[i];
+      let updatePlayer = updatePlayerList[i];
+
       if(initPlayer) {
-
-         if(viewport_HTML.id === String(serverPlayer.id)) {
+         if(initPlayerID === updatePlayer.id) {
+            
             initPlayer.isClient = true;
-            initPlayer.render_ClientPlayer(serverPlayer, frame);
+            initPlayer.render_ClientPlayer(updatePlayer, frame);
          }
-         else initPlayer.render_OtherPlayer(serverPlayer, frame);
+         else initPlayer.render_OtherPlayer(updatePlayer, frame);
       }
-   };
-
-   // Server Sync ==> Mobs
+   }
+   
+   // Mobs Update
    for(let i = 0; i < updateMobList.length; i++) {
 
       let initEnemy = initMobList[i];
-      let serverEnemy = updateMobList[i];
+      let updateEnemy = updateMobList[i];
 
-      if(initEnemy) initEnemy.render_Enemy(serverEnemy, frame);
+      if(initEnemy) initEnemy.render_Enemy(updateEnemy, frame);
    };
 
    // Draw floating text

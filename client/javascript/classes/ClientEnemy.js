@@ -39,10 +39,10 @@ class Enemy extends Character {
       this.sprites = initEnemy.sprites;
    }
 
-   pos(serverEnemy) {
+   pos(updateEnemy) {
       return {
-         x: serverEnemy.x -this.viewport.x,
-         y: serverEnemy.y -this.viewport.y
+         x: updateEnemy.x -this.viewport.x,
+         y: updateEnemy.y -this.viewport.y
       }
    }
 
@@ -54,7 +54,7 @@ class Enemy extends Character {
    }
 
    // Draw Mini Bars
-   drawMiniBar(serverEnemy) {
+   drawMiniBar(updateEnemy) {
       
       const colorBar = {
          yellow: 0.7,   // 70%
@@ -64,8 +64,8 @@ class Enemy extends Character {
 
       const enemyBar = {
          ctx: this.ctxEnemies,
-         x: this.pos(serverEnemy).x,
-         y: this.pos(serverEnemy).y,
+         x: this.pos(updateEnemy).x,
+         y: this.pos(updateEnemy).y,
          width: this.barWidth,
          height: this.barHeight,
       }
@@ -73,12 +73,12 @@ class Enemy extends Character {
       const offsetX = -this.barWidth/2;
       const offsetY = -80;
       
-      const gameBar = new GameBar(enemyBar, offsetX, offsetY, this.initEnemy.baseHealth, serverEnemy.health);
+      const gameBar = new GameBar(enemyBar, offsetX, offsetY, this.initEnemy.baseHealth, updateEnemy.health);
    
       let index = 0;
-      if(serverEnemy.health <= this.initEnemy.baseHealth * colorBar.yellow) index = 1;
-      if(serverEnemy.health <= this.initEnemy.baseHealth * colorBar.orange) index = 2;
-      if(serverEnemy.health <= this.initEnemy.baseHealth * colorBar.red) index = 3;
+      if(updateEnemy.health <= this.initEnemy.baseHealth * colorBar.yellow) index = 1;
+      if(updateEnemy.health <= this.initEnemy.baseHealth * colorBar.orange) index = 2;
+      if(updateEnemy.health <= this.initEnemy.baseHealth * colorBar.red) index = 3;
    
       gameBar.draw(
          this.gameUI_Img,
@@ -90,7 +90,7 @@ class Enemy extends Character {
    }
 
    // Draw Player, Ring, Shadow, Name
-   drawRing(serverEnemy) {
+   drawRing(updateEnemy) {
       
       // Shadow Ring
       this.ctxEnemies.lineWidth = "2";
@@ -99,8 +99,8 @@ class Enemy extends Character {
 
       this.ctxEnemies.beginPath();
       this.ctxEnemies.ellipse(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y +this.sprites.radius,
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y +this.sprites.radius,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -111,8 +111,8 @@ class Enemy extends Character {
       // Color Ring
       this.ctxEnemies.beginPath();
       this.ctxEnemies.ellipse(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y +this.sprites.radius,
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y +this.sprites.radius,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -121,14 +121,14 @@ class Enemy extends Character {
       this.ctxEnemies.closePath();
    }
 
-   drawShadow(serverEnemy) {
+   drawShadow(updateEnemy) {
 
       // Shadow
       this.ctxEnemies.fillStyle = "rgba(30, 30, 30, 0.7)";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.ellipse(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y +this.sprites.radius,
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y +this.sprites.radius,
          this.sprites.radius *this.shadowSize,
          this.sprites.radius *this.shadowSize/2,
          0, 0, Math.PI * 2
@@ -137,7 +137,7 @@ class Enemy extends Character {
       this.ctxEnemies.closePath();
    }
       
-   drawEnemy(serverEnemy) {
+   drawEnemy(updateEnemy) {
       
       const enemy_Img = new Image();
       enemy_Img.src = this.imageSrc;
@@ -146,20 +146,20 @@ class Enemy extends Character {
          enemy_Img,
 
          // Source
-         (serverEnemy.frameX +this.animState) *this.sprites.width,
+         (updateEnemy.frameX +this.animState) *this.sprites.width,
          this.frameY *this.sprites.height,
          this.sprites.width,
          this.sprites.height,
          
          // Destination
-         this.pos(serverEnemy).x -this.sprites.width/2 +this.sprites.offsetX,
-         this.pos(serverEnemy).y -this.sprites.height/2 +this.sprites.offsetY,
+         this.pos(updateEnemy).x -this.sprites.width/2 +this.sprites.offsetX,
+         this.pos(updateEnemy).y -this.sprites.height/2 +this.sprites.offsetY,
          this.sprites.width *this.sprites.sizeRatio,
          this.sprites.height *this.sprites.sizeRatio
       );
    }
 
-   drawName(serverEnemy) {
+   drawName(updateEnemy) {
 
       let offsetY = 87;
       
@@ -172,33 +172,33 @@ class Enemy extends Character {
 
       this.ctxEnemies.fillText(
          this.initEnemy.name,
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y -offsetY
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y -offsetY
       );
 
       this.ctxEnemies.strokeText(
          this.initEnemy.name,
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y -offsetY
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y -offsetY
       );
    }
    
    // Animation
-   animation(frame, index, spritesNumber, serverEnemy) {
+   animation(frame, index, spritesNumber, updateEnemy) {
       
       if(frame % index === 0) {
          if(this.frameY < spritesNumber -1) this.frameY++;
 
          else {
             if(!this.isAnimable) this.isAnimable = true;
-            if(!serverEnemy.isDead) this.frameY = 0;
+            if(!updateEnemy.isDead) this.frameY = 0;
          }
       }
    }
 
-   enemyState(frame, serverEnemy) {
+   enemyState(frame, updateEnemy) {
 
-      switch(serverEnemy.state) {
+      switch(updateEnemy.state) {
          case "walk": {
             
             this.animState = this.frameToJump * 1;
@@ -206,7 +206,7 @@ class Enemy extends Character {
                frame,
                this.animSpecs.walk.index,
                this.animSpecs.walk.spritesNumber,
-               serverEnemy
+               updateEnemy
             );
          }
          break;
@@ -218,7 +218,7 @@ class Enemy extends Character {
                frame,
                this.animSpecs.run.index,
                this.animSpecs.run.spritesNumber,
-               serverEnemy
+               updateEnemy
             );
          }
          break;
@@ -235,7 +235,7 @@ class Enemy extends Character {
                frame,
                this.animSpecs.attack.index,
                this.animSpecs.attack.spritesNumber,
-               serverEnemy
+               updateEnemy
             );
          }
          break;
@@ -247,7 +247,7 @@ class Enemy extends Character {
                frame,
                this.animSpecs.died.index,
                this.animSpecs.died.spritesNumber,
-               serverEnemy
+               updateEnemy
             );
          }
          break;
@@ -258,7 +258,7 @@ class Enemy extends Character {
             this.animation(frame,
                this.animSpecs.idle.index,
                this.animSpecs.idle.spritesNumber,
-               serverEnemy
+               updateEnemy
             );
          }
          break;
@@ -268,36 +268,36 @@ class Enemy extends Character {
    // =====================================================================
    // Enemy Sync (Every frame)
    // =====================================================================
-   render_Enemy(serverEnemy, frame) {
+   render_Enemy(updateEnemy, frame) {
       
-      if(!serverEnemy.isHidden) {
+      if(!updateEnemy.isHidden) {
          
          // Animation State
-         this.enemyState(frame, serverEnemy);
+         this.enemyState(frame, updateEnemy);
          
          // ******************************
-         // this.DEBUG_GENERAL(serverEnemy);
+         // this.DEBUG_GENERAL(updateEnemy);
          // ******************************
 
-         this.drawRing(serverEnemy)
-         this.drawShadow(serverEnemy);
-         this.drawEnemy(serverEnemy);
-         this.drawMiniBar(serverEnemy);
-         this.drawName(serverEnemy);
+         this.drawRing(updateEnemy)
+         this.drawShadow(updateEnemy);
+         this.drawEnemy(updateEnemy);
+         this.drawMiniBar(updateEnemy);
+         this.drawName(updateEnemy);
       }
    }
 
 
    // ==>  DEBUG MODE  <==
-   DEBUG_GENERAL(serverEnemy) {
+   DEBUG_GENERAL(updateEnemy) {
    
-      if(!serverEnemy.isDead) {
+      if(!updateEnemy.isDead) {
          this.DEBUG_MaxChaseRange();
-         this.DEBUG_WanderRange(serverEnemy);
-         this.DEBUG_ChasingRange(serverEnemy);
-         this.DEBUG_DrawEnemy(serverEnemy);
-         this.DEBUG_PathLine(serverEnemy);
-         this.DEBUG_ReachPoint(serverEnemy);
+         this.DEBUG_WanderRange(updateEnemy);
+         this.DEBUG_ChasingRange(updateEnemy);
+         this.DEBUG_DrawEnemy(updateEnemy);
+         this.DEBUG_PathLine(updateEnemy);
+         this.DEBUG_ReachPoint(updateEnemy);
       }
    }
    
@@ -331,29 +331,29 @@ class Enemy extends Character {
       this.ctxEnemies.closePath();
    }
    
-   DEBUG_ChasingRange(serverEnemy) {
+   DEBUG_ChasingRange(updateEnemy) {
    
       // Circle
       this.ctxEnemies.globalAlpha = 0.6;
       this.ctxEnemies.fillStyle = "red";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.arc(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y,
-         serverEnemy.chasingRange, 0, Math.PI * 2);
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y,
+         updateEnemy.chasingRange, 0, Math.PI * 2);
       this.ctxEnemies.fill();
       this.ctxEnemies.closePath();
       this.ctxEnemies.globalAlpha = 1;
    }
    
-   DEBUG_DrawEnemy(serverEnemy) {
+   DEBUG_DrawEnemy(updateEnemy) {
       
       // Mob Radius
       this.ctxEnemies.fillStyle = "blue";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.arc(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y,
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y,
          this.initEnemy.radius, 0, Math.PI * 2);
       this.ctxEnemies.fill();
       this.ctxEnemies.closePath();
@@ -363,23 +363,23 @@ class Enemy extends Character {
       this.ctxEnemies.fillStyle = "black";
       this.ctxEnemies.font = "26px Orbitron-Regular";
       this.ctxEnemies.fillText(
-         Math.round(serverEnemy.health),
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y
+         Math.round(updateEnemy.health),
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y
       );
    
       // Center
       this.ctxEnemies.fillStyle = "yellow";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.arc(
-         this.pos(serverEnemy).x,
-         this.pos(serverEnemy).y,
+         this.pos(updateEnemy).x,
+         this.pos(updateEnemy).y,
          6, 0, Math.PI * 2);
       this.ctxEnemies.fill();
       this.ctxEnemies.closePath();
    }
    
-   DEBUG_PathLine(serverEnemy) {
+   DEBUG_PathLine(updateEnemy) {
    
       // Point
       this.ctxEnemies.fillStyle = "lime";
@@ -401,22 +401,22 @@ class Enemy extends Character {
       );
 
       this.ctxEnemies.lineTo(
-         serverEnemy.calcX -this.viewport.x,
-         serverEnemy.calcY -this.viewport.y
+         updateEnemy.calcX -this.viewport.x,
+         updateEnemy.calcY -this.viewport.y
       );
 
       this.ctxEnemies.lineWidth = 4;
       this.ctxEnemies.stroke();
    }
    
-   DEBUG_ReachPoint(serverEnemy) {
+   DEBUG_ReachPoint(updateEnemy) {
    
       // Point
       this.ctxEnemies.fillStyle = "blue";
       this.ctxEnemies.beginPath();
       this.ctxEnemies.arc(
-         serverEnemy.calcX -this.viewport.x,
-         serverEnemy.calcY -this.viewport.y,
+         updateEnemy.calcX -this.viewport.x,
+         updateEnemy.calcY -this.viewport.y,
          4, 0, Math.PI * 2
       );
       this.ctxEnemies.fill();
