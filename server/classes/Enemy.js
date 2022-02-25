@@ -258,7 +258,14 @@ class Enemy extends Character {
                   fluidSpeed: player.fluidSpeed,
                }
                
-               if(player.fame >= this.looseFameCost) socket.emit("looseFame", playerPos, serverFame);
+               if(player.fame >= this.looseFameCost) {
+
+                  socket.emit("looseFame",
+                     player.eventPack(),
+                     playerPos,
+                     serverFame
+                  );
+               }
             }
 
          }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));
@@ -279,7 +286,8 @@ class Enemy extends Character {
          this.isWandering = true;
          this.isChasing = false;
          this.chasingRange = this.baseChasingRange;
-         this.removeIndex(player.chased_By, this.id);
+
+         if(player.chased_By.includes(this.id)) this.removeIndex(player.chased_By, this.id);
       }
    }
    
@@ -324,13 +332,13 @@ class Enemy extends Character {
    }
 
    // Death
-   death() {
+   death(player) {
       this.health = 0;
       this.isDead = true;
       this.isChasing = true;
       
       this.speed = this.runSpeed;
-      this.backToSpawn();
+      this.backToSpawn(player);
       
       setTimeout(() => {
          this.isHidden = true

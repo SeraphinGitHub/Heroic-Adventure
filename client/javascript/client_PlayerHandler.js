@@ -52,15 +52,6 @@ const handleGameUI = (socket) => {
 
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
-   socket.on("fameCount", (fameCount) => {
-   
-      ctx.fixedBack.clearRect(0, 0, viewSize.width, viewSize.height);
-      ctx.fixedFront.clearRect(0, 0, viewSize.width, viewSize.height);
-      
-      clientPlayer.drawHUD_Frame();
-      clientPlayer.drawFame_Frame();
-      clientPlayer.drawFame_Count(fameCount);
-   });
 }
 
 
@@ -196,6 +187,7 @@ const clientState = (socket, playerID) => {
       initPlayerList = playerTempList;
    });
 
+
    // Sync players OnUpdate (Every Frame)
    socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList) => {
 
@@ -205,8 +197,7 @@ const clientState = (socket, playerID) => {
    
    // Remove players OnDisconnect
    socket.on("removePlayerPack", (loggedOutPlayer) => {
-
-      clientPlayer.removeIndex(playerID_List, loggedOutPlayer.id);
+      
       clientPlayer.removeIndex(initPlayerList, loggedOutPlayer);
    });
 }

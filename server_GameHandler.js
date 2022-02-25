@@ -105,7 +105,7 @@ const onConnect = (socket) => {
       
       player.name = data;
       socket.emit("initEnemyPack", initPack_MobList);
-      socket.emit("fameCount", player.fameCount);
+      socket.emit("drawEventPack", player.eventPack());
 
       socket.emit("playerStats", {
          
@@ -133,13 +133,13 @@ const onConnect = (socket) => {
       for(let i in playerList) {
          let player = playerList[i];         
          initPack_PlayerList[player.id] = player.initPack();
-      };
+      }
 
       for(let i in playerList) {
          let player = playerList[i];
          let socket = socketList[player.id];
          socket.emit("initPlayerPack", initPack_PlayerList);
-      };
+      }
    });
    
 
@@ -329,8 +329,6 @@ setInterval(() => {
 
       // Sending Light Packs: Players, Mobs
       socket.emit("serverSync", playersToRender, mobsToRender);
-
-      // console.log(playersToRender.length); // ******************************************************
    }
    
    frame++;

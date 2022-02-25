@@ -55,24 +55,30 @@ const ctx = {
    enemies:    set_Canvas()[1],
    player:     set_Canvas()[2],
    fixedBack:  set_Canvas()[3],
-   UI:         set_Canvas()[4],
-   fixedFront: set_Canvas()[5],
+   fixedUI:    set_Canvas()[4],
+   UI:         set_Canvas()[5],
+   fixedFront: set_Canvas()[6],
 }
 
 
 // =====================================================================
 // Canvas Clearing
 // =====================================================================
+const ctxFixedBack_index = 3;
+const ctxFixedUI_index = 4;
+const ctxFixedFront_index = 6;
+
 const ctxArray = set_Canvas();
-let ctxFixedBack_index = ctxArray.length -3;
-let ctxFixedFront_index = ctxArray.length -1;
 
 const canvasClearing = () => {
    
    for(let i = 0; i < ctxArray.length; i++) {
       let ctxIndexed = ctxArray[i];
       
-      if(i === ctxFixedBack_index || i === ctxFixedFront_index) continue;
+      if(i === ctxFixedBack_index
+      || i === ctxFixedUI_index
+      || i === ctxFixedFront_index) continue;
+
       ctxIndexed.clearRect(0, 0, viewSize.width, viewSize.height);
    }
 }
@@ -200,6 +206,7 @@ const cl_PlayerObj = {
    ctxOtherPlay:  ctx.otherPlay,
    ctxPlayer:     ctx.player,
    ctxFixedBack:  ctx.fixedBack,
+   ctxFixedUI:    ctx.fixedUI,
    ctxUI:         ctx.UI,
    ctxFixedFront: ctx.fixedFront,
 

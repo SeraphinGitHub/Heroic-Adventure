@@ -10,8 +10,9 @@ class Player extends Character {
       super();
 
       // Init Server Player
-      this.initPlayer = initPlayer;
       this.isClient = false;
+      this.initPlayer = initPlayer;
+      this.updatePlayer;
 
       // Viewport
       this.detectViewport = initPlayer.detectViewport;
@@ -27,6 +28,7 @@ class Player extends Character {
       this.ctxEnemies = cl_PlayerObj.ctxEnemies;
       this.ctxPlayer = cl_PlayerObj.ctxPlayer;
       this.ctxFixedBack = cl_PlayerObj.ctxFixedBack;
+      this.ctxFixedUI = cl_PlayerObj.ctxFixedUI;
       this.ctxUI = cl_PlayerObj.ctxUI;
       this.ctxFixedFront = cl_PlayerObj.ctxFixedFront;
 
@@ -83,19 +85,39 @@ class Player extends Character {
       this.animSpecs = initPlayer.animSpecs;
    }
    
-   pos(updatePlayer) {
+   pos(playerPos) {
       
       if(this.isClient) return {
          x: this.viewSize.width/2,
          y: this.viewSize.height/2
       }
 
+      else if(playerPos) return {
+         x: playerPos.x - this.viewport.x,
+         y: playerPos.y - this.viewport.y
+      }
+
       else return {
-         x: updatePlayer.x - this.viewport.x,
-         y: updatePlayer.y - this.viewport.y
+         x: this.updatePlayer.x - this.viewport.x,
+         y: this.updatePlayer.y - this.viewport.y
       }
    }
 
+   ctxToRender() {
+      if(this.updatePlayer.isCtxPlayer) return this.ctxPlayer;
+      else return this.ctxEnemies;
+   }
+
+   // Draw on Event
+   drawOnEvent(eventPack) {
+
+      this.ctxFixedUI.clearRect(0, 0, viewSize.width, viewSize.height);
+      
+      this.drawFame_Bar(eventPack);
+      this.drawFame_Count(eventPack);
+   }
+
+   // Init Map
    initMapSpecs(socket) {
       
       socket.on("initMap", (data) => {
@@ -107,9 +129,9 @@ class Player extends Character {
    }
    
    // Camera
-   scrollCam(updatePlayer) {
+   scrollCam() {
 
-      this.viewport.scrollTo(updatePlayer.x, updatePlayer.y);
+      this.viewport.scrollTo(this.updatePlayer.x, this.updatePlayer.y);
       
       // Viewport bounderies
       let vpLeftCol_Nbr = Math.floor(this.viewport.x / this.cellSize);
@@ -147,12 +169,12 @@ class Player extends Character {
    }
    
    // Floating Text
-   toggleFloatingText(updatePlayer, textObj) {
+   toggleFloatingText(playerPos, textObj) {
       
       const newText = new FloatingText(
          this.ctxPlayer,
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y,
+         this.pos(playerPos).x,
+         this.pos(playerPos).y,
          textObj.x,
          textObj.y,
          textObj.size,
@@ -170,10 +192,13 @@ class Player extends Character {
       this.fluidBarArray.push(newFluidBar);
    }
 
+   // Events listening
    initFloatingText(socket) {
    
       const mainTexSize = 34;
    
+      socket.on("drawEventPack", (eventPack) => this.drawOnEvent(eventPack));
+
       socket.on("getHeal", (serverPlayer) => {
 
          this.toggleFloatingText(serverPlayer, {
@@ -186,7 +211,7 @@ class Player extends Character {
       });
    
       socket.on("giveDamage", (playerPos, calcDamage) => {
-            
+
          this.toggleFloatingText(playerPos, {
             x: -5,
             y: -100,
@@ -197,7 +222,7 @@ class Player extends Character {
       });
    
       socket.on("getDamage", (playerPos, calcDamage) => {
-         
+
          this.toggleFloatingText(playerPos, {
             x: -5,
             y: -85,
@@ -207,7 +232,7 @@ class Player extends Character {
          });
       });
       
-      socket.on("getFame", (playerPos, serverFame) => {
+      socket.on("getFame", (eventPack, playerPos, serverFame) => {
          
          this.toggleFloatingText(playerPos, {
             x: 0,
@@ -219,24 +244,26 @@ class Player extends Character {
          
          this.baseFluidity({
             stateStr: "getFame",
+
             x: this.fame.x,
             y: this.fame.y,
             width: this.fame.width,
             height: this.fame.height,
+            fluidSpeed: serverFame.fluidSpeed,
+            fluidDuration: serverFame.totalFameCost /serverFame.fluidSpeed,
+            
             fameScale_X: this.fameScale_X,
             baseFame: serverFame.baseFame,
             fame: serverFame.fame,
             fameValue: serverFame.fameValue,
             fameCount: serverFame.fameCount,
             fameCost: serverFame.totalFameCost,
-            fluidSpeed: serverFame.fluidSpeed,
             fameFluidValue: 0,
             isFameReseted: false,
-            fameDuration: serverFame.totalFameCost /serverFame.fluidSpeed,
          });
       });
       
-      socket.on("looseFame", (playerPos, serverFame) => {
+      socket.on("looseFame", (eventPack, playerPos, serverFame) => {
 
          this.toggleFloatingText(playerPos, {
             x: 0,
@@ -248,20 +275,22 @@ class Player extends Character {
 
          this.baseFluidity({
             stateStr: "looseFame",
+
             x: this.fame.x,
             y: this.fame.y,
             width: this.fame.width,
             height: this.fame.height,
+            fluidSpeed: serverFame.fluidSpeed,
+            fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
+
             fameScale_X: this.fameScale_X,
             baseFame: serverFame.baseFame,
             fame: serverFame.fame,
             fameValue: serverFame.fameValue,
             fameCount: serverFame.fameCount,
             fameCost: serverFame.fameCost,
-            fluidSpeed: serverFame.fluidSpeed,
             fameFluidValue: serverFame.fameCost,
             isFameReseted: false,
-            fameDuration: this.clientFrameRate *serverFame.fameCost /serverFame.fluidSpeed,
          });
       });
    }
@@ -288,29 +317,29 @@ class Player extends Character {
       );
    }
 
-   drawFame_Bar(updatePlayer) {
+   drawFame_Bar(eventPack) {
       
-      // let fameBarWidth = Math.floor(
-      //    (updatePlayer.fameValue / this.initPlayer.baseFame) * (this.fame.width - (65 * this.fameScale_X))
-      // );
+      let fameBarWidth = Math.floor(
+         (eventPack.fameValue /eventPack.baseFame) * (this.fame.width - (65 * this.fameScale_X))
+      );
    
-      // // Fame Bar
-      // this.ctxUI.drawImage(this.gameUI_Img,
-      //    522, 529, 26, 48,
-      //    this.fame.x + (32 * this.fameScale_X),
-      //    this.fame.y + 19,
-      //    fameBarWidth,
-      //    this.fame.height - 27
-      // );
+      // Fame Bar
+      this.ctxFixedUI.drawImage(this.gameUI_Img,
+         522, 529, 26, 48,
+         this.fame.x + (32 * this.fameScale_X),
+         this.fame.y + 19,
+         fameBarWidth,
+         this.fame.height - 27
+      );
    }
    
-   drawFame_Count(fameCount) {
+   drawFame_Count(eventPack) {
    
       // Fame Count   
-      this.ctxFixedFront.fillStyle = "darkviolet";
-      this.ctxFixedFront.font = "30px Orbitron-ExtraBold";
-      this.ctxFixedFront.fillText(fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
-      this.ctxFixedFront.strokeText(fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
+      this.ctxFixedUI.fillStyle = "darkviolet";
+      this.ctxFixedUI.font = "30px Orbitron-ExtraBold";
+      this.ctxFixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
+      this.ctxFixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
    }
    
    // Draw HUD
@@ -347,19 +376,19 @@ class Player extends Character {
       this.ctxUI.drawImage(
          this.gameUI_Img,
          sx, sy, sw *ratio, sh,
-         this.HUD.x + (offX * this.HUD_scale_X),                  // Pos X
-         this.HUD.y + (offY * this.HUD_scale_Y),                  // Pos Y
-         barWidth,   // Width
-         this.HUD.height/3 - (offH * this.HUD_scale_Y)            // Height
+         this.HUD.x + (offX * this.HUD_scale_X),
+         this.HUD.y + (offY * this.HUD_scale_Y),
+         barWidth,
+         this.HUD.height/3 - (offH * this.HUD_scale_Y)
       );
    }
 
-   drawHUD_Mana(updatePlayer) {
+   drawHUD_Mana() {
       
-      let manaRatio = updatePlayer.mana / this.initPlayer.baseMana;
+      let manaRatio = this.updatePlayer.mana / this.initPlayer.baseMana;
       
       // Still Castable Mana
-      if(updatePlayer.mana >= this.initPlayer.healCost) {
+      if(this.updatePlayer.mana >= this.initPlayer.healCost) {
 
          this.drawHUD_BaseBar(
             manaRatio,
@@ -378,12 +407,12 @@ class Player extends Character {
       }
    }
 
-   drawHUD_Health(updatePlayer) {
+   drawHUD_Health() {
       
-      let healthRatio = updatePlayer.health / this.initPlayer.baseHealth;
+      let healthRatio = this.updatePlayer.health /this.initPlayer.baseHealth;
 
       // if Health Over 30%
-      if(updatePlayer.health > this.initPlayer.baseHealth * this.minHealthRatio) {
+      if(this.updatePlayer.health > this.initPlayer.baseHealth * this.minHealthRatio) {
 
          // Normal Bar
          this.drawHUD_BaseBar(
@@ -419,9 +448,9 @@ class Player extends Character {
       }
    }
 
-   drawHUD_Energy(updatePlayer) {
+   drawHUD_Energy() {
       
-      let energyRatio = updatePlayer.energy / this.initPlayer.baseEnergy;
+      let energyRatio = this.updatePlayer.energy / this.initPlayer.baseEnergy;
 
       // Yellow Bar
       this.drawHUD_BaseBar(
@@ -432,17 +461,17 @@ class Player extends Character {
    }
    
    // Draw Mini Bars
-   drawBars_Client(ctxToRender, updatePlayer) {
+   drawBars_Client() {
       
       const clientPlayerBar = {
-         ctx: ctxToRender,
+         ctx: this.ctxToRender(),
          x: this.viewSize.width/2 - this.barWidth/2,
          y: this.viewSize.height/2,
          width: this.barWidth,
          height: this.barHeight,
       }
       
-      const attackBar = new GameBar(clientPlayerBar, 0, 65, this.initPlayer.GcD, updatePlayer.speedGcD);
+      const attackBar = new GameBar(clientPlayerBar, 0, 65, this.initPlayer.GcD, this.updatePlayer.speedGcD);
       const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
@@ -454,33 +483,33 @@ class Player extends Character {
       );
    }
 
-   drawBars_OtherPlayer(ctxToRender, updatePlayer) {
+   drawBars_OtherPlayer() {
       
       // Bar Value Array
       const barValueArray = [
          {
             name: "health",
             maxValue: this.initPlayer.baseHealth,
-            value: updatePlayer.health,
+            value: this.updatePlayer.health,
          },
 
          {
             name: "mana",
             maxValue: this.initPlayer.baseMana,
-            value: updatePlayer.mana,
+            value: this.updatePlayer.mana,
          },
 
          {
             name: "energy",
             maxValue: this.initPlayer.baseEnergy,
-            value: updatePlayer.energy,
+            value: this.updatePlayer.energy,
          }
       ];
 
       const otherPlayerBar = {
-         ctx: ctxToRender,
-         x: updatePlayer.x - this.viewport.x,
-         y: updatePlayer.y - this.viewport.y,
+         ctx: this.ctxToRender(),
+         x: this.updatePlayer.x - this.viewport.x,
+         y: this.updatePlayer.y - this.viewport.y,
          width: this.barWidth,
          height: this.barHeight,
       }
@@ -492,20 +521,20 @@ class Player extends Character {
          
          let index;
          let bar = barValueArray[i];
-         if(updatePlayer.isDead) bar.value = 0;
+         if(this.updatePlayer.isDead) bar.value = 0;
          
          const gameBar = new GameBar(otherPlayerBar, -this.barWidth/2, -95 +barGap, bar.maxValue, bar.value);
 
          // Health Bar
          if(bar.name === "health") {
             index = 0;
-            if(updatePlayer.health <= this.initPlayer.baseHealth * this.minHealthRatio) index = 3;
+            if(this.updatePlayer.health <= this.initPlayer.baseHealth * this.minHealthRatio) index = 3;
          }
 
          // Mana Bar
          if(bar.name === "mana") {
             index = 5;
-            if(updatePlayer.mana < this.initPlayer.healCost) index = 6;
+            if(this.updatePlayer.mana < this.initPlayer.healCost) index = 6;
          }
 
          // Energy Bar
@@ -525,7 +554,9 @@ class Player extends Character {
    }
 
    // Draw Player, Ring, Shadow, Name
-   drawRing(ctx, updatePlayer) {
+   drawRing() {
+
+      let ctx = this.ctxToRender();
 
       if(this.isClient) {
          ctx.fillStyle = "rgb(0, 85, 0, 0.5)";
@@ -540,8 +571,8 @@ class Player extends Character {
       ctx.lineWidth = "2";
       ctx.beginPath();
       ctx.ellipse(
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y +this.sprites.radius,
+         this.pos().x,
+         this.pos().y +this.sprites.radius,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -553,8 +584,8 @@ class Player extends Character {
       ctx.lineWidth = "2";
       ctx.beginPath();
       ctx.ellipse(
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y +this.sprites.radius,
+         this.pos().x,
+         this.pos().y +this.sprites.radius,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -563,13 +594,15 @@ class Player extends Character {
       ctx.closePath();
    }
 
-   drawShadow(ctx, updatePlayer) {
+   drawShadow() {
       
+      let ctx = this.ctxToRender();
+
       ctx.fillStyle = "rgba(30, 30, 30, 0.7)";
       ctx.beginPath();
       ctx.ellipse(
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y + this.sprites.radius,
+         this.pos().x,
+         this.pos().y + this.sprites.radius,
          this.sprites.radius * this.shadowSize,
          this.sprites.radius * this.shadowSize/2,
          0, 0, Math.PI * 2
@@ -578,30 +611,34 @@ class Player extends Character {
       ctx.closePath();
    }
 
-   drawPlayer(ctx, updatePlayer) {
+   drawPlayer() {
       
+      let ctx = this.ctxToRender();
+
       ctx.drawImage(
          this.player_Img,
 
          // Source
-         (updatePlayer.frameX + this.animState) * this.sprites.width,
+         (this.updatePlayer.frameX + this.animState) * this.sprites.width,
          this.frameY * this.sprites.height,
          this.sprites.width,
          this.sprites.height,      
          
          // Destination
-         this.pos(updatePlayer).x - this.sprites.width/2,
-         this.pos(updatePlayer).y - this.sprites.height/2 - this.sprites.offsetY,
+         this.pos().x - this.sprites.width/2,
+         this.pos().y - this.sprites.height/2 - this.sprites.offsetY,
          this.sprites.height,
          this.sprites.width,
       );
    }
 
-   drawName(ctx, updatePlayer) {
+   drawName() {
       
+      let ctx = this.ctxToRender();
+
       let offsetY = 95;
-      let namePos_X = this.pos(updatePlayer).x;
-      let namePos_Y = this.pos(updatePlayer).y + offsetY;
+      let namePos_X = this.pos().x;
+      let namePos_Y = this.pos().y + offsetY;
       
       if(this.isClient) ctx.fillStyle = "lime";
       else ctx.fillStyle = "darkorange";
@@ -628,9 +665,9 @@ class Player extends Character {
       }
    }
 
-   playerState(frame, updatePlayer) {
+   playerState(frame) {
 
-      switch(updatePlayer.state) {
+      switch(this.updatePlayer.state) {
          case "walk": {
             
             this.animState = this.frameToJump * 1;
@@ -714,31 +751,28 @@ class Player extends Character {
    // =====================================================================
    render_ClientPlayer(updatePlayer, frame) {
 
+      this.updatePlayer = updatePlayer;
+
       // Animation State
-      this.playerState(frame, updatePlayer);
+      this.playerState(frame);
       
       // Camera 
-      this.scrollCam(updatePlayer);
+      this.scrollCam();
       
       // UI
-      this.drawFame_Bar(updatePlayer);
-      this.drawHUD_Mana(updatePlayer);
-      this.drawHUD_Health(updatePlayer);
-      this.drawHUD_Energy(updatePlayer);
-      
-      let ctxToRender;
-      if(updatePlayer.isCtxPlayer) ctxToRender = this.ctxPlayer;
-      else ctxToRender = this.ctxEnemies;
+      this.drawHUD_Mana();
+      this.drawHUD_Health();
+      this.drawHUD_Energy();
       
       // Player
-      this.drawRing(ctxToRender, updatePlayer);
-      this.drawShadow(ctxToRender, updatePlayer);
-      this.drawPlayer(ctxToRender, updatePlayer);
-      this.drawBars_Client(ctxToRender, updatePlayer);
-      this.drawName(ctxToRender, updatePlayer);
+      this.drawRing();
+      this.drawShadow();
+      this.drawPlayer();
+      this.drawBars_Client();
+      this.drawName();
 
       // ******************************
-      // this.DEBUG_GENERAL(updatePlayer);
+      // this.DEBUG_GENERAL();
       // this.DEBUG_DrawDetectViewport();
       // ******************************
    }
@@ -749,32 +783,30 @@ class Player extends Character {
    // =====================================================================
    render_OtherPlayer(updatePlayer, frame) {
       
+      this.updatePlayer = updatePlayer;
+
       // Animation State
-      this.playerState(frame, updatePlayer);
-      
-      let ctxToRender;
-      if(updatePlayer.isCtxPlayer) ctxToRender = this.ctxPlayer;
-      else ctxToRender = this.ctxEnemies;
+      this.playerState(frame);
 
       // Player
-      this.drawRing(ctxToRender, updatePlayer);
-      this.drawShadow(ctxToRender, updatePlayer);
-      this.drawPlayer(ctxToRender, updatePlayer);
-      this.drawBars_OtherPlayer(ctxToRender, updatePlayer);
-      this.drawName(ctxToRender, updatePlayer);
+      this.drawRing();
+      this.drawShadow();
+      this.drawPlayer();
+      this.drawBars_OtherPlayer();
+      this.drawName();
 
       // ******************************
-      // this.DEBUG_GENERAL(updatePlayer);
+      // this.DEBUG_GENERAL();
       // ******************************
    }
 
 
    // ==>  DEBUG MODE  <==
-   DEBUG_GENERAL(updatePlayer) {
+   DEBUG_GENERAL() {
       
-      this.DEBUG_DrawPlayer(updatePlayer);
-      this.DEBUG_DrawAttackArea(updatePlayer);
-      this.DEBUG_DrawHealthNumber(updatePlayer);
+      this.DEBUG_DrawPlayer();
+      this.DEBUG_DrawAttackArea();
+      this.DEBUG_DrawHealthNumber();
    }
 
    DEBUG_DrawDetectViewport() {
@@ -790,40 +822,40 @@ class Player extends Character {
       );
    }
 
-   DEBUG_DrawPlayer(updatePlayer) {
+   DEBUG_DrawPlayer() {
       
       this.ctxPlayer.fillStyle = "darkviolet";
       this.ctxPlayer.beginPath();
       this.ctxPlayer.arc(
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y,
+         this.pos().x,
+         this.pos().y,
          this.initPlayer.radius, 0, Math.PI * 2
       );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
    }
 
-   DEBUG_DrawAttackArea(updatePlayer) {
+   DEBUG_DrawAttackArea() {
 
       this.ctxPlayer.fillStyle = "orangered";
       this.ctxPlayer.beginPath();
       this.ctxPlayer.arc(
-         this.pos(updatePlayer).x + updatePlayer.attkOffset_X,
-         this.pos(updatePlayer).y + updatePlayer.attkOffset_Y,
+         this.pos().x + this.updatePlayer.attkOffset_X,
+         this.pos().y + this.updatePlayer.attkOffset_Y,
          this.initPlayer.attkRadius, 0, Math.PI * 2
       );
       this.ctxPlayer.fill();
       this.ctxPlayer.closePath();
    }
 
-   DEBUG_DrawHealthNumber(updatePlayer) {
+   DEBUG_DrawHealthNumber() {
 
       this.ctxPlayer.fillStyle = "black";
       this.ctxPlayer.font = "26px Orbitron-Regular";
       this.ctxPlayer.fillText(
-         Math.round(updatePlayer.health),
-         this.pos(updatePlayer).x,
-         this.pos(updatePlayer).y -15
+         Math.round(this.updatePlayer.health),
+         this.pos().x,
+         this.pos().y -15
       );
    }
 }

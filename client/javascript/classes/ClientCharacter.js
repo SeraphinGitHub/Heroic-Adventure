@@ -38,7 +38,7 @@ class Character {
          if(fluidBar.stateStr === "getFame") fluidBar.getFameFluid();
          if(fluidBar.stateStr === "looseFame") fluidBar.looseFameFluid();
 
-         if(fluidBar.fameDuration <= 0) this.removeIndex(this.fluidBarArray, fluidBar);
+         if(fluidBar.fluidDuration <= 0) this.removeIndex(this.fluidBarArray, fluidBar);
       });
    }
 }
