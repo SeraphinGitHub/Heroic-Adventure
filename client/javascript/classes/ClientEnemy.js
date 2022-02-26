@@ -188,7 +188,7 @@ class Enemy extends Character {
    animation(frame, index, spritesNumber) {
       
       if(frame % index === 0) {
-         if(this.frameY < spritesNumber -1) this.frameY++;
+         if(this.frameY < spritesNumber -2) this.frameY++;
 
          else {
             if(!this.isAnimable) this.isAnimable = true;

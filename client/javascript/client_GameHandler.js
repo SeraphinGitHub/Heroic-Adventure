@@ -253,6 +253,7 @@ let initPlayerID;
 
 let initPlayerList = [];
 let initMobList = [];
+
 let updatePlayerList = [];
 let updateMobList = [];
 
@@ -288,7 +289,7 @@ const clientUpdate = () => {
 
       let initEnemy = initMobList[i];
       let updateEnemy = updateMobList[i];
-
+      
       if(initEnemy) initEnemy.render_Enemy(updateEnemy, frame);
    };
 

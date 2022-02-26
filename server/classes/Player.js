@@ -79,8 +79,8 @@ class Player extends Character {
       this.cast_Heal = false;
       
       // Spell - Healing
-      this.healCost = 45;
-      this.baseHealing = this.baseHealth * 0.15; // <== Healing = 25% from MaxHealth
+      this.healCost = 35;
+      this.baseHealing = this.baseHealth * 0.20; // <== Healing = 20% from MaxHealth
       this.calcHealing;
       
       // Movements Speed

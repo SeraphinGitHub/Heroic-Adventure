@@ -187,7 +187,6 @@ const clientState = (socket, playerID) => {
       initPlayerList = playerTempList;
    });
 
-
    // Sync players OnUpdate (Every Frame)
    socket.on("serverSync", (lightPack_PlayerList, lightPack_MobList) => {
 

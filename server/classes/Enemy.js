@@ -21,7 +21,7 @@ class Enemy extends Character {
       this.devFPS = process.env.DEV_FRAME_RATE;
       this.deployFPS = process.env.DEPLOY_FRAME_RATE;
       this.syncCoeff = process.env.SYNC_COEFF;
-      this.syncFormula = this.syncCoeff *this.devFPS /this.deployFPS;
+      this.syncFormula = Math.floor(this.syncCoeff *this.devFPS /this.deployFPS *10) /10;
 
       // State Machine
       this.calcX = spawnX;
@@ -49,7 +49,6 @@ class Enemy extends Character {
       this.baseDamage = enemySpecs.damages;
       this.calcDamage;
       this.damageRatio = enemySpecs.damageRatio;
-      this.attackDelay = enemySpecs.attackDelay;
 
       // FameCost
       this.getFameCost = enemySpecs.getFameCost;
@@ -268,7 +267,7 @@ class Enemy extends Character {
                }
             }
 
-         }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));
+         },this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber) *0.9);
       }
    }
 

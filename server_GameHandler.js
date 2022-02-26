@@ -34,7 +34,6 @@ server.listen(process.env.PORT || 3000, () => {
 // =====================================================================
 // Global Variables
 // =====================================================================
-const playerMax = 300;
 let socketList = {};
 
 // Init Pack
@@ -306,7 +305,11 @@ setInterval(() => {
             radius: mob.wanderRange + mob.radius,
          }
    
-         if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender.push(lightMob);
+         // if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender.push(lightMob);
+         
+         // ********** Temporary ==> Bug Anim need to fix **********
+         mobsToRender.push(lightMob);
+         // ********************************************************
       }
 
       // Set Players to Render in Client
