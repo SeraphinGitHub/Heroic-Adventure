@@ -74,6 +74,7 @@ class Enemy extends Character {
       // Animation
       this.state;
       this.frameY = 1;
+      this.animationDelay = enemySpecs.animationDelay;
       this.imageSrc = enemySpecs.imageSrc;
       this.animSpecs = enemySpecs.animSpecs;
       this.sprites = enemySpecs.sprites;
@@ -231,10 +232,11 @@ class Enemy extends Character {
 
       if(!player.isDead) {
 
+         const animTimeOut = this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber);
+
          // Delay logic to match animation
          setTimeout(() => {
-            this.attack_isAnimable = false;
-
+            
             player.calcDamage = this.damageRnG();
             player.health -= player.calcDamage;
             socket.emit("getDamage", playerPos, player.calcDamage);
@@ -258,16 +260,13 @@ class Enemy extends Character {
                }
                
                if(player.fame >= this.looseFameCost) {
-
-                  socket.emit("looseFame",
-                     player.eventPack(),
-                     playerPos,
-                     serverFame
-                  );
+                  socket.emit("looseFame", playerPos, serverFame);
                }
             }
 
-         },this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber) *0.9);
+         }, animTimeOut *this.animationDelay);
+
+         setTimeout(() => this.attack_isAnimable = false, animTimeOut);
       }
    }
 
@@ -392,6 +391,7 @@ class Enemy extends Character {
 
    initPack() {
       return {
+         id: this.id,
          spawnX: this.spawnX,
          spawnY: this.spawnY,
          name: this.name,
@@ -407,6 +407,7 @@ class Enemy extends Character {
 
    lightPack() {
       return {
+         id: this.id,
          x: this.x,
          y: this.y,
          radius: this.radius,

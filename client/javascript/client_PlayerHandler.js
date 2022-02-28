@@ -168,23 +168,18 @@ const clientState = (socket, playerID) => {
    // Set Enemies OnConnect
    socket.on("initEnemyPack", (initPack_MobList) => {
 
-      initPack_MobList.forEach(enemy => initMobList.push( new Enemy(cl_EnemyObj, enemy) ));
+      initPack_MobList.forEach(enemy => initMobList[enemy.id] = new Enemy(cl_EnemyObj, enemy) );
    });
 
    // Set other players OnConnect
    socket.on("initPlayerPack", (initPack_PlayerList) => {
       
-      initPlayerID = playerID;
-      let playerTempList = [];
+      clientID = playerID;
    
       for(let i in initPack_PlayerList) {
-      
          let initPlayer = initPack_PlayerList[i];
-         const newClient = new Player(cl_PlayerObj, initPlayer);
-         playerTempList.push(newClient);
+         initPlayerList[initPlayer.id] = new Player(cl_PlayerObj, initPlayer);
       }
-
-      initPlayerList = playerTempList;
    });
 
    // Sync players OnUpdate (Every Frame)
@@ -197,7 +192,7 @@ const clientState = (socket, playerID) => {
    // Remove players OnDisconnect
    socket.on("removePlayerPack", (loggedOutPlayer) => {
       
-      clientPlayer.removeIndex(initPlayerList, loggedOutPlayer);
+      if(loggedOutPlayer) delete initPlayerList[loggedOutPlayer.id];
    });
 }
 

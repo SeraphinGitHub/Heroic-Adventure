@@ -110,7 +110,7 @@ p {
    height: 35px;
    width: 80%;
 
-   border-radius: 8px;
+   border-radius: 4px;
    border: solid 1px red;
    background: pink;
 
@@ -131,8 +131,8 @@ p {
 
 .UI-content {
    padding: 10px;
-   border-radius: 10px;
-   background: rgb(206, 227, 255);
+   border-radius: 4px;
+   background: gray;
 }
 
 

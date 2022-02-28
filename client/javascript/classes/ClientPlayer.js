@@ -232,14 +232,14 @@ class Player extends Character {
          });
       });
       
-      socket.on("getFame", (eventPack, playerPos, serverFame) => {
+      socket.on("getFame", (playerPos, serverFame) => {
          
          this.toggleFloatingText(playerPos, {
             x: 0,
             y: 180,
             size: mainTexSize,
             color: "darkviolet",
-            value: `+${serverFame.totalFameCost} Fame`,
+            value: `+${serverFame.fameCost} Fame`,
          });
          
          this.baseFluidity({
@@ -250,20 +250,20 @@ class Player extends Character {
             width: this.fame.width,
             height: this.fame.height,
             fluidSpeed: serverFame.fluidSpeed,
-            fluidDuration: serverFame.totalFameCost /serverFame.fluidSpeed,
+            fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
             
             fameScale_X: this.fameScale_X,
             baseFame: serverFame.baseFame,
             fame: serverFame.fame,
             fameValue: serverFame.fameValue,
             fameCount: serverFame.fameCount,
-            fameCost: serverFame.totalFameCost,
+            fameCost: serverFame.fameCost,
             fameFluidValue: 0,
             isFameReseted: false,
          });
       });
       
-      socket.on("looseFame", (eventPack, playerPos, serverFame) => {
+      socket.on("looseFame", (playerPos, serverFame) => {
 
          this.toggleFloatingText(playerPos, {
             x: 0,
@@ -518,11 +518,9 @@ class Player extends Character {
       let barOffset = 9;
       
       for(let i = 0; i < barValueArray.length; i++) {
-         
+
          let index;
          let bar = barValueArray[i];
-         if(this.updatePlayer.isDead) bar.value = 0;
-         
          const gameBar = new GameBar(otherPlayerBar, -this.barWidth/2, -95 +barGap, bar.maxValue, bar.value);
 
          // Health Bar

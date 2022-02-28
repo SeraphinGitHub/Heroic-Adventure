@@ -20,20 +20,30 @@ class Fluidity {
       // Specs
       this.stateStr = bar.stateStr;
       this.fluidSpeed = bar.fluidSpeed;
-      this.calcMiniWidth = 0;
+      this.miniWidth = 0;
       this.origin_X = 0;
       this.fluidDuration = bar.fluidDuration;
    }
    
+   calcFluid() {
+
+   }
 
    // =====================================================================
    // Fame Bar
    // =====================================================================
-   calcFameFluid(fameCost) {
+   calcMiniWidth() {
 
       const fullBarWidth = this.width - (65 *this.bar.fameScale_X);
       const miniBarWidth = Math.floor(this.bar.fameCost /this.bar.baseFame *fullBarWidth);      
-      this.calcMiniWidth = Math.floor((this.bar.fameFluidValue /this.bar.fameCost) *miniBarWidth);
+      this.miniWidth = Math.floor((this.bar.fameFluidValue /this.bar.fameCost) *miniBarWidth);
+      
+      return fullBarWidth;
+   }
+
+   getFameOriginX(fameCost) {
+
+      const fullBarWidth = this.calcMiniWidth();
 
       // Mini Bar is rendering first
       if(this.bar.fameFluidValue !== fameCost) {
@@ -49,14 +59,17 @@ class Fluidity {
 
       // Mini Bar reset in order to render second
       else if(!this.bar.isFameReseted) {
-         this.calcMiniWidth = 0;
+         this.miniWidth = 0;
          this.bar.fameFluidValue = 0;
          this.bar.isFameReseted = true;
       }
-   }
+   }  
 
-   getFameFluid() { // ==> FameCost already added to fame
+   // Get Fame
+   getFameFluid() {
       
+      // ==> Already include fameCost <==
+
       const initialFame = this.bar.fame -this.bar.fameCost;
       const fameEdge = this.bar.baseFame *this.bar.fameCount;
       
@@ -64,51 +77,51 @@ class Fluidity {
       const firstPart_FameCost = this.bar.fameCost -secondPart_FameCost;
       
       // Fame within FameBar
-      if(initialFame >= fameEdge) this.calcFameFluid(this.bar.fameCost);
+      if(initialFame >= fameEdge) this.getFameOriginX(this.bar.fameCost);
 
       // Fame over FameBar
       else {
-         if(!this.bar.isFameReseted) this.calcFameFluid(firstPart_FameCost); // Render first Part
-         else this.calcFameFluid(secondPart_FameCost); // Render second Part
+         if(!this.bar.isFameReseted) this.getFameOriginX(firstPart_FameCost); // Render first Part
+         else this.getFameOriginX(secondPart_FameCost); // Render second Part
       }    
 
-      this.ctx.drawImage(
-         this.img,
-         552, 477, 26, 48,
-         this.x + (32 *this.bar.fameScale_X) +this.origin_X,
-         this.y +19,
-         this.calcMiniWidth,
-         this.height - 27
-      );
+      this.drawFameFluid(552, 477, 26, 48);
+      
+      // AnimTimeOut before remove from array
+      if(this.fluidDuration > 0) this.fluidDuration --;
+   }
+
+   // Loose Fame
+   looseFameFluid() {
+
+      // ==> Already removed fameCost <==
+
+      const fullBarWidth = this.calcMiniWidth();
+
+      if(this.miniWidth <= 0) this.miniWidth = 0;
+      if(this.bar.fameFluidValue > 0) this.bar.fameFluidValue -= this.fluidSpeed;
+
+      if(this.bar.fameFluidValue <= 0) {
+         this.bar.fameFluidValue = 0;
+         this.miniWidth = 0;
+      }
+
+      this.origin_X = this.bar.fameValue /this.bar.baseFame *fullBarWidth;
+
+      this.drawFameFluid(552, 529, 26, 48);
 
       // AnimTimeOut before remove from array
       if(this.fluidDuration > 0) this.fluidDuration --;
    }
 
-   looseFameFluid() {
-
-      let origin_X = 0;
-
-      let fullBarWidth = this.bar.width - (65 *this.bar.fameScale_X);
-      let miniBarWidth = Math.floor(this.bar.fameCost /this.bar.baseFame *fullBarWidth);
-      let calcMiniWidth = Math.floor((this.bar.fameFluidValue /this.bar.fameCost) *miniBarWidth);
-      
-      if(calcMiniWidth <= 0) calcMiniWidth = 0;
-      if(this.bar.fameFluidValue > 0) this.bar.fameFluidValue -= this.fluidSpeed;
-
-      if(this.bar.fameFluidValue <= 0) {
-         this.bar.fameFluidValue = 0;
-         calcMiniWidth = 0;
-      }
-      
-      origin_X = this.bar.fameValue /this.bar.baseFame *fullBarWidth;
-      
+   // Draw Fame Fluidity
+   drawFameFluid(sX, sY, sW, sH) {
       this.ctx.drawImage(
          this.img,
-         552, 529, 26, 48,
-         this.bar.x + (32 * this.bar.fameScale_X) +origin_X,
+         sX ,sY, sW, sH,
+         this.bar.x + (32 * this.bar.fameScale_X) +this.origin_X,
          this.bar.y +19,
-         calcMiniWidth,
+         this.miniWidth,
          this.bar.height - 27
       );
    }

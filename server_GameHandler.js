@@ -281,15 +281,15 @@ setInterval(() => {
    // ===================================
    for(let i in playerList) {
       
-      let playersToRender = [];
-      let mobsToRender = [];
+      let playersToRender = {};
+      let mobsToRender = {};
 
       let player = playerList[i];
       let lightPlayer = lightPack_PlayerList[i];
       let socket = socketList[player.id];      
       
       // Add first player to Render
-      playersToRender.push(lightPlayer);
+      playersToRender[player.id] = lightPlayer;
 
       const playerViewport = set_DetectViewport(player);
 
@@ -305,11 +305,7 @@ setInterval(() => {
             radius: mob.wanderRange + mob.radius,
          }
    
-         // if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender.push(lightMob);
-         
-         // ********** Temporary ==> Bug Anim need to fix **********
-         mobsToRender.push(lightMob);
-         // ********************************************************
+         if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender[mob.id] = lightMob;
       }
 
       // Set Players to Render in Client
@@ -326,7 +322,7 @@ setInterval(() => {
                radius: other_player.radius,
             }
 
-            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) playersToRender.push(other_LightPlayer);
+            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) playersToRender[other_player.id] = other_LightPlayer;
          }
       }      
 
