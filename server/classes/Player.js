@@ -41,7 +41,8 @@ class Player extends Character {
 
       // Player Health
       this.baseHealth = 250;
-      this.health = this.baseHealth;
+      this.health = 100;
+      // this.health = this.baseHealth;
 
       // Player Energy
       this.baseEnergy = 200;
@@ -97,6 +98,7 @@ class Player extends Character {
       this.right = false;
 
       // States
+      this.isPlayer = true;
       this.isDead = false;
       this.isRespawning = false;
       this.isCasting = false;
@@ -348,31 +350,34 @@ class Player extends Character {
          }, this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber));
          
          let socket = socketList[this.id];
-         this.damagingOtherPlayers(socket, socketList, playerList);
+         this.damagingPlayers(socket, socketList, playerList);
          this.damagingMobs(socketList, mobList);
          
          
-         // Calculate Fame
-         this.calcfame("get", this.totalFameCost, socket);
-
-         const playerPos = {
-            id: this.id,
-            x: this.x,
-            y: this.y,
-         };
-   
-         const serverFame = {
-            baseFame: this.baseFame,
-            fame: this.fame,
-            fameValue: this.fameValue,
-            fameCount: this.fameCount,
-            fameCost: this.totalFameCost,
-            fluidSpeed: this.fluidSpeed,
-         }
-
-         // Send Fame data
+         // After killed Mobs or Players
          if(this.totalFameCost !== 0) {
+            
+            // Calculate Fame
+            this.calcfame("get", this.totalFameCost, socket);
+            
+            const playerPos = {
+               id: this.id,
+               x: this.x,
+               y: this.y,
+            }
+
+            const serverFame = {
+               baseFame: this.baseFame,
+               fame: this.fame,
+               fameValue: this.fameValue,
+               fameCount: this.fameCount,
+               fameCost: this.totalFameCost,
+               fluidSpeed: this.fluidSpeed,
+            }
+            
+            // Send Fame data
             socket.emit("getFame", playerPos, serverFame);
+
             this.totalFameCost = 0;
          }
       }
@@ -393,105 +398,112 @@ class Player extends Character {
       && this.mana >= this.healCost
       && this.health < this.baseHealth) {
 
-         let socket = socketList[this.id];
-
          this.speedGcD = 0;
          this.cast_Heal = false;
          this.heal_isAnimable = true;
-         
-         setTimeout(() => {
-            this.heal_isAnimable = false
-         }, this.animTimeOut(this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber));
-   
+
          this.calcHealing = this.healRnG();
          this.health += this.calcHealing;
          this.mana -= this.healCost;
    
          if(this.health > this.baseHealth) this.health = this.baseHealth;
-   
-         socket.emit("getHeal", {
+         
+         setTimeout(() => {
+            this.heal_isAnimable = false
+         }, this.animTimeOut(this.animSpecs.heal.index, this.animSpecs.heal.spritesNumber));
+
+         const serverHealing = {
+            baseHealth: this.baseHealth,
+            calcHealing: this.calcHealing,
+            health: this.health,
+            fluidSpeed: this.fluidSpeed,
+         }
+
+         const playerPos = {
             id: this.id,
             x: this.x,
             y: this.y,
-            calcHealing: this.calcHealing,
-         });
+         }
+
+         let socket = socketList[this.id];
+         socket.emit("getHeal", playerPos, serverHealing);
       }
    }
    
    // Damaging
-   damagingOtherPlayers(socket, socketList, playerList) {
+   damagingPlayers(socket, socketList, playerList) {
 
       for(let i in playerList) {
          let otherPlayer = playerList[i];
          let otherSocket = socketList[otherPlayer.id];
    
-         if(this.circle_toCircle(this, otherPlayer, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
-   
-            if(this !== otherPlayer
-            && !otherPlayer.isDead) {
-               
-               otherPlayer.calcDamage = this.damageRnG();
-               otherPlayer.health -= otherPlayer.calcDamage;
-   
-               const otherPlayerPos = {
-                  id: otherPlayer.id,
-                  x: otherPlayer.x,
-                  y: otherPlayer.y,
-               };
-               
-               socket.emit("giveDamage", otherPlayerPos, otherPlayer.calcDamage);
-               otherSocket.emit("getDamage", otherPlayerPos, otherPlayer.calcDamage);
-   
-               // Other player's Death
-               if(otherPlayer.health <= 0) {
+         if(this.circle_toCircle(this, otherPlayer, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)
+         && this !== otherPlayer
+         && !otherPlayer.isDead) {
 
-                  this.kills++;
-                  this.totalFameCost += otherPlayer.getFameCost;
-                  
-                  otherPlayer.death();
-                  otherPlayer.calcfame("loose", this.looseFameCost, otherSocket);
-                  
-                  const otherFame = {
-                     baseFame: otherPlayer.baseFame,
-                     fameValue: otherPlayer.fameValue,
-                     fameCost: this.looseFameCost,
-                     fluidSpeed: otherPlayer.fluidSpeed,
-                  }
-                  
-                  otherSocket.emit("looseFame", otherPlayerPos, otherFame);
-               }
-            }
+            otherPlayer.getDamage(this, otherSocket, socket);
          }
       }
    }
    
    damagingMobs(socketList, mobList) {
-   
       let socket = socketList[this.id];
       
       mobList.forEach(mob => {
-   
-         if(!mob.isDead
-         && this.circle_toCircle(this, mob, this.attkOffset_X, this.attkOffset_Y, this.attkRadius)) {
-            
-            mob.calcDamage = this.damageRnG();
-            mob.health -= mob.calcDamage;
-            
-            const mobPos = {
-               x: mob.x,
-               y: mob.y,
-            };
-            
-            socket.emit("giveDamage", mobPos, mob.calcDamage);
-   
-            // Mob's Death
-            if(mob.health <= 0) {
-               
-               mob.death(this);
-               this.totalFameCost += mob.getFameCost;
-            }
+
+         if(this.circle_toCircle(this, mob, this.attkOffset_X, this.attkOffset_Y, this.attkRadius) && !mob.isDead) {
+            mob.getDamage(this, socket);
          }
       });
+   }
+
+   getDamage(enemy, socket, killerSocket) {
+
+      this.calcDamage = enemy.damageRnG();
+      this.health -= this.calcDamage;
+
+      const playerPos = {
+         id: this.id,
+         x: this.x,
+         y: this.y,
+      }
+
+      const serverDamage = {
+         baseHealth: this.baseHealth,
+         calcDamage: this.calcDamage,
+         fluidSpeed: this.fluidSpeed,
+      }
+
+      socket.emit("getDamage", playerPos, serverDamage);
+      if(enemy.isPlayer) killerSocket.emit("giveDamage", playerPos, this.calcDamage);
+
+      // Player's Death
+      if(this.health <= 0) {
+
+         // Killer is a Player
+         if(enemy.isPlayer) {
+            enemy.kills++;
+            enemy.totalFameCost += this.getFameCost;
+         }
+
+         // Killer is a Mob
+         else {
+            enemy.isChasing = true;
+            enemy.speed = enemy.runSpeed;
+         }
+
+         this.death();
+         this.calcfame("loose", enemy.looseFameCost, socket);
+
+         const serverFame = {
+            baseFame: this.baseFame,
+            fameValue: this.fameValue,
+            fameCost: enemy.looseFameCost,
+            fluidSpeed: this.fluidSpeed,
+         }
+         
+         socket.emit("looseFame", playerPos, serverFame);
+      }
    }
    
    // Fame
@@ -515,7 +527,7 @@ class Player extends Character {
          }
          
          const clientFrameRate = Math.floor(1000/60);
-         const animTimeOut = Math.floor((clientFrameRate *fameCost /this.fluidSpeed));
+         const animTimeOut = Math.floor(clientFrameRate *fameCost /this.fluidSpeed);
 
          // Fame within FameBar
          setTimeout(() => {

@@ -20,38 +20,45 @@ class Fluidity {
       // Specs
       this.stateStr = bar.stateStr;
       this.fluidSpeed = bar.fluidSpeed;
-      this.miniWidth = 0;
-      this.origin_X = 0;
       this.fluidDuration = bar.fluidDuration;
+      this.origin_X = 0;
+      this.fullBarWidth;
+      this.miniBarWidth;
+      this.statRatio;
+      this.calcStatRatio;
+      this.fluidWidth;
    }
-   
-   calcFluid() {
 
+   calcMiniWidth() {
+
+      this.statRatio = this.bar.stat /this.bar.baseStat;
+      this.calcStatRatio = this.bar.calcStat /this.bar.baseStat;
+      this.fullBarWidth = this.width - (this.bar.off_W *this.bar.scale_X);
+      this.miniBarWidth = Math.floor(this.calcStatRatio *this.fullBarWidth);      
+      this.fluidWidth = Math.floor((this.bar.statFluidValue /this.bar.calcStat) *this.miniBarWidth);
    }
+
+   animTimeOut() {
+
+      // TimeOut before remove from array
+      if(this.fluidDuration > 0) this.fluidDuration --;
+   }
+
 
    // =====================================================================
    // Fame Bar
    // =====================================================================
-   calcMiniWidth() {
-
-      const fullBarWidth = this.width - (65 *this.bar.fameScale_X);
-      const miniBarWidth = Math.floor(this.bar.fameCost /this.bar.baseFame *fullBarWidth);      
-      this.miniWidth = Math.floor((this.bar.fameFluidValue /this.bar.fameCost) *miniBarWidth);
-      
-      return fullBarWidth;
-   }
-
    getFameOriginX(fameCost) {
-
-      const fullBarWidth = this.calcMiniWidth();
+      
+      this.calcMiniWidth();
 
       // Mini Bar is rendering first
-      if(this.bar.fameFluidValue !== fameCost) {
-         if(this.bar.fameFluidValue < fameCost) this.bar.fameFluidValue += this.fluidSpeed;
-         if(this.bar.fameFluidValue > fameCost) this.bar.fameFluidValue = fameCost;
+      if(this.bar.statFluidValue !== fameCost) {
+         if(this.bar.statFluidValue < fameCost) this.bar.statFluidValue += this.fluidSpeed;
+         if(this.bar.statFluidValue > fameCost) this.bar.statFluidValue = fameCost;
 
          // Mini Bar within FameBar
-         if(!this.bar.isFameReseted) this.origin_X = this.bar.fameValue /this.bar.baseFame *fullBarWidth;
+         if(!this.bar.isFameReseted) this.origin_X = this.statRatio *this.fullBarWidth;
          
          // Mini Bar over FameBar
          else this.origin_X = 0;
@@ -59,25 +66,25 @@ class Fluidity {
 
       // Mini Bar reset in order to render second
       else if(!this.bar.isFameReseted) {
-         this.miniWidth = 0;
-         this.bar.fameFluidValue = 0;
+         this.fluidWidth = 0;
+         this.bar.statFluidValue = 0;
          this.bar.isFameReseted = true;
       }
-   }  
+   }
 
    // Get Fame
    getFameFluid() {
       
       // ==> Already include fameCost <==
 
-      const initialFame = this.bar.fame -this.bar.fameCost;
-      const fameEdge = this.bar.baseFame *this.bar.fameCount;
+      const initialFame = this.bar.fame -this.bar.calcStat;
+      const fameEdge = this.bar.baseStat *this.bar.fameCount;
       
-      const secondPart_FameCost = this.bar.fame - (this.bar.baseFame *this.bar.fameCount);
-      const firstPart_FameCost = this.bar.fameCost -secondPart_FameCost;
+      const secondPart_FameCost = this.bar.fame - (this.bar.baseStat *this.bar.fameCount);
+      const firstPart_FameCost = this.bar.calcStat -secondPart_FameCost;
       
       // Fame within FameBar
-      if(initialFame >= fameEdge) this.getFameOriginX(this.bar.fameCost);
+      if(initialFame >= fameEdge) this.getFameOriginX(this.bar.calcStat);
 
       // Fame over FameBar
       else {
@@ -86,9 +93,7 @@ class Fluidity {
       }    
 
       this.drawFameFluid(552, 477, 26, 48);
-      
-      // AnimTimeOut before remove from array
-      if(this.fluidDuration > 0) this.fluidDuration --;
+      this.animTimeOut();
    }
 
    // Loose Fame
@@ -96,22 +101,20 @@ class Fluidity {
 
       // ==> Already removed fameCost <==
 
-      const fullBarWidth = this.calcMiniWidth();
+      this.calcMiniWidth();
 
-      if(this.miniWidth <= 0) this.miniWidth = 0;
-      if(this.bar.fameFluidValue > 0) this.bar.fameFluidValue -= this.fluidSpeed;
+      if(this.fluidWidth <= 0) this.fluidWidth = 0;
+      if(this.bar.statFluidValue > 0) this.bar.statFluidValue -= this.fluidSpeed;
 
-      if(this.bar.fameFluidValue <= 0) {
-         this.bar.fameFluidValue = 0;
-         this.miniWidth = 0;
+      if(this.bar.statFluidValue <= 0) {
+         this.bar.statFluidValue = 0;
+         this.fluidWidth = 0;
       }
 
-      this.origin_X = this.bar.fameValue /this.bar.baseFame *fullBarWidth;
+      this.origin_X = this.statRatio *this.fullBarWidth;
 
       this.drawFameFluid(552, 529, 26, 48);
-
-      // AnimTimeOut before remove from array
-      if(this.fluidDuration > 0) this.fluidDuration --;
+      this.animTimeOut();
    }
 
    // Draw Fame Fluidity
@@ -119,10 +122,49 @@ class Fluidity {
       this.ctx.drawImage(
          this.img,
          sX ,sY, sW, sH,
-         this.bar.x + (32 * this.bar.fameScale_X) +this.origin_X,
+         this.bar.x + (32 * this.bar.scale_X) +this.origin_X,
          this.bar.y +19,
-         this.miniWidth,
+         this.fluidWidth,
          this.bar.height - 27
+      );
+   }
+
+
+   // =====================================================================
+   // Health Bar
+   // =====================================================================
+   getHealthFluid() {
+
+      this.calcMiniWidth();
+
+      if(this.bar.statFluidValue < this.bar.calcStat) this.bar.statFluidValue += 0.25;
+      else this.bar.statFluidValue = this.bar.calcStat;
+
+      this.origin_X = this.statRatio *this.fullBarWidth;
+
+      // this.drawHealthFluid(6, 376, 729, 45);
+      this.drawHealthFluid(6, 424, 729, 45);
+      this.animTimeOut();
+   }
+
+   looseHealthFluid() {
+
+   }
+
+   // Draw Fame Fluidity
+   drawHealthFluid(sX, sY, sW, sH) {
+      this.ctx.drawImage(
+         this.img,
+
+         sW *this.statRatio,
+         sY,
+         sW *this.calcStatRatio,
+         sH,
+
+         this.bar.x + (this.bar.off_X * this.bar.scale_X) +this.origin_X, 
+         this.bar.y + (this.bar.off_Y * this.bar.scale_Y),
+         this.fluidWidth,
+         this.bar.height/3 - (this.bar.off_H * this.bar.scale_Y)
       );
    }
 }

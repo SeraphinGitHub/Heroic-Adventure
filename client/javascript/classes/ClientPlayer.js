@@ -53,6 +53,21 @@ class Player extends Character {
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
+
+      this.healthOffset = {
+         x: 15,
+         y: 39,
+         width: 30,
+         height: 9,
+      };      
+      
+      this.manaOffset = {
+         x: 82,
+         y: 10,
+         width: 165,
+         height: 8,
+      }
+
       this.minHealthRatio = 0.3; // Min Health before flash (%)
       this.flashingSpeed = 6;
       this.flashFrame = 0;
@@ -71,6 +86,7 @@ class Player extends Character {
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
+      this.fame_OffW = 65;
 
       // Player Sprites
       this.sprites = initPlayer.sprites;
@@ -199,48 +215,84 @@ class Player extends Character {
    
       socket.on("drawEventPack", (eventPack) => this.drawOnEvent(eventPack));
 
-      socket.on("getHeal", (serverPlayer) => {
+      socket.on("getHeal", (playerPos, serverHealing) => {
 
-         this.toggleFloatingText(serverPlayer, {
-            x: -5,
-            y: -75,
-            size: mainTexSize,
-            color: "lime",
-            value: `+${serverPlayer.calcHealing}`,
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -75,
+               size: mainTexSize,
+               color: "lime",
+               value: `+${serverHealing.calcHealing}`,
+            }
+         );
+
+         this.baseFluidity({
+            stateStr: "getHealth",
+
+            x: this.HUD.x,
+            y: this.HUD.y,
+            width: this.HUD.width,
+            height: this.HUD.height,
+            scale_X: this.HUD_scale_X,
+            scale_Y: this.HUD_scale_Y,
+            
+            off_X: this.healthOffset.x,
+            off_Y: this.healthOffset.y,
+            off_W: this.healthOffset.width,
+            off_H: this.healthOffset.height,
+
+            baseStat: serverHealing.baseHealth,
+            stat: serverHealing.health,
+            calcStat: serverHealing.calcHealing,
+            statFluidValue: 0,
+            fluidSpeed: serverHealing.fluidSpeed,
+            // fluidDuration: serverHealing.calcHealing /serverHealing.fluidSpeed,
+            fluidDuration: serverHealing.calcHealing /2.5,
          });
       });
    
       socket.on("giveDamage", (playerPos, calcDamage) => {
 
-         this.toggleFloatingText(playerPos, {
-            x: -5,
-            y: -100,
-            size: mainTexSize,
-            color: "yellow",
-            value: `-${calcDamage}`,
-         });
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -100,
+               size: mainTexSize,
+               color: "yellow",
+               value: `-${calcDamage}`,
+            }
+         );
       });
    
-      socket.on("getDamage", (playerPos, calcDamage) => {
+      socket.on("getDamage", (playerPos, serverDamage) => {
 
-         this.toggleFloatingText(playerPos, {
-            x: -5,
-            y: -85,
-            size: mainTexSize,
-            color: "red",
-            value: `-${calcDamage}`,
-         });
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -85,
+               size: mainTexSize,
+               color: "red",
+               value: `-${serverDamage.calcDamage}`,
+            }
+         );
       });
       
       socket.on("getFame", (playerPos, serverFame) => {
          
-         this.toggleFloatingText(playerPos, {
-            x: 0,
-            y: 180,
-            size: mainTexSize,
-            color: "darkviolet",
-            value: `+${serverFame.fameCost} Fame`,
-         });
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: 0,
+               y: 180,
+               size: mainTexSize,
+               color: "darkviolet",
+               value: `+${serverFame.fameCost} Fame`,
+            }
+         );
          
          this.baseFluidity({
             stateStr: "getFame",
@@ -249,29 +301,34 @@ class Player extends Character {
             y: this.fame.y,
             width: this.fame.width,
             height: this.fame.height,
+            off_W: this.fame_OffW,
+            scale_X: this.fameScale_X,
+            
+            baseStat: serverFame.baseFame,
+            stat: serverFame.fameValue,
+            calcStat: serverFame.fameCost,
+            statFluidValue: 0,
+
+            isFameReseted: false,
+            fame: serverFame.fame,
+            fameCount: serverFame.fameCount,
             fluidSpeed: serverFame.fluidSpeed,
             fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
-            
-            fameScale_X: this.fameScale_X,
-            baseFame: serverFame.baseFame,
-            fame: serverFame.fame,
-            fameValue: serverFame.fameValue,
-            fameCount: serverFame.fameCount,
-            fameCost: serverFame.fameCost,
-            fameFluidValue: 0,
-            isFameReseted: false,
          });
       });
       
       socket.on("looseFame", (playerPos, serverFame) => {
 
-         this.toggleFloatingText(playerPos, {
-            x: 0,
-            y: 180,
-            size: mainTexSize,
-            color: "red",
-            value: `-${serverFame.fameCost} Fame`,
-         });
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: 0,
+               y: 180,
+               size: mainTexSize,
+               color: "red",
+               value: `-${serverFame.fameCost} Fame`,
+            }
+         );
 
          this.baseFluidity({
             stateStr: "looseFame",
@@ -280,17 +337,19 @@ class Player extends Character {
             y: this.fame.y,
             width: this.fame.width,
             height: this.fame.height,
+            off_W: this.fame_OffW,
+            scale_X: this.fameScale_X,
+            
+            baseStat: serverFame.baseFame,
+            stat: serverFame.fameValue,
+            calcStat: serverFame.fameCost,
+            statFluidValue: serverFame.fameCost,
+            
+            isFameReseted: false,
+            fame: serverFame.fame,
+            fameCount: serverFame.fameCount,
             fluidSpeed: serverFame.fluidSpeed,
             fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
-
-            fameScale_X: this.fameScale_X,
-            baseFame: serverFame.baseFame,
-            fame: serverFame.fame,
-            fameValue: serverFame.fameValue,
-            fameCount: serverFame.fameCount,
-            fameCost: serverFame.fameCost,
-            fameFluidValue: serverFame.fameCost,
-            isFameReseted: false,
          });
       });
    }
@@ -320,7 +379,7 @@ class Player extends Character {
    drawFame_Bar(eventPack) {
       
       let fameBarWidth = Math.floor(
-         (eventPack.fameValue /eventPack.baseFame) * (this.fame.width - (65 * this.fameScale_X))
+         (eventPack.fameValue /eventPack.baseFame) * (this.fame.width - (this.fame_OffW * this.fameScale_X))
       );
    
       // Fame Bar
@@ -393,7 +452,10 @@ class Player extends Character {
          this.drawHUD_BaseBar(
             manaRatio,
             6, 528, 460, 47,
-            82, 10, 165, 8
+            this.manaOffset.x,
+            this.manaOffset.y,
+            this.manaOffset.width,
+            this.manaOffset.height
          );
       }
       
@@ -402,12 +464,25 @@ class Player extends Character {
          this.drawHUD_BaseBar(
             manaRatio,
             5, 475, 461, 47,
-            82, 10, 165, 8
+            this.manaOffset.x,
+            this.manaOffset.y,
+            this.manaOffset.width,
+            this.manaOffset.height
          );
       }
    }
 
    drawHUD_Health() {
+
+      let delayedHealth = this.updatePlayer.health;
+      let health;
+      const clientFrameRate = Math.floor(1000/60);
+      const animTimeOut = Math.floor(clientFrameRate *this.calcHealing /this.fluidSpeed *100);
+
+      // console.log(animTimeOut); // ******************************************************
+      
+      setTimeout(() => {
+      }, animTimeOut);
       
       let healthRatio = this.updatePlayer.health /this.initPlayer.baseHealth;
 
@@ -418,7 +493,10 @@ class Player extends Character {
          this.drawHUD_BaseBar(
             healthRatio,
             5, 327, 729, 45,
-            15, 39, 30, 9
+            this.healthOffset.x,
+            this.healthOffset.y,
+            this.healthOffset.width,
+            this.healthOffset.height
          );
       }
 
@@ -429,7 +507,10 @@ class Player extends Character {
          this.drawHUD_BaseBar(
             healthRatio,
             6, 424, 729, 45,
-            15, 39, 30, 9
+            this.healthOffset.x,
+            this.healthOffset.y,
+            this.healthOffset.width,
+            this.healthOffset.height
          );
 
          this.flashFrame++;
@@ -440,7 +521,10 @@ class Player extends Character {
             this.drawHUD_BaseBar(
                healthRatio,
                5, 327, 729, 45,
-               15, 39, 30, 9
+               this.healthOffset.x,
+               this.healthOffset.y,
+               this.healthOffset.width,
+               this.healthOffset.height
             );
          }
 

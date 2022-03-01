@@ -224,49 +224,32 @@ class Enemy extends Character {
    
    damagingPlayers(socket, player) {
 
-      const playerPos = {
-         id: player.id,
-         x: player.x,
-         y: player.y,
-      };
-
       if(!player.isDead) {
-
          const animTimeOut = this.animTimeOut(this.animSpecs.attack.index, this.animSpecs.attack.spritesNumber);
 
-         // Delay logic to match animation
-         setTimeout(() => {
-            
-            player.calcDamage = this.damageRnG();
-            player.health -= player.calcDamage;
-            socket.emit("getDamage", playerPos, player.calcDamage);
-            
-            // Player's Death
-            if(player.health <= 0) {
-               
-               this.isChasing = true;
-               this.speed = this.runSpeed;
-
-               player.death();
-               player.calcfame("loose", this.looseFameCost, socket);
-         
-               const serverFame = {
-                  baseFame: player.baseFame,
-                  fame: player.fame,
-                  fameValue: player.fameValue,
-                  fameCount: player.fameCount,
-                  fameCost: this.looseFameCost,
-                  fluidSpeed: player.fluidSpeed,
-               }
-               
-               if(player.fame >= this.looseFameCost) {
-                  socket.emit("looseFame", playerPos, serverFame);
-               }
-            }
-
-         }, animTimeOut *this.animationDelay);
-
+         // Delay the logic to match animation
+         setTimeout(() => player.getDamage(this, socket), animTimeOut *this.animationDelay);
          setTimeout(() => this.attack_isAnimable = false, animTimeOut);
+      }
+   }
+
+   getDamage(enemy, killetSocket) {
+
+      this.calcDamage = enemy.damageRnG();
+      this.health -= this.calcDamage;
+      
+      const mobPos = {
+         x: this.x,
+         y: this.y,
+      };
+      
+      killetSocket.emit("giveDamage", mobPos, this.calcDamage);
+
+      // Mob's Death
+      if(this.health <= 0) {
+         
+         this.death(enemy);
+         enemy.totalFameCost += this.getFameCost;
       }
    }
 
