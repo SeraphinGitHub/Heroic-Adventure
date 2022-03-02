@@ -69,7 +69,7 @@ class Player extends Character {
       }
 
       this.minHealthRatio = 0.3; // Min Health before flash (%)
-      this.flashingSpeed = 6;
+      this.flashingSpeed = 6; // Lower = faster
       this.flashFrame = 0;
 
       // Game UI ==> Mini Bars
@@ -122,15 +122,6 @@ class Player extends Character {
    ctxToRender() {
       if(this.updatePlayer.isCtxPlayer) return this.ctxPlayer;
       else return this.ctxEnemies;
-   }
-
-   // Draw on Event
-   drawOnEvent(eventPack) {
-
-      this.ctxFixedUI.clearRect(0, 0, viewSize.width, viewSize.height);
-      
-      this.drawFame_Bar(eventPack);
-      this.drawFame_Count(eventPack);
    }
 
    // Init Map
@@ -202,85 +193,16 @@ class Player extends Character {
    }
 
    // Fluidity
-   baseFluidity(barSpecs) {
-      
-      const newFluidBar = new Fluidity(this.ctxUI, this.gameUI_Img, barSpecs);
-      this.fluidBarArray.push(newFluidBar);
-   }
-
-   // Events listening
-   initFloatingText(socket) {
+   initTextAndFluidity(socket) {
    
       const mainTexSize = 34;
-   
-      socket.on("drawEventPack", (eventPack) => this.drawOnEvent(eventPack));
 
-      socket.on("getHeal", (playerPos, serverHealing) => {
+      // ========== Fame ==========
+      socket.on("fameEvent", (eventPack) => {
 
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -75,
-               size: mainTexSize,
-               color: "lime",
-               value: `+${serverHealing.calcHealing}`,
-            }
-         );
-
-         this.baseFluidity({
-            stateStr: "getHealth",
-
-            x: this.HUD.x,
-            y: this.HUD.y,
-            width: this.HUD.width,
-            height: this.HUD.height,
-            scale_X: this.HUD_scale_X,
-            scale_Y: this.HUD_scale_Y,
-            
-            off_X: this.healthOffset.x,
-            off_Y: this.healthOffset.y,
-            off_W: this.healthOffset.width,
-            off_H: this.healthOffset.height,
-
-            baseStat: serverHealing.baseHealth,
-            stat: serverHealing.health,
-            calcStat: serverHealing.calcHealing,
-            statFluidValue: 0,
-            fluidSpeed: serverHealing.fluidSpeed,
-            // fluidDuration: serverHealing.calcHealing /serverHealing.fluidSpeed,
-            fluidDuration: serverHealing.calcHealing /2.5,
-         });
+         this.fameEvent(eventPack);
       });
-   
-      socket.on("giveDamage", (playerPos, calcDamage) => {
 
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -100,
-               size: mainTexSize,
-               color: "yellow",
-               value: `-${calcDamage}`,
-            }
-         );
-      });
-   
-      socket.on("getDamage", (playerPos, serverDamage) => {
-
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -85,
-               size: mainTexSize,
-               color: "red",
-               value: `-${serverDamage.calcDamage}`,
-            }
-         );
-      });
-      
       socket.on("getFame", (playerPos, serverFame) => {
          
          this.toggleFloatingText(
@@ -313,7 +235,6 @@ class Player extends Character {
             fame: serverFame.fame,
             fameCount: serverFame.fameCount,
             fluidSpeed: serverFame.fluidSpeed,
-            fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
          });
       });
       
@@ -349,12 +270,141 @@ class Player extends Character {
             fame: serverFame.fame,
             fameCount: serverFame.fameCount,
             fluidSpeed: serverFame.fluidSpeed,
-            fluidDuration: serverFame.fameCost /serverFame.fluidSpeed,
+         });
+      });
+
+
+      // ========== Mana ==========
+      socket.on("looseMana", (serverMana) => {
+
+         this.baseFluidity({
+            stateStr: "looseMana",
+
+            x: this.HUD.x,
+            y: this.HUD.y,
+            width: this.HUD.width,
+            height: this.HUD.height,
+            scale_X: this.HUD_scale_X,
+            scale_Y: this.HUD_scale_Y,
+            
+            off_X: this.manaOffset.x,
+            off_Y: this.manaOffset.y,
+            off_W: this.manaOffset.width,
+            off_H: this.manaOffset.height,
+
+            baseStat: serverMana.baseMana,
+            stat: serverMana.mana,
+            calcStat: serverMana.calcManaCost,
+            statFluidValue: serverMana.calcManaCost,
+            fluidSpeed: serverMana.fluidSpeed,
+         });
+      });
+
+
+      // ========== Health ==========
+      socket.on("getHeal", (playerPos, serverHealing) => {
+
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -75,
+               size: mainTexSize,
+               color: "lime",
+               value: `+${serverHealing.calcHealing}`,
+            }
+         );
+
+         this.baseFluidity({
+            stateStr: "getHealth",
+
+            x: this.HUD.x,
+            y: this.HUD.y,
+            width: this.HUD.width,
+            height: this.HUD.height,
+            scale_X: this.HUD_scale_X,
+            scale_Y: this.HUD_scale_Y,
+            
+            off_X: this.healthOffset.x,
+            off_Y: this.healthOffset.y,
+            off_W: this.healthOffset.width,
+            off_H: this.healthOffset.height,
+
+            baseStat: serverHealing.baseHealth,
+            stat: serverHealing.health,
+            calcStat: serverHealing.calcHealing,
+            statFluidValue: serverHealing.calcHealing,
+            fluidSpeed: serverHealing.fluidSpeed,
+         });
+      });
+   
+      socket.on("giveDamage", (playerPos, calcDamage) => {
+
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -100,
+               size: mainTexSize,
+               color: "yellow",
+               value: `-${calcDamage}`,
+            }
+         );
+      });
+   
+      socket.on("getDamage", (playerPos, serverDamage) => {
+
+         this.toggleFloatingText(
+            playerPos,
+            {
+               x: -5,
+               y: -85,
+               size: mainTexSize,
+               color: "red",
+               value: `-${serverDamage.calcDamage}`,
+            }
+         );
+
+         this.baseFluidity({
+            stateStr: "looseHealth",
+
+            x: this.HUD.x,
+            y: this.HUD.y,
+            width: this.HUD.width,
+            height: this.HUD.height,
+            scale_X: this.HUD_scale_X,
+            scale_Y: this.HUD_scale_Y,
+            
+            off_X: this.healthOffset.x,
+            off_Y: this.healthOffset.y,
+            off_W: this.healthOffset.width,
+            off_H: this.healthOffset.height,
+
+            baseStat: serverDamage.baseHealth,
+            stat: serverDamage.health,
+            calcStat: serverDamage.calcDamage,
+            statFluidValue: serverDamage.calcDamage,
+            fluidSpeed: serverDamage.fluidSpeed,
          });
       });
    }
 
+   // Fluidity
+   baseFluidity(barSpecs) {
+      
+      const newFluidBar = new Fluidity(this.ctxUI, this.gameUI_Img, barSpecs);
+      this.fluidBarArray.push(newFluidBar);
+   }
+   
    // Draw Fame
+   fameEvent(eventPack) {
+
+      this.ctxFixedUI.clearRect(0, 0, viewSize.width, viewSize.height);
+      
+      this.drawFame_Bar(eventPack);
+      this.drawFame_Count(eventPack);
+   }
+   
    drawFame_Frame() {
 
       // Background
@@ -474,16 +524,6 @@ class Player extends Character {
 
    drawHUD_Health() {
 
-      let delayedHealth = this.updatePlayer.health;
-      let health;
-      const clientFrameRate = Math.floor(1000/60);
-      const animTimeOut = Math.floor(clientFrameRate *this.calcHealing /this.fluidSpeed *100);
-
-      // console.log(animTimeOut); // ******************************************************
-      
-      setTimeout(() => {
-      }, animTimeOut);
-      
       let healthRatio = this.updatePlayer.health /this.initPlayer.baseHealth;
 
       // if Health Over 30%

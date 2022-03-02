@@ -20,7 +20,7 @@ class Fluidity {
       // Specs
       this.stateStr = bar.stateStr;
       this.fluidSpeed = bar.fluidSpeed;
-      this.fluidDuration = bar.fluidDuration;
+      this.fluidDuration = Math.floor(bar.calcStat /bar.fluidSpeed);
       this.origin_X = 0;
       this.fullBarWidth;
       this.miniBarWidth;
@@ -33,6 +33,7 @@ class Fluidity {
 
       this.statRatio = this.bar.stat /this.bar.baseStat;
       this.calcStatRatio = this.bar.calcStat /this.bar.baseStat;
+
       this.fullBarWidth = this.width - (this.bar.off_W *this.bar.scale_X);
       this.miniBarWidth = Math.floor(this.calcStatRatio *this.fullBarWidth);      
       this.fluidWidth = Math.floor((this.bar.statFluidValue /this.bar.calcStat) *this.miniBarWidth);
@@ -43,12 +44,12 @@ class Fluidity {
       // TimeOut before remove from array
       if(this.fluidDuration > 0) this.fluidDuration --;
    }
-
+   
 
    // =====================================================================
    // Fame Bar
    // =====================================================================
-   getFameOriginX(fameCost) {
+   getFame_OriginX(fameCost) {
       
       this.calcMiniWidth();
 
@@ -71,6 +72,17 @@ class Fluidity {
          this.bar.isFameReseted = true;
       }
    }
+   
+   drawFameFluid(sX, sY, sW, sH) {
+      this.ctx.drawImage(
+         this.img,
+         sX ,sY, sW, sH,
+         this.bar.x + (32 * this.bar.scale_X) +this.origin_X,
+         this.bar.y +19,
+         this.fluidWidth,
+         this.bar.height - 27
+      );
+   }
 
    // Get Fame
    getFameFluid() {
@@ -84,18 +96,18 @@ class Fluidity {
       const firstPart_FameCost = this.bar.calcStat -secondPart_FameCost;
       
       // Fame within FameBar
-      if(initialFame >= fameEdge) this.getFameOriginX(this.bar.calcStat);
+      if(initialFame >= fameEdge) this.getFame_OriginX(this.bar.calcStat);
 
       // Fame over FameBar
       else {
-         if(!this.bar.isFameReseted) this.getFameOriginX(firstPart_FameCost); // Render first Part
-         else this.getFameOriginX(secondPart_FameCost); // Render second Part
+         if(!this.bar.isFameReseted) this.getFame_OriginX(firstPart_FameCost); // Render first Part
+         else this.getFame_OriginX(secondPart_FameCost); // Render second Part
       }    
 
       this.drawFameFluid(552, 477, 26, 48);
       this.animTimeOut();
    }
-
+   
    // Loose Fame
    looseFameFluid() {
 
@@ -116,55 +128,58 @@ class Fluidity {
       this.drawFameFluid(552, 529, 26, 48);
       this.animTimeOut();
    }
-
-   // Draw Fame Fluidity
-   drawFameFluid(sX, sY, sW, sH) {
-      this.ctx.drawImage(
-         this.img,
-         sX ,sY, sW, sH,
-         this.bar.x + (32 * this.bar.scale_X) +this.origin_X,
-         this.bar.y +19,
-         this.fluidWidth,
-         this.bar.height - 27
-      );
-   }
-
+   
 
    // =====================================================================
-   // Health Bar
+   // HUD Bar
    // =====================================================================
-   getHealthFluid() {
+   getHUD_OriginX(sX, sY, sW, sH, modifier) {
 
       this.calcMiniWidth();
 
-      if(this.bar.statFluidValue < this.bar.calcStat) this.bar.statFluidValue += 0.25;
-      else this.bar.statFluidValue = this.bar.calcStat;
+      if(this.bar.statFluidValue > 0) this.bar.statFluidValue -= this.fluidSpeed;
+      else this.bar.statFluidValue = 0;
 
-      this.origin_X = this.statRatio *this.fullBarWidth;
+      this.origin_X = this.statRatio *this.fullBarWidth
 
-      // this.drawHealthFluid(6, 376, 729, 45);
-      this.drawHealthFluid(6, 424, 729, 45);
+      this.drawHUD_Fluid(sX, sY, sW, sH, modifier);
       this.animTimeOut();
    }
 
-   looseHealthFluid() {
+   drawHUD_Fluid(sX, sY, sW, sH, modifier) {
 
-   }
+      const healWidth = sW *(this.bar.statFluidValue /this.bar.baseStat);
+      const start_X = sX + sW *this.statRatio -healWidth/2 + (healWidth/2 *modifier);
 
-   // Draw Fame Fluidity
-   drawHealthFluid(sX, sY, sW, sH) {
       this.ctx.drawImage(
          this.img,
+         start_X, sY, healWidth, sH,
 
-         sW *this.statRatio,
-         sY,
-         sW *this.calcStatRatio,
-         sH,
-
-         this.bar.x + (this.bar.off_X * this.bar.scale_X) +this.origin_X, 
+         this.bar.x + (this.bar.off_X * this.bar.scale_X) +this.origin_X,
          this.bar.y + (this.bar.off_Y * this.bar.scale_Y),
-         this.fluidWidth,
+         this.fluidWidth *modifier,
          this.bar.height/3 - (this.bar.off_H * this.bar.scale_Y)
       );
+   }
+
+   // Get Health
+   getHealthFluid() {
+
+      const modifier = -1;
+      this.getHUD_OriginX(6, 376, 729, 45, modifier);
+   }
+
+   // Loose Health
+   looseHealthFluid() {
+
+      const modifier = 1;
+      this.getHUD_OriginX(6, 424, 729, 45, modifier);
+   }
+   
+   // Loose Mana
+   looseManaFluid() {
+
+      const modifier = 1;
+      this.getHUD_OriginX(521, 580, 460, 47, modifier);
    }
 }

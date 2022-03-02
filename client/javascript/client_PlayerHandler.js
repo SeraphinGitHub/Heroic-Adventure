@@ -209,7 +209,7 @@ const initPlayer = (socket, playerID) => {
    clientPlayer.drawHUD_Frame();
    clientPlayer.drawFame_Frame();
    clientPlayer.initMapSpecs(socket);
-   clientPlayer.initFloatingText(socket);
+   clientPlayer.initTextAndFluidity(socket);
    handleGameUI(socket);
    deathScreen(socket);
    onKeyboardInput(socket);

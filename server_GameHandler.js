@@ -104,7 +104,7 @@ const onConnect = (socket) => {
       
       player.name = data;
       socket.emit("initEnemyPack", initPack_MobList);
-      socket.emit("drawEventPack", player.eventPack());
+      socket.emit("fameEvent", player.famePack());
 
       socket.emit("playerStats", {
          
