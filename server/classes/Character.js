@@ -22,33 +22,61 @@ class Character {
       }
    }
 
-   square_toCircle(square, circle) {
+   square_toCircle(stateStr, square, circle) {
 
-      // const square = {
-      //    x: sqrX,
-      //    y: sqrY,
-      //    height: sqrH,
-      //    width: sqrW,
-      // }
+      const circ = {
+         left:   circle.x -circle.radius,
+         right:  circle.x +circle.radius,
+         top:    circle.y -circle.radius,
+         bottom: circle.y +circle.radius,
+      }
+
+      const sqr = {
+         left:   square.x,
+         right:  square.x +square.width,
+         top:    square.y,
+         bottom: square.y +square.height,
+      }
       
-      // const circle = {
-      //    x: cirX,
-      //    y: cirY,
-      //    radius: cirRadius,
-      // }
+      if(stateStr === "normal") return this.sqr_Circ_Normal(circ, sqr);
+      if(stateStr === "special") return this.sqr_Circ_Special(circ, sqr);
+   }
 
-      if(  (circle.x + circle.radius > square.x
-         && circle.x - circle.radius < square.x + square.width
-         || circle.x - circle.radius < square.x + square.width
-         && circle.x + circle.radius > square.x)
-         
-         &&(circle.y + circle.radius > square.y
-         && circle.y - circle.radius < square.y + square.height
-         || circle.y - circle.radius < square.y + square.height
-         && circle.y + circle.radius > square.y) ) {
-         
+   sqr_Circ_Normal(circ, sqr) {
+
+      if(circ.right  > sqr.left
+      && circ.left   < sqr.right
+      && circ.bottom > sqr.top
+      && circ.top    < sqr.bottom) {
+      
          return true;
       }
+   }
+
+   sqr_Circ_Special(circ, sqr) {
+
+      const collide = {
+         left: false,
+         right: false,
+         top: false,
+         bottom: false,
+      }
+      
+      // Horizontal Check
+      if(circ.bottom > sqr.top && circ.top < sqr.bottom) {
+
+         if(circ.right > sqr.left && circ.left < sqr.left) collide.left = true;
+         if(circ.left < sqr.right && circ.right > sqr.right) collide.right = true;
+      }
+
+      // Vertical Check
+      if(circ.right > sqr.left && circ.left < sqr.right) {
+
+         if(circ.bottom > sqr.top && circ.top < sqr.top) collide.top = true;
+         if(circ.top < sqr.bottom && circ.bottom > sqr.bottom) collide.bottom = true;
+      }
+
+      return collide;
    }
    
    circle_toCircle(first, second, offsetX, offsetY, radius) {

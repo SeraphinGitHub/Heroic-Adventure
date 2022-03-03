@@ -80,7 +80,7 @@ const extractPlayerName = (socket, messageIndexed) => {
    else receiverName = splitedName;
    
    if(receiverName !== ""
-   && receiverName !== logged_PlayerName
+   // && receiverName !== logged_PlayerName
    && !messageText.includes(offlineStr)) {
       
       socket.emit("chatReceiverName", receiverName);

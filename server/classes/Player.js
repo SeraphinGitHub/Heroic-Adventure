@@ -8,7 +8,9 @@ class Player extends Character {
    constructor(id) {
       
       super();
-      
+
+      this.isDEBUG_Position = false;
+
       this.id = id;
       this.name = "";
       this.x = 1080;
@@ -58,8 +60,8 @@ class Player extends Character {
       this.totalManaCost = 0;
 
       // Fame
-      this.getFameCost = 1000;
-      this.looseFameCost = 700;
+      this.getFameCost = 600;
+      this.looseFameCost = 400;
 
       this.baseFame = 10000;
       this.fame = 0;
@@ -340,7 +342,7 @@ class Player extends Character {
       && this.speedGcD >= this.GcD) {
 
          // ***************************
-         // this.DEBUG_PlayerPosition();
+         if(this.isDEBUG_Position) this.DEBUG_PlayerPosition();
          // ***************************
          
          this.speedGcD = 0;
@@ -699,10 +701,41 @@ class Player extends Character {
       };
    }
 
+
+   test_unwakable() {
+
+      const rect = {
+         x: 810,
+         y: 810,
+         width: 180,
+         height: 90,
+      }
+
+      const circle = {
+         x: this.x,
+         y: this.y,
+         radius: this.radius,
+      }
+
+      const collide = this.square_toCircle("special", rect, circle);
+
+      // if(collide) console.log(collide); // ********
+
+      if(collide.left) console.log("Left"); // ********
+      if(collide.right) console.log("Right"); // ********
+      if(collide.top) console.log("Top"); // ********
+      if(collide.bottom) console.log("Bottom"); // ********
+   }
+
    // Update (Sync)
    update(socketList, playerList, mobList, lightPack_PlayerList) {
 
       if(!this.isDead) {
+
+
+         // ***************************
+         this.test_unwakable();
+         // ***************************
 
          this.movements();
          this.running();

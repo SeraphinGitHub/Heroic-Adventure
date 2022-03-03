@@ -894,8 +894,7 @@ class Player extends Character {
       this.drawName();
 
       // ******************************
-      // this.DEBUG_GENERAL();
-      // this.DEBUG_DrawDetectViewport();
+      this.DEBUG_GENERAL();
       // ******************************
    }
 
@@ -927,8 +926,42 @@ class Player extends Character {
    DEBUG_GENERAL() {
       
       this.DEBUG_DrawPlayer();
-      this.DEBUG_DrawAttackArea();
-      this.DEBUG_DrawHealthNumber();
+      // this.DEBUG_DrawAttackArea();
+      // this.DEBUG_DrawHealthNumber();
+      // this.DEBUG_DrawDetectViewport();
+      // this.DEBUG_DrawOrigin();
+   }
+
+   DEBUG_DrawOrigin() {
+      
+      const lineSize = 100;
+      this.ctxUI.lineWidth = 2;
+      this.ctxUI.strokeStyle = "red";
+
+      // Horizontal Line
+      this.ctxUI.beginPath();
+      this.ctxUI.moveTo(
+         this.pos().x -lineSize,
+         this.pos().y,
+      );
+      this.ctxUI.lineTo(
+         this.pos().x +lineSize,
+         this.pos().y,
+      );
+      this.ctxUI.stroke();
+
+
+      // Vertical Line
+      this.ctxUI.beginPath();
+      this.ctxUI.moveTo(
+         this.pos().x,
+         this.pos().y -lineSize,
+      );
+      this.ctxUI.lineTo(
+         this.pos().x,
+         this.pos().y +lineSize,
+      );
+      this.ctxUI.stroke();
    }
 
    DEBUG_DrawDetectViewport() {

@@ -253,7 +253,7 @@ setInterval(() => {
             radius: mob.wanderRange + mob.radius,
          }
       
-         if(player.square_toCircle(playerViewport, mobHitBox)) {
+         if(player.square_toCircle("normal", playerViewport, mobHitBox)) {
          
             if(!mob_Collision.includes(mob)) mob_Collision.push(mob);
             mob_PlayerList[socket.id] = player;
@@ -305,7 +305,7 @@ setInterval(() => {
             radius: mob.wanderRange + mob.radius,
          }
    
-         if(player.square_toCircle(playerViewport, mobHitBox)) mobsToRender[mob.id] = lightMob;
+         if(player.square_toCircle("normal", playerViewport, mobHitBox)) mobsToRender[mob.id] = lightMob;
       }
 
       // Set Players to Render in Client
@@ -322,7 +322,7 @@ setInterval(() => {
                radius: other_player.radius,
             }
 
-            if(player.square_toCircle(playerViewport, otherPlayerHitBox)) playersToRender[other_player.id] = other_LightPlayer;
+            if(player.square_toCircle("normal", playerViewport, otherPlayerHitBox)) playersToRender[other_player.id] = other_LightPlayer;
          }
       }      
 

@@ -163,7 +163,7 @@ canvas {
 .corner-bottom-left {
    width: 145px;
 	height: 83px;
-   background-position: 0 -14px  !important;
+   background-position: 0 -14px !important;
 }
 
 .corner-top-left {
