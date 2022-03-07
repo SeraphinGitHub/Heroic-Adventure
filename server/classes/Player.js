@@ -19,7 +19,7 @@ class Player extends Character {
       // Viewport size in CSS & JS +200 for both
       this.detectViewport = {
          height: 1000,
-         width: 2000,
+         width: 1900,
       }
       
       // Env Variables

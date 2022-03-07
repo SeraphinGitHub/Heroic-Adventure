@@ -6,7 +6,7 @@
 // =====================================================================
 const viewSize = {
    height: 870, // ==> Check to match with viewport size in CSS
-   width: 1850,
+   width: 1750,
 };
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 

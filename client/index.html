@@ -10,7 +10,7 @@
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/logScreen.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/viewport.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/cursor.css">
-        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneGeneral.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/general_UI.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneChat.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneInventory.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneStats.css">
@@ -39,28 +39,21 @@
             </form>
         </section>
 
-        <!-- Chat -->
-        <section class="flexCenter UI-frame chat">
-            
-            <button class="btn absolute general-chat-btn">General</button>
-            <div class="UI-content absolute general-chat">
-                <!-- <p></p> -->
-            </div>
-            
-            <button class="btn absolute private-chat-btn">Private</button>
-            <div class="UI-content absolute private-chat">
-                <!-- <p></p> -->
-            </div>
-            
-            <p class="flexCenter message-receiver"></p>
+        <!-- NavBar Left -->
+        <nav class="UI-navBar nav-left toggle-nav-left">
+            <button class="toggle-inventory">Inv</button>
+            <button class="toggle-player-stats">Stat</button>
+            <button class="toggle-player-score">Scr</button>
+            <button class="toggle-player-controls">Ctrl</button>
+        </nav>
 
-            <form class="flexCenter chat-enter">
-                <input type="text" placeholder="Send message">
-            </form>
-
-            <button class="btn orange-btn clear-chat-btn">Clear Chat</button>
-        </section>
-
+        <!-- NavBar Right -->
+        <nav class="UI-navBar nav-right toggle-nav-right">
+            <button class="toggle-inventory">Inv</button>
+            <button class="toggle-player-stats">Stat</button>
+            <button class="toggle-player-score">Scr</button>
+            <button class="toggle-player-controls">Ctrl</button>
+        </nav>
 
         <!-- Viewport -->
         <section class="viewport">
@@ -76,7 +69,7 @@
             <div class="style-frame corner-top-right"></div>
             <div class="style-frame corner-bottom-left"></div>
             <div class="style-frame corner-bottom-right"></div>
-            
+
             <!-- Game window -->
             <section class="flexCenter game-window">
                             
@@ -97,17 +90,31 @@
                 </div>
 
 
-                <!-- NavBar -->
-                <nav class="UI-navBar">
-                    <button class="toggle-inventory">Inv</button>
-                    <button class="toggle-player-stats">Stat</button>
-                    <button class="toggle-player-score">Scr</button>
-                    <button class="toggle-player-controls">Ctrl</button>
-                </nav>
+                <!-- Chat -->
+                <section class="flexCenter UI-frame chat">
+                    
+                    <button class="btn absolute general-chat-btn">General</button>
+                    <div class="UI-content absolute general-chat">
+                        <!-- <p></p> -->
+                    </div>
+                    
+                    <button class="btn absolute private-chat-btn">Private</button>
+                    <div class="UI-content absolute private-chat">
+                        <!-- <p></p> -->
+                    </div>
+                    
+                    <p class="flexCenter message-receiver"></p>
+
+                    <form class="flexCenter chat-enter">
+                        <input type="text" placeholder="Send message">
+                    </form>
+
+                    <button class="btn orange-btn clear-chat-btn">Clear Chat</button>
+                </section>
 
 
                 <!-- Stats -->
-                <section class="wood-pane nav-pane player-stats">
+                <section class="wood-pane panel player-stats">
 
                     <!-- Name Plate -->
                     <div class="flexCenter name-plate">
@@ -253,7 +260,7 @@
 
 
                 <!-- Controls -->
-                <section class="wood-pane nav-pane player-controls">
+                <section class="wood-pane panel player-controls">
 
                     <!-- Paper pane -->
                     <div class="paper-pane"></div>

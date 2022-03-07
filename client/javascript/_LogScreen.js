@@ -11,7 +11,7 @@ const easyLogin = () => {
    setTimeout(() => {
       isSocket = true;
       const logScreen = document.querySelector(".log-screen");
-      const navBarUI = document.querySelector(".UI-navBar");
+      const navBarUI = document.querySelectorAll(".UI-navBar");
       
       // Send player's name
       const socket = io();
@@ -27,7 +27,12 @@ const easyLogin = () => {
          logFormInput.value = ""
          logFormInput.blur();
          logScreen.classList.add("hide-LogScreen");
-         navBarUI.classList.add("visible");
+
+         navBarUI.forEach(nav => {
+            nav.classList.add("visible");
+            nav.classList.remove("toggle-nav-left");
+            nav.classList.remove("toggle-nav-right");
+         });
       });
    }, 300);
 }
@@ -88,7 +93,7 @@ const loadClient = () => {
    
    isSocket = true;
    const logScreen = document.querySelector(".log-screen");
-   const navBarUI = document.querySelector(".UI-navBar");
+   const navBarUI = document.querySelectorAll(".UI-navBar");
    
    // Send player's name
    const socket = io();
@@ -100,11 +105,18 @@ const loadClient = () => {
       initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
       initChat(socket);             // ==> Client_ChatHandler.js
 
-      // Reset inputField's value
-      logFormInput.value = ""
-      logFormInput.blur();
-      logScreen.classList.add("hide-LogScreen");
-      navBarUI.classList.add("visible");
+      setTimeout(() => {
+         // Reset inputField's value
+         logFormInput.value = ""
+         logFormInput.blur();
+         logScreen.classList.add("hide-LogScreen");
+         
+         navBarUI.forEach(nav => {
+            nav.classList.add("visible");
+            nav.classList.remove("toggle-nav-left");
+            nav.classList.remove("toggle-nav-right");
+         });
+      }, 500);
    });
 }
 

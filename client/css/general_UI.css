@@ -122,14 +122,14 @@
 /* ===================================================================== */
 /* Pane Toggle
 /* ===================================================================== */
-.nav-pane {
+.panel {
    visibility: hidden;
    right: -400px;
    transform: scale(90%, 90%);
    transition-duration: 0.8s;
 }
 
-.toggle-nav-pane {
+.toggle-panel {
    right: 45px !important;
    transition-duration: 0.8s;
 }
@@ -140,16 +140,36 @@
 /* ===================================================================== */
 .UI-navBar {
    visibility: hidden;
-   position: absolute;
+   position: fixed;
    top: 50%;
-   right: 10px;
-   width: 50px;
+   width: 65px;
    transform: translate(0%, -50%);
+   transition-duration: 0.8s;
 }
 
+.nav-left {
+   left: 4px;
+}
+
+.nav-right {
+   right: 4px;
+}
+
+.toggle-nav-left {
+   left: -75px !important;
+   transition-duration: 0.8s;
+}
+
+.toggle-nav-right {
+   right: -75px !important;
+   transition-duration: 0.8s;
+}
+
+
+/* ===== Nav Buttons ===== */
 .UI-navBar button {
-   height: 50px;
-   width: 50px;
+   height: 65px;
+   width: 65px;
    margin-bottom: 40px;
    border: double black 6px;
    border-radius: 8px;
