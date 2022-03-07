@@ -11,6 +11,7 @@ const easyLogin = () => {
    setTimeout(() => {
       isSocket = true;
       const logScreen = document.querySelector(".log-screen");
+      const navBarUI = document.querySelector(".UI-navBar");
       
       // Send player's name
       const socket = io();
@@ -26,6 +27,7 @@ const easyLogin = () => {
          logFormInput.value = ""
          logFormInput.blur();
          logScreen.classList.add("hide-LogScreen");
+         navBarUI.classList.add("visible");
       });
    }, 300);
 }
@@ -86,6 +88,7 @@ const loadClient = () => {
    
    isSocket = true;
    const logScreen = document.querySelector(".log-screen");
+   const navBarUI = document.querySelector(".UI-navBar");
    
    // Send player's name
    const socket = io();
@@ -101,6 +104,7 @@ const loadClient = () => {
       logFormInput.value = ""
       logFormInput.blur();
       logScreen.classList.add("hide-LogScreen");
+      navBarUI.classList.add("visible");
    });
 }
 
@@ -150,7 +154,7 @@ const formValidation = () => {
    else if(logFormInput.value.length < 4) alertMessage(minCharsAlert);
 
    // if player name is more than 10 characters
-   else if(logFormInput.value.length > 10) alertMessage(maxCharsAlert);
+   else if(logFormInput.value.length > 12) alertMessage(maxCharsAlert);
 
    // if include white space
    else if(includeSpaceRegEx.test(logFormInput.value)) alertMessage(whiteSpaceAlert);

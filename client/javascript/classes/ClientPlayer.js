@@ -45,8 +45,8 @@ class Player extends Character {
       this.mapScheme = cl_PlayerObj.mapSpecs.mapScheme;
       
       // Game UI ==> HUD
-      this.HUD_scale_X = 1.2;
-      this.HUD_scale_Y = 0.9;
+      this.HUD_scale_X = 1.3;
+      this.HUD_scale_Y = 1;
       this.HUD = {
          x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
          y: this.viewSize.height -110 * this.HUD_scale_Y,
@@ -78,11 +78,11 @@ class Player extends Character {
       this.barCoordArray = cl_PlayerObj.barCoordArray;
 
       // Game UI ==> Fame Bar
-      this.fameScale_X = 1.25;
+      this.fameScale_X = 1.5;
       this.fameScale_Y = 1;
       this.fame = {
          x: this.viewSize.width/2 -900/2 * this.fameScale_X,
-         y: this.viewSize.height -805,
+         y: this.viewSize.height -870,
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
@@ -418,7 +418,7 @@ class Player extends Character {
 
       // Fame Sprite
       this.ctxFixedFront.drawImage(this.gameUI_Img,
-         6, 631, 2083, 105,
+         794, 7, 1701, 87,
          this.fame.x,
          this.fame.y,
          this.fame.width,
@@ -894,7 +894,7 @@ class Player extends Character {
       this.drawName();
 
       // ******************************
-      this.DEBUG_GENERAL();
+      // this.DEBUG_GENERAL();
       // ******************************
    }
 

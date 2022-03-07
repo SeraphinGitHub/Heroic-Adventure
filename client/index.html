@@ -9,13 +9,19 @@
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/style.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/logScreen.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/viewport.css">
-        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/chat.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/cursor.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneGeneral.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneChat.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneInventory.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneStats.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneScore.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneControls.css">
         <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/style.css"> -->
         <title>Multi Player RPG</title>
     </head>
     
     <body class="flexCenter">
-
+        
         <!-- Log Player -->
         <section class="log-screen">
             <div class="flag"></div>
@@ -58,92 +64,227 @@
 
         <!-- Viewport -->
         <section class="viewport">
+
+            <!-- Artwork -->
+            <div class="style-frame top-side-left"></div>
+            <div class="style-frame top-side-right"></div>
+            <div class="style-frame bottom-side-left"></div>
+            <div class="style-frame bottom-side-right"></div>
+            <div class="style-frame left-side"></div>
+            <div class="style-frame right-side"></div>
+            <div class="style-frame corner-top-left"></div>
+            <div class="style-frame corner-top-right"></div>
+            <div class="style-frame corner-bottom-left"></div>
+            <div class="style-frame corner-bottom-right"></div>
             
-            <div class="flexCenter game-window">
+            <!-- Game window -->
+            <section class="flexCenter game-window">
+                            
+                <!-- Canvas -->
                 <canvas class="canvas-map"></canvas>
                 <canvas class="canvas-enemies"></canvas>
                 <canvas class="canvas-player"></canvas>
-
-                <!-- Player UI -->
                 <canvas class="canvas-fixed-back"></canvas>
                 <canvas class="canvas-fixed-UI"></canvas>
                 <canvas class="canvas-UI"></canvas>
                 <canvas class="canvas-fixed-front"></canvas>
     
+
+                <!-- Death Screen -->
                 <div class="death-screen">
                     <p class="death-message"></p>
                     <p class="respawn-timer"></p>
                 </div>
-            </div>
-
-            <!-- Game window's surround -->
-            <div class="style-frame">
-
-                <div class="top-side-left"></div>
-                <div class="top-side-right"></div>
-                <div class="bottom-side-left"></div>
-                <div class="bottom-side-right"></div>
-
-                <div class="left-side"></div>
-                <div class="right-side"></div>
-
-                <div class="corner-top-left"></div>
-                <div class="corner-top-right"></div>
-                <div class="corner-bottom-left"></div>
-                <div class="corner-bottom-right"></div>
-            </div>
-            
-        </section>
 
 
-        <!-- Player UI -->
-        <section class="flexCenter player-UI">
+                <!-- NavBar -->
+                <nav class="UI-navBar">
+                    <button class="toggle-inventory">Inv</button>
+                    <button class="toggle-player-stats">Stat</button>
+                    <button class="toggle-player-score">Scr</button>
+                    <button class="toggle-player-controls">Ctrl</button>
+                </nav>
 
-            <!-- Player Infos -->
-            <div class="flexCenter UI-frame player-infos">
-                <div class="flexCenter UI-content">
 
-                    <div class="flexCenter player-title">
-                        <h2>Stats :</h2>
-                        <h2 class="player-name"></h2>
+                <!-- Stats -->
+                <section class="wood-pane nav-pane player-stats">
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Stats</p>
                     </div>
 
-                    <div class="flexCenter player-stats">
-                        <p class="health"></p>
-                        <p class="mana"></p>
-                        <p class="mana-regen"></p>
-                        <p class="energy"></p>
-                        <p class="energy-regen"></p>
-                        <p class="GcD"></p>
+                    <!-- Stats Container -->
+                    <div class="flexCenter stats-container">
+
+                        <!-- Max Health -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Max Health</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="health-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Max Mana -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Max Mana</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="mana-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Regen Mana -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Reg. Mana</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="mana-regen-value"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Max Energy -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Max Energy</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="energy-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Regen Energy -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Reg. Energy</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="energy-regen-value"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- GcD -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Global C.D</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="GcD-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Attack Speed -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Attack Speed</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="attackSpeed-value"></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Player Score -->
+                <section class="flexCenter player-score">
+                    <p class="player-name"></p>
+                    <p class="kills"></p>
+                    <p class="died"></p>
+                    <p class="fame"></p>
+                    <p class="fame-count"></p>
+                </section>
+
+
+                <!-- Controls -->
+                <section class="wood-pane nav-pane player-controls">
+
+                    <!-- Paper pane -->
+                    <div class="paper-pane"></div>
+                    
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Controls</p>
                     </div>
 
-                    <div class="flexCenter player-score">
-                        <p class="kills"></p>
-                        <p class="died"></p>
-                        <p class="fame"></p>
-                        <p class="fame-count"></p>
+                    <!-- Text -->
+                    <div class="controls">
+                        <p>Attack: left click</p>
+                        <p>Heal: r</p>
+                        <p>Run: space bar</p>
+                        <br>
+                        <p>Up: z</p>
+                        <p>Down: s</p>
+                        <p>Left: q</p>
+                        <p>Right: d</p>
+                        <br>
+                        <br>
+                        <br>
+                        <p>Open another tab and try MultiPlayer</p>
+                        <p>Enjoy =)</p>
                     </div>
-
-                </div>
-            </div>
-
-            <!-- Player Controls -->
-            <div class="flexCenter UI-frame player-controls">
-                <div class="UI-content">
-                    <p>****** Controls ******</p>
-                    <p>Attack: left click</p>
-                    <p>Heal: r</p>
-                    <p>Run: space bar</p>
-                    <br>
-                    <p>Up: z</p>
-                    <p>Down: s</p>
-                    <p>Left: q</p>
-                    <p>Right: d</p>
-                    <br>
-                    <p>Open another tab and try MultiPlayer</p>
-                    <p>Enjoy =)</p>
-                </div>
-            </div>
+                </section>
+                
+            </section>
 
         </section>
     </body>

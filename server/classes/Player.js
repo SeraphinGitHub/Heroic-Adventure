@@ -19,7 +19,7 @@ class Player extends Character {
       // Viewport size in CSS & JS +200 for both
       this.detectViewport = {
          height: 1000,
-         width: 1400,
+         width: 2000,
       }
       
       // Env Variables
@@ -29,7 +29,7 @@ class Player extends Character {
       this.syncFormula = this.syncCoeff *this.devFPS /this.deployFPS;
 
       // Player Hitbox
-      this.radius = 42;
+      this.radius = 45;
 
       // Attack Hitbox
       this.attkOffset_X = 0;
@@ -40,6 +40,7 @@ class Player extends Character {
       this.baseGcD = 30;
       this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
       this.speedGcD = this.GcD;
+      this.attackSpeed = this.baseGcD /60;
 
       // Player Health
       this.baseHealth = 250;
@@ -164,7 +165,7 @@ class Player extends Character {
       this.sprites = {
          height: 200,
          width: 200,
-         offsetY: 5,
+         offsetY: 12,
          radius: 45,
       }
    }
@@ -706,9 +707,9 @@ class Player extends Character {
 
       const rect = {
          x: 810,
-         y: 810,
-         width: 180,
-         height: 90,
+         y: 810 +90,
+         width: 180 *2,
+         height: 90 *2,
       }
 
       const circle = {
@@ -718,13 +719,11 @@ class Player extends Character {
       }
 
       const collide = this.square_toCircle("special", rect, circle);
-
-      // if(collide) console.log(collide); // ********
-
-      if(collide.left) console.log("Left"); // ********
-      if(collide.right) console.log("Right"); // ********
-      if(collide.top) console.log("Top"); // ********
-      if(collide.bottom) console.log("Bottom"); // ********
+      
+      if(collide.left && this.right) this.x -= this.walkSpeed;
+      if(collide.right && this.left) this.x += this.walkSpeed; 
+      if(collide.top && this.down) this.y -= this.walkSpeed; 
+      if(collide.bottom && this.up) this.y += this.walkSpeed; 
    }
 
    // Update (Sync)
@@ -760,6 +759,7 @@ class Player extends Character {
          attkRadius: this.attkRadius,
          healCost: this.healCost,
          GcD: this.GcD,
+         attackSpeed: this.attackSpeed,
          baseHealth: this.baseHealth,
          baseEnergy: this.baseEnergy,
          baseMana: this.baseMana,

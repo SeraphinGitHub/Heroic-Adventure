@@ -3,6 +3,7 @@
 /* Chat
 /* ===================================================================== */
 .chat {
+   display: none;
    position: relative;
    justify-content: space-between;
    align-content: flex-end;
@@ -118,8 +119,7 @@
    margin-bottom: 5px;
 }
 
-.chat,
-.player-UI {
+.chat {
    width: 16%;
 }
 

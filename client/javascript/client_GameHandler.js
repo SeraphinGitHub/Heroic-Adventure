@@ -1,18 +1,12 @@
 
 "use strict"
 
-// window.dispatchEvent(new KeyboardEvent("keydown", {
-//    "key": "F11"
-// }));
-
-
 // =====================================================================
 // Set Viewport
 // =====================================================================
-const viewport_HTML = document.querySelector(".viewport");
 const viewSize = {
-   height: 800, // ==> Check to match with viewport size in CSS
-   width: 1200,
+   height: 870, // ==> Check to match with viewport size in CSS
+   width: 1850,
 };
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 
@@ -21,9 +15,12 @@ const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 // Inside Canvas Detection
 // =====================================================================
 let insideCanvas = false;
-viewport_HTML.addEventListener("mouseenter", () => insideCanvas = true);
-viewport_HTML.addEventListener("mouseleave", () => insideCanvas = false);
-viewport_HTML.oncontextmenu = (event) => {
+const canvasUIFront = document.querySelector(".canvas-fixed-front");
+
+canvasUIFront.addEventListener("mouseenter", () => insideCanvas = true);
+canvasUIFront.addEventListener("mouseleave", () => insideCanvas = false);
+
+canvasUIFront.oncontextmenu = (event) => {
    event.preventDefault();
    event.stopPropagation();
 }
@@ -276,9 +273,9 @@ const clientUpdate = () => {
    ctx.player.fillStyle = "blue";
    ctx.player.fillRect(
       810 -viewport.x,
-      810 -viewport.y,
-      180,
-      90
+      810 -viewport.y +90,
+      180 *2,
+      90 *2
    );
 
    // ***************************************************************

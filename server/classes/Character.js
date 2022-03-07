@@ -69,11 +69,22 @@ class Character {
          if(circ.left < sqr.right && circ.right > sqr.right) collide.right = true;
       }
 
+      if(circ.bottom === sqr.top || circ.top === sqr.bottom) {
+         collide.left = false;
+         collide.right = false;
+      }
+
+      
       // Vertical Check
       if(circ.right > sqr.left && circ.left < sqr.right) {
 
          if(circ.bottom > sqr.top && circ.top < sqr.top) collide.top = true;
          if(circ.top < sqr.bottom && circ.bottom > sqr.bottom) collide.bottom = true;
+      }
+
+      if(circ.left === sqr.right || circ.right === sqr.left) {
+         collide.top = false;
+         collide.bottom = false;
       }
 
       return collide;

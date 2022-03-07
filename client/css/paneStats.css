@@ -1,0 +1,65 @@
+
+/* ===================================================================== */
+/* Stats Pane
+/* ===================================================================== */
+.player-stats {
+   top: 20px;
+}
+
+.stats-container {
+   align-content: flex-start;
+   position: relative;
+   top: 45px;
+   height: 90%;
+   width: 100%;
+}
+
+.stat {
+   position: relative;
+   height: 45px;
+   width: 100%;
+   margin-top: 4px;
+   transform: scale(100%, 65%);
+}
+
+/* Stat Name */
+.stat-name {
+   position: relative;
+   left: -12px;
+   transform: scale(85%, 100%);
+}
+
+/* Stat Value */
+.stat-value {
+   position: relative;
+   left: 150px;
+   transform: scale(55%, 100%);
+}
+
+/* Font */
+.stat-name p,
+.stat-value p {
+   position: absolute;
+   top: 20px;
+   width: 250px;
+   transform: translate(0%, 50%);
+
+   text-align: center;
+   color: White;
+}
+
+.stat-name p {
+   transform: scale(150%, 200%);
+}
+
+.stat-value p {
+   transform: scale(240%, 200%);
+}
+
+.stat-name:hover .white-plate {
+   visibility: visible;
+}
+
+.stat-value:hover .white-plate {
+   visibility: visible;
+}

@@ -3,22 +3,28 @@
 /* Viewport
 /* ===================================================================== */
 .viewport {
-   position: relative;
-   height: 800px; /* ==> Check to match with viewport size in JS */
-   width: 1200px;
-   background-color: black;
+   position: fixed;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
 
+   height: 870px; /* ==> Check to match with viewport size in JS */
+   width: 1850px;
+
+   background-color: black;
    animation: openGameWindow;
 }
 
 @keyframes openGameWindow {
    0% { width: 0px; }
-   100% { width: 1200px; }
+   100% { width: 1850px; }
 }
 
 
-/* ===== Game ===== */
-.game-window {
+/* ===================================================================== */
+/* Game Window
+/* ===================================================================== */
+.game-window {   
    position: absolute;
    overflow: hidden;
    height: 100%;
@@ -31,21 +37,20 @@ canvas {
 }
 
 
-/* ===== Style ===== */
+/* ===================================================================== */
+/* Style Frame
+/* ===================================================================== */
 .style-frame {
-   position: relative;
-   height: 100%;
-   width: 100%;
-}
-
-.style-frame div {
-   position: absolute;
+   z-index: 100;
+   position: fixed;
    display: block;
    background: url("../images/playerUI/Game Frame.png") no-repeat;
 }
 
 
-/* ===== Sides ===== */
+/* ======================== */
+/* Sides
+/* ======================== */
 .top-side-left,
 .top-side-right,
 .right-side,
@@ -56,27 +61,39 @@ canvas {
 }
 
 
-/* ===== Left / Right ===== */
-.right-side,
-.left-side {
+/* ===== Left & Right ===== */
+.left-side,
+.right-side {
    width: 1310px;
    background-position: 0 0;
 }
 
+.left-side {
+   bottom: 49%;
+   left: -3px;
+   transform: translate(-50%) rotate(90deg) scale(64%, 130%);
+}
 
-/* ===== Top / Bottom Left ===== */
+.right-side {
+   top: 49%;
+   right: -4px;
+   transform: translate(50%) rotate(90deg) scale(64%, -130%);
+}
+
+
+/* ===== Left ===== */
 .top-side-left,
 .bottom-side-left  {
-   width: 667px;
+   width: 1000px;
    background-position: 0 0;
 }
 
 
-/* ===== Top / Bottom Right ===== */
+/* ===== Right ===== */
 .top-side-right,
 .bottom-side-right {
-   width: 667px;
-   background-position: -667px 0 !important;
+   width: 1000px;
+   background-position: -320px 0 !important;
 }
 
 
@@ -84,7 +101,7 @@ canvas {
 .top-side-left,
 .top-side-right {
    top: -10px;
-   transform: scale(80%, -130%);
+   transform: scale(85%, -130%);
 }
 
 .top-side-left {
@@ -98,11 +115,11 @@ canvas {
 }
 
 
-/* ===== Top ===== */
+/* ===== Bottom ===== */
 .bottom-side-left,
 .bottom-side-right {
    bottom: -10px;
-   transform: scale(80%, 130%);
+   transform: scale(85%, 130%);
 }
 
 .bottom-side-left {
@@ -117,37 +134,23 @@ canvas {
 
 
 @keyframes leftSideWindow {
-   0% { width: 0px; background-position: -667px 0; }
-   100% { width: 667px; background-position: 0 0; }
+   0% { width: 0px; background-position: -1000px 0; }
+   100% { width: 1000px; background-position: 0 0; }
 }
 
 @keyframes rightSideWindow {
    0% { width: 0px; background-position: -1310px 0; }
-   100% { width: 667px; background-position: -667px 0; }
+   100% { width: 1000px; background-position: -320px 0; }
 }
 
 
-/* Left / Right */
-.left-side {
-   bottom: 49%;
-   left: -3px;
-   transform: translate(-50%) rotate(90deg) scale(59%, 130%);
-}
-
-.right-side {
-   top: 49%;
-   right: -4px;
-   transform: translate(50%) rotate(90deg) scale(59%, -130%);
-}
-
-
-/* ===== Top / Bottom ===== */
+/* ===== Top & Bottom ===== */
 .viewport,
 .top-side-left,
 .top-side-right,
 .bottom-side-left,
 .bottom-side-right {
-   animation-duration: 1.5s;
+   animation-duration: 2s;
    animation-timing-function: linear;
 
    /* ********************************************* Dev Mode ********************************************* */
@@ -156,7 +159,9 @@ canvas {
 }
 
 
-/* ===== Corners ===== */
+/* ======================== */
+/* Corners
+/* ======================== */
 .corner-top-left,
 .corner-top-right,
 .corner-bottom-right,
@@ -190,7 +195,9 @@ canvas {
 }
 
 
-/* ===== Death Screen ===== */
+/* ===================================================================== */
+/* Death Screen
+/* ===================================================================== */
 .death-screen {
    visibility: hidden;
    position: absolute;

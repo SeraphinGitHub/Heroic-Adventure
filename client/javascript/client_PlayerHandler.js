@@ -1,33 +1,78 @@
 
 "use strict"
 
+
 // =====================================================================
-// DOM Player UI
+// Pane Toggling
+// =====================================================================
+const togglePane = (button, pane) => {
+   
+   let isVisible = false;
+   button.addEventListener("click", () => {
+
+      if(!isVisible) {
+         isVisible = true;
+         pane.classList.add("visible");
+         pane.classList.add("toggle-nav-pane");
+      }
+      else {
+         isVisible = false;
+         pane.classList.remove("visible");
+         pane.classList.remove("toggle-nav-pane");
+      }
+   });
+}
+
+
+// =====================================================================
+// Player Stats Pane
 // =====================================================================
 const playerStats = (data) => {
    
-   const playerName = document.querySelector(".player-name");
-   playerName.textContent = data.name;
+   // const playerName = document.querySelector(".player-name");
+   // playerName.textContent = data.name;
    
-   // Player infos
-   const playerStats = document.querySelector(".player-stats");
-
-   const health = playerStats.querySelector(".health");
-   const mana = playerStats.querySelector(".mana");
-   const regenMana = playerStats.querySelector(".mana-regen");
-   const energy = playerStats.querySelector(".energy");
-   const regenEnergy = playerStats.querySelector(".energy-regen");
-   const GcD = playerStats.querySelector(".GcD");
+   // Player Stats
+   const health = document.querySelector(".health-value");
+   const mana = document.querySelector(".mana-value");
+   const regenMana = document.querySelector(".mana-regen-value");
+   const energy = document.querySelector(".energy-value");
+   const regenEnergy = document.querySelector(".energy-regen-value");
+   const GcD = document.querySelector(".GcD-value");
+   const attackSpeed = document.querySelector(".attackSpeed-value");
 
    // Set DOM text content
-   health.textContent = `Health: ${data.health}`;
-   mana.textContent = `Mana: ${data.mana}`;
-   regenMana.textContent = `Regen mana: ${data.regenMana}`;
-   energy.textContent = `Energy: ${data.energy}`;
-   regenEnergy.textContent = `Regen energy: ${data.regenEnergy}`;
-   GcD.textContent = `GcD: ${data.GcD}`;
+   health.textContent = data.health;
+   mana.textContent = data.mana;
+   regenMana.textContent = `${data.regenMana} /s`;
+   energy.textContent = data.energy;
+   regenEnergy.textContent = `${data.regenEnergy} /s`;
+   GcD.textContent = data.GcD;
+   attackSpeed.textContent = `${data.attackSpeed} s`;
+
+   // Toggle Stat Pane
+   const toggleStats = document.querySelector(".toggle-player-stats");
+   const statsPane = document.querySelector(".player-stats");
+
+   togglePane(toggleStats, statsPane);
 }
 
+
+// =====================================================================
+// Player Controls Pane
+// =====================================================================
+const playerControls = () => {
+
+   const toggleControls = document.querySelector(".toggle-player-controls");
+   const controlsPane = document.querySelector(".player-controls");
+   
+   togglePane(toggleControls, controlsPane);
+}
+
+
+// =====================================================================
+// Player Score Pane
+// =====================================================================
 const playerScore = (data) => {
    const playerScore = document.querySelector(".player-score");
 
@@ -52,6 +97,8 @@ const handleGameUI = (socket) => {
 
    socket.on("playerStats", (data) => playerStats(data));
    socket.on("playerScore", (data) => playerScore(data));
+
+   playerControls();
 }
 
 

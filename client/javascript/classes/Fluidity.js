@@ -180,6 +180,6 @@ class Fluidity {
    looseManaFluid() {
 
       const modifier = 1;
-      this.getHUD_OriginX(521, 580, 460, 47, modifier);
+      this.getHUD_OriginX(10, 631, 460, 47, modifier);
    }
 }

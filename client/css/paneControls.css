@@ -1,0 +1,13 @@
+
+.controls {
+   position: absolute;
+   top: 50px;
+   left: 70px;
+   width: 65%;
+}
+
+.controls p {
+   font-family: "Orbitron-Extrabold";
+   font-size: 120%;
+   color: black;
+}
