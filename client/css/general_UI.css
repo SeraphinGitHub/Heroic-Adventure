@@ -94,24 +94,21 @@
 /* ===================================================================== */
 .name-plate {
    position: absolute;
-   top: -23px;
+   top: -15px;
    transform: scale(95%, 85%);
 }
 
 .name-plate p {
-   margin: 0;
-   padding: 0;
    z-index: 100;
-   font-weight: 600;
-   font-size: 190%;
    color: gold;
+   transform: scale(270%, 230%);
 }
 
 .name-plate p,
 .stat-name p,
 .stat-value p {
-   font-family: "Orbitron-Extrabold";
-   text-shadow: black 5px 5px 5px;
+   font-family: "Dimbo-Regular";
+   text-shadow: black 2px 2px 1px;
 }
 
 .name-plate:hover .white-plate {
@@ -130,7 +127,7 @@
 }
 
 .toggle-panel {
-   right: 45px !important;
+   right: -12px !important;
    transition-duration: 0.8s;
 }
 
@@ -142,25 +139,13 @@
    visibility: hidden;
    position: fixed;
    top: 50%;
+   right: 4px;
    width: 65px;
    transform: translate(0%, -50%);
    transition-duration: 0.8s;
 }
 
-.nav-left {
-   left: 4px;
-}
-
-.nav-right {
-   right: 4px;
-}
-
-.toggle-nav-left {
-   left: -75px !important;
-   transition-duration: 0.8s;
-}
-
-.toggle-nav-right {
+.toggle-navBar {
    right: -75px !important;
    transition-duration: 0.8s;
 }

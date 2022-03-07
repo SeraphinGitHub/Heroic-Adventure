@@ -195,7 +195,7 @@ class Player extends Character {
    // Fluidity
    initTextAndFluidity(socket) {
    
-      const mainTexSize = 34;
+      const mainTexSize = 42;
 
       // ========== Fame ==========
       socket.on("fameEvent", (eventPack) => {
@@ -210,7 +210,7 @@ class Player extends Character {
             {
                x: 0,
                y: 180,
-               size: mainTexSize,
+               size: mainTexSize *1.2,
                color: "darkviolet",
                value: `+${serverFame.fameCost} Fame`,
             }
@@ -245,7 +245,7 @@ class Player extends Character {
             {
                x: 0,
                y: 180,
-               size: mainTexSize,
+               size: mainTexSize *1.2,
                color: "red",
                value: `-${serverFame.fameCost} Fame`,
             }
@@ -446,9 +446,9 @@ class Player extends Character {
    
       // Fame Count   
       this.ctxFixedUI.fillStyle = "darkviolet";
-      this.ctxFixedUI.font = "30px Orbitron-ExtraBold";
-      this.ctxFixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
-      this.ctxFixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +70);
+      this.ctxFixedUI.font = "40px Dimbo-Regular";
+      this.ctxFixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
+      this.ctxFixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
    }
    
    // Draw HUD
@@ -595,7 +595,7 @@ class Player extends Character {
          height: this.barHeight,
       }
       
-      const attackBar = new GameBar(clientPlayerBar, 0, 65, this.initPlayer.GcD, this.updatePlayer.speedGcD);
+      const attackBar = new GameBar(clientPlayerBar, 0, 55, this.initPlayer.GcD, this.updatePlayer.speedGcD);
       const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
@@ -694,7 +694,7 @@ class Player extends Character {
       ctx.beginPath();
       ctx.ellipse(
          this.pos().x,
-         this.pos().y +this.sprites.radius,
+         this.pos().y +this.sprites.radius -this.sprites.offsetY /2,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -707,7 +707,7 @@ class Player extends Character {
       ctx.beginPath();
       ctx.ellipse(
          this.pos().x,
-         this.pos().y +this.sprites.radius,
+         this.pos().y +this.sprites.radius -this.sprites.offsetY /2,
          this.sprites.radius *this.shadowSize +this.ringSize,
          this.sprites.radius *this.shadowSize *0.5 +this.ringSize *0.75,
          0, 0, Math.PI * 2
@@ -724,7 +724,7 @@ class Player extends Character {
       ctx.beginPath();
       ctx.ellipse(
          this.pos().x,
-         this.pos().y + this.sprites.radius,
+         this.pos().y + this.sprites.radius -this.sprites.offsetY /2,
          this.sprites.radius * this.shadowSize,
          this.sprites.radius * this.shadowSize/2,
          0, 0, Math.PI * 2
@@ -758,7 +758,7 @@ class Player extends Character {
       
       let ctx = this.ctxToRender();
 
-      let offsetY = 95;
+      let offsetY = 89;
       let namePos_X = this.pos().x;
       let namePos_Y = this.pos().y + offsetY;
       
@@ -766,7 +766,7 @@ class Player extends Character {
       else ctx.fillStyle = "darkorange";
 
       ctx.textAlign = "center";
-      ctx.font = "22px Orbitron-ExtraBold";
+      ctx.font = "30px Dimbo-Regular";
       
       ctx.lineWidth = "1";
       ctx.strokeStyle = "black";
@@ -1006,7 +1006,7 @@ class Player extends Character {
    DEBUG_DrawHealthNumber() {
 
       this.ctxPlayer.fillStyle = "black";
-      this.ctxPlayer.font = "26px Orbitron-Regular";
+      this.ctxPlayer.font = "26px Dimbo-Regular";
       this.ctxPlayer.fillText(
          Math.round(this.updatePlayer.health),
          this.pos().x,

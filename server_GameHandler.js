@@ -108,19 +108,24 @@ const onConnect = (socket) => {
 
       socket.emit("playerStats", {
          
-         name: data,
+         // name: data,
          health: player.baseHealth,
          mana: player.baseMana,
          regenMana: player.baseRegenMana,
          energy: player.baseEnergy,
          regenEnergy: player.baseRegenEnergy,
-         GcD: player.baseGcD,
          attackSpeed: player.attackSpeed,
+         minDamage: player.minDamage,
+         maxDamage: player.maxDamage,
+         walkSpeed: player.walkSpeed_Percent,
+         runSpeed: player.runSpeed_Percent,
       });
       
       socket.emit("playerScore", {
          
          kills: player.kills,
+         playersKills: player.playersKills,
+         mobsKills: player.mobsKills,
          died: player.died,
          fame: player.fame,
          fameCount: player.fameCount,

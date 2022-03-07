@@ -29,7 +29,7 @@ class FloatingText {
 
       this.ctx.globalAlpha = this.opacity;
       this.ctx.fillStyle = this.color;
-      this.ctx.font = `${this.size}px Orbitron-ExtraBold`;
+      this.ctx.font = `${this.size}px Dimbo-Regular`;
       this.ctx.fillText(this.value, this.x + this.offsetX, this.y + this.offsetY);
       this.ctx.strokeText(this.value, this.x + this.offsetX, this.y + this.offsetY);
       this.ctx.globalAlpha = 1;

@@ -165,7 +165,7 @@ class Enemy extends Character {
       let offsetY = 87;
       
       this.ctxEnemies.textAlign = "center";
-      this.ctxEnemies.font = "20px Orbitron-ExtraBold";
+      this.ctxEnemies.font = "28px Dimbo-Regular";
       
       this.ctxEnemies.lineWidth = "1";
       this.ctxEnemies.strokeStyle = "black";
@@ -359,7 +359,7 @@ class Enemy extends Character {
       // Health
       this.ctxEnemies.textAlign = "center";
       this.ctxEnemies.fillStyle = "black";
-      this.ctxEnemies.font = "26px Orbitron-Regular";
+      this.ctxEnemies.font = "28px Dimbo-Regular";
       this.ctxEnemies.fillText(
          Math.round(this.updateEnemy.health),
          this.pos().x,

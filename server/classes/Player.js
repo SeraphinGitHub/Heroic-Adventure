@@ -37,10 +37,10 @@ class Player extends Character {
       this.attkRadius = 32;
       
       // GcD
-      this.baseGcD = 30;
+      this.baseGcD = 40;
       this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
       this.speedGcD = this.GcD;
-      this.attackSpeed = this.baseGcD /60;
+      this.attackSpeed = Math.floor(this.baseGcD /60 *10) /10;
 
       // Player Health
       this.baseHealth = 250;
@@ -79,6 +79,9 @@ class Player extends Character {
       // Damages
       this.baseDamage = 23;
       this.calcDamage;
+      this.damageRatioRnG = 0.62; // More high => Higher RnG Range => More damage
+      this.minDamage = this.baseDamage;
+      this.maxDamage = this.baseDamage + Math.floor(this.baseDamage *this.damageRatioRnG);
 
       // Spells cast
       this.cast_Heal = false;
@@ -93,7 +96,9 @@ class Player extends Character {
       this.runSpeed = Math.floor( 7 *this.syncFormula);
       this.baseWalkSpeed = this.walkSpeed;
       this.baseRunSpeed = this.runSpeed;
-      
+      this.walkSpeed_Percent = Math.ceil(this.baseWalkSpeed *33.33);
+      this.runSpeed_Percent = Math.ceil(this.baseRunSpeed *33.33);
+
       // Movements Axis
       this.up = false;
       this.down = false;
@@ -119,6 +124,8 @@ class Player extends Character {
 
       // Score
       this.kills = 0;
+      this.playersKills = 0;
+      this.mobsKills = 0;
       this.died = 0;
 
       // Fluidity ==> Higher = faster
@@ -183,7 +190,7 @@ class Player extends Character {
    }
 
    damageRnG() {
-      return this.RnG(this.baseDamage, 0.62); // More high => Higher RnG Range => More damage
+      return this.RnG(this.baseDamage, this.damageRatioRnG);
    }
 
    // Movements
@@ -501,6 +508,7 @@ class Player extends Character {
          // Killer is a Player
          if(enemy.isPlayer) {
             enemy.kills++;
+            enemy.playersKills++;
             enemy.totalFameCost += this.getFameCost;
          }
 
@@ -579,6 +587,8 @@ class Player extends Character {
 
       socket.emit("playerScore", {
          kills: this.kills,
+         playersKills: this.playersKills,
+         mobsKills: this.mobsKills,
          died: this.died,
          fame: this.fame,
          fameCount: this.fameCount,
@@ -637,6 +647,8 @@ class Player extends Character {
          
          socket.emit("playerScore", {
             kills: this.kills,
+            playersKills: this.playersKills,
+            mobsKills: this.mobsKills,
             died: this.died,
             fame: this.fame,
             fameCount: this.fameCount,
@@ -759,7 +771,6 @@ class Player extends Character {
          attkRadius: this.attkRadius,
          healCost: this.healCost,
          GcD: this.GcD,
-         attackSpeed: this.attackSpeed,
          baseHealth: this.baseHealth,
          baseEnergy: this.baseEnergy,
          baseMana: this.baseMana,

@@ -3,7 +3,7 @@
 /* Stats Pane
 /* ===================================================================== */
 .player-stats {
-   top: 20px;
+   top: 110px;
 }
 
 .stats-container {
@@ -49,12 +49,17 @@
 }
 
 .stat-name p {
-   transform: scale(150%, 200%);
+   transform: scale(210%, 210%);
+   left: 70px;
+   width: 28%;
 }
 
 .stat-value p {
-   transform: scale(240%, 200%);
+   transform: scale(320%, 220%);
+   left: 95px;
+   width: 15%;
 }
+
 
 .stat-name:hover .white-plate {
    visibility: visible;

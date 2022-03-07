@@ -13,12 +13,12 @@ const togglePane = (button, pane) => {
       if(!isVisible) {
          isVisible = true;
          pane.classList.add("visible");
-         pane.classList.add("toggle-nav-pane");
+         pane.classList.add("toggle-panel");
       }
       else {
          isVisible = false;
          pane.classList.remove("visible");
-         pane.classList.remove("toggle-nav-pane");
+         pane.classList.remove("toggle-panel");
       }
    });
 }
@@ -38,8 +38,10 @@ const playerStats = (data) => {
    const regenMana = document.querySelector(".mana-regen-value");
    const energy = document.querySelector(".energy-value");
    const regenEnergy = document.querySelector(".energy-regen-value");
-   const GcD = document.querySelector(".GcD-value");
    const attackSpeed = document.querySelector(".attackSpeed-value");
+   const damage = document.querySelector(".damage-value");
+   const walkSpeed = document.querySelector(".walkSpeed-value");
+   const runSpeed = document.querySelector(".runSpeed-value");
 
    // Set DOM text content
    health.textContent = data.health;
@@ -47,14 +49,46 @@ const playerStats = (data) => {
    regenMana.textContent = `${data.regenMana} /s`;
    energy.textContent = data.energy;
    regenEnergy.textContent = `${data.regenEnergy} /s`;
-   GcD.textContent = data.GcD;
    attackSpeed.textContent = `${data.attackSpeed} s`;
+   damage.textContent = `${data.minDamage} - ${data.maxDamage}`;
+   walkSpeed.textContent = `${data.walkSpeed} %`;
+   runSpeed.textContent = `${data.runSpeed} %`;
 
    // Toggle Stat Pane
    const toggleStats = document.querySelector(".toggle-player-stats");
    const statsPane = document.querySelector(".player-stats");
 
    togglePane(toggleStats, statsPane);
+}
+
+
+// =====================================================================
+// Player Score Pane
+// =====================================================================
+const playerScore = (data) => {
+   const playerScore = document.querySelector(".player-score");
+
+   // Player score
+   const kills = playerScore.querySelector(".kills-value");
+   const playersKills = playerScore.querySelector(".players-kills-value");
+   const mobsKills = playerScore.querySelector(".mobs-kills-value");
+   const died = playerScore.querySelector(".died-value");
+   const fame = playerScore.querySelector(".fame-value");
+   const fameCount = playerScore.querySelector(".fame-count-value");
+
+   // Set DOM text content
+   kills.textContent = data.kills;
+   playersKills.textContent = data.playersKills;
+   mobsKills.textContent =  data.mobsKills;
+   died.textContent =  data.died;
+   fame.textContent =  data.fame;
+   fameCount.textContent =  data.fameCount;
+
+   // Toggle Score Pane
+   const toggleScore = document.querySelector(".toggle-player-score");
+   const scorePane = document.querySelector(".player-score");
+   
+   togglePane(toggleScore, scorePane);
 }
 
 
@@ -67,26 +101,6 @@ const playerControls = () => {
    const controlsPane = document.querySelector(".player-controls");
    
    togglePane(toggleControls, controlsPane);
-}
-
-
-// =====================================================================
-// Player Score Pane
-// =====================================================================
-const playerScore = (data) => {
-   const playerScore = document.querySelector(".player-score");
-
-   // Player score
-   const kills = playerScore.querySelector(".kills");
-   const died = playerScore.querySelector(".died");
-   const fame = playerScore.querySelector(".fame");
-   const fameCount = playerScore.querySelector(".fame-count");
-
-   // Set DOM text content
-   kills.textContent = `Kills: ${data.kills}`;
-   died.textContent = `Died: ${data.died}`;
-   fame.textContent = `Fame: ${data.fame}`;
-   fameCount.textContent = `F_Count: ${data.fameCount}`;
 }
 
 

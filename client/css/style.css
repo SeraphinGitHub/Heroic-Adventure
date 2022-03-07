@@ -39,6 +39,18 @@ body {
    src: url("../fonts/Orbitron-ExtraBold.ttf");
 }
 
+/* Dimbo Regular */
+@font-face {
+   font-family: "Dimbo-Regular";
+   src: url("../fonts/Dimbo Regular.ttf");
+}
+
+/* Dimbo Italic */
+@font-face {
+   font-family: "Dimbo-Italic";
+   src: url("../fonts/Dimbo Italic.ttf");
+}
+
 h1, h2, h3, h4, p {
    font-family: "Verdana";
 }

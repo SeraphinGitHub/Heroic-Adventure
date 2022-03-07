@@ -11,7 +11,7 @@ const easyLogin = () => {
    setTimeout(() => {
       isSocket = true;
       const logScreen = document.querySelector(".log-screen");
-      const navBarUI = document.querySelectorAll(".UI-navBar");
+      const navBarUI = document.querySelector(".UI-navBar");
       
       // Send player's name
       const socket = io();
@@ -27,12 +27,9 @@ const easyLogin = () => {
          logFormInput.value = ""
          logFormInput.blur();
          logScreen.classList.add("hide-LogScreen");
-
-         navBarUI.forEach(nav => {
-            nav.classList.add("visible");
-            nav.classList.remove("toggle-nav-left");
-            nav.classList.remove("toggle-nav-right");
-         });
+         
+         navBarUI.classList.add("visible");
+         navBarUI.classList.remove("toggle-navBar");
       });
    }, 300);
 }
@@ -111,11 +108,8 @@ const loadClient = () => {
          logFormInput.blur();
          logScreen.classList.add("hide-LogScreen");
          
-         navBarUI.forEach(nav => {
-            nav.classList.add("visible");
-            nav.classList.remove("toggle-nav-left");
-            nav.classList.remove("toggle-nav-right");
-         });
+         navBarUI.classList.add("visible");
+         navBarUI.classList.remove("toggle-navBar");
       }, 500);
    });
 }

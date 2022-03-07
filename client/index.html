@@ -39,16 +39,8 @@
             </form>
         </section>
 
-        <!-- NavBar Left -->
-        <nav class="UI-navBar nav-left toggle-nav-left">
-            <button class="toggle-inventory">Inv</button>
-            <button class="toggle-player-stats">Stat</button>
-            <button class="toggle-player-score">Scr</button>
-            <button class="toggle-player-controls">Ctrl</button>
-        </nav>
-
-        <!-- NavBar Right -->
-        <nav class="UI-navBar nav-right toggle-nav-right">
+        <!-- NavBar -->
+        <nav class="UI-navBar toggle-navBar">
             <button class="toggle-inventory">Inv</button>
             <button class="toggle-player-stats">Stat</button>
             <button class="toggle-player-score">Scr</button>
@@ -211,23 +203,6 @@
                                 <p class="energy-regen-value"></p>
                             </div>
                         </div>
-                        
-                        <!-- GcD -->
-                        <div class="stat">
-                            <div class="stat-name">
-                                <div class="background-plate"></div>
-                                <div class="red-plate"></div>
-                                <div class="white-plate"></div>
-                                <p>Global C.D</p>
-                            </div>
-
-                            <div class="stat-value">
-                                <div class="background-plate"></div>
-                                <div class="grey-plate"></div>
-                                <div class="white-plate"></div>
-                                <p class="GcD-value"></p>
-                            </div>
-                        </div>
 
                         <!-- Attack Speed -->
                         <div class="stat">
@@ -245,17 +220,177 @@
                                 <p class="attackSpeed-value"></p>
                             </div>
                         </div>
+
+                        <!-- Damages -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Damages</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="damage-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Walk Speed -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Walk Speed</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="walkSpeed-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Run Speed -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="red-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Run Speed</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="runSpeed-value"></p>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
 
                 <!-- Player Score -->
-                <section class="flexCenter player-score">
-                    <p class="player-name"></p>
-                    <p class="kills"></p>
-                    <p class="died"></p>
-                    <p class="fame"></p>
-                    <p class="fame-count"></p>
+                <section class="wood-pane panel player-score">
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Score</p>
+                    </div>
+
+                    <!-- Score Container -->
+                    <div class="flexCenter score-container">
+
+                        <!-- Kills -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Total kills</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="kills-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Players Kills -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Players killed</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="players-kills-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Mobs Killed -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Mobs killed</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="mobs-kills-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Died -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Total died</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="died-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Fame -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Fame</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="fame-value"></p>
+                            </div>
+                        </div>
+
+                        <!-- Fame Count -->
+                        <div class="stat">
+                            <div class="stat-name">
+                                <div class="background-plate"></div>
+                                <div class="orange-plate"></div>
+                                <div class="white-plate"></div>
+                                <p>Fame Count</p>
+                            </div>
+
+                            <div class="stat-value">
+                                <div class="background-plate"></div>
+                                <div class="grey-plate"></div>
+                                <div class="white-plate"></div>
+                                <p class="fame-count-value"></p>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
 
@@ -278,12 +413,10 @@
                         <p>Attack: left click</p>
                         <p>Heal: r</p>
                         <p>Run: space bar</p>
-                        <br>
                         <p>Up: z</p>
                         <p>Down: s</p>
                         <p>Left: q</p>
                         <p>Right: d</p>
-                        <br>
                         <br>
                         <br>
                         <p>Open another tab and try MultiPlayer</p>

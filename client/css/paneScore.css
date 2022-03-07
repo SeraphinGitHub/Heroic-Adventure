@@ -1,0 +1,15 @@
+
+/* ===================================================================== */
+/* Score Pane
+/* ===================================================================== */
+.player-score {
+   top: 200px;
+}
+
+.score-container {
+   align-content: flex-start;
+   position: relative;
+   top: 45px;
+   height: 90%;
+   width: 100%;
+}
