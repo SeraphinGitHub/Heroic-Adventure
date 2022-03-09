@@ -10,8 +10,11 @@ const easyLogin = () => {
    
    setTimeout(() => {
       isSocket = true;
+
       const logScreen = document.querySelector(".log-screen");
-      const navBarUI = document.querySelector(".UI-navBar");
+      const logBackground = document.querySelector(".log-background");
+      const navLeft = document.querySelector(".nav-left");
+      const navRight = document.querySelector(".nav-right");
       
       // Send player's name
       const socket = io();
@@ -27,9 +30,10 @@ const easyLogin = () => {
          logFormInput.value = ""
          logFormInput.blur();
          logScreen.classList.add("hide-LogScreen");
-         
-         navBarUI.classList.add("visible");
-         navBarUI.classList.remove("toggle-navBar");
+         logBackground.classList.add("hide-LogScreen");
+
+         navLeft.classList.remove("hide-nav-left");
+         navRight.classList.remove("hide-nav-right");
       });
    }, 300);
 }
@@ -65,6 +69,7 @@ const initClientScripts = () => {
       "classes/Viewport.js",
       
       // Scripts
+      "client_PlayerUI.js",
       "client_PlayerHandler.js",
       "client_MapHandler.js",
       "client_ChatHandler.js",
@@ -89,8 +94,12 @@ const initClientScripts = () => {
 const loadClient = () => {
    
    isSocket = true;
+
    const logScreen = document.querySelector(".log-screen");
-   const navBarUI = document.querySelectorAll(".UI-navBar");
+   const logBackground = document.querySelector(".log-background");
+
+   const navLeft = document.querySelector(".nav-left");
+   const navRight = document.querySelector(".nav-right");
    
    // Send player's name
    const socket = io();
@@ -106,10 +115,12 @@ const loadClient = () => {
          // Reset inputField's value
          logFormInput.value = ""
          logFormInput.blur();
+
          logScreen.classList.add("hide-LogScreen");
-         
-         navBarUI.classList.add("visible");
-         navBarUI.classList.remove("toggle-navBar");
+         logBackground.classList.add("hide-LogScreen");
+
+         navLeft.classList.remove("hide-nav-left");
+         navRight.classList.remove("hide-nav-right");
       }, 500);
    });
 }

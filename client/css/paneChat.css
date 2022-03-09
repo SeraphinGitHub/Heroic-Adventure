@@ -2,13 +2,9 @@
 /* ===================================================================== */
 /* Chat
 /* ===================================================================== */
-.chat {
-   display: none;
-   position: relative;
-   justify-content: space-between;
-   align-content: flex-end;
-   margin-left: 10px;
-   height: 710px;
+.player-chat .wood-pane,
+.player-chat .paper-pane {
+   transform: translate(20%, -14%) rotate(90deg);
 }
 
 /* Chrome scroll bar */
@@ -20,142 +16,174 @@
    background: white;
 }
 
-.general-chat-btn,
-.private-chat-btn {
-   top: 4px;
-   height: 50px;
-   width: 48%;
-   border-radius: 10px 10px 0px 0px;
+
+.player-chat {
+   position: absolute;
+   bottom: -368px;
+   left: 40px;
+   height: 395px;
+   width: 552px;
+}
+
+.chat-glowing {
+   position: absolute;
+   top: 6px;
+   left: 5px;
+   width: 98.5%;
+   height: 97.5%;
+}
+
+.glow-purple {
+   animation: chatGlowing_Purple 2s linear infinite;
+}
+
+.glow-orange {
+   animation: chatGlowing_Orange 2s linear infinite;
+}
+
+@keyframes chatGlowing_Purple {
+   0% { box-shadow: darkviolet 0px 0px 0px; }
+   50% { box-shadow: darkviolet 0px 0px 60px; }
+   100% { box-shadow: darkviolet 0px 0px 0px; }
+}
+
+@keyframes chatGlowing_Orange {
+   0% { box-shadow: orangered 0px 0px 0px; }
+   50% { box-shadow: orangered 0px 0px 60px; }
+   100% { box-shadow: orangered 0px 0px 0px; }
+}
+
+.chat-plate {
+   transform: translate(-50%) scale(85%, 75%);
+}
+
+.general-plate,
+.private-plate {
+   z-index: 10;
+   top: 15px;
+   transform: scale(70%, 60%);
+   background: transparent;
 }
 
 .general-chat,
 .private-chat {
-   overflow-y: scroll;
+   visibility: hidden;
+   position: absolute;
+   overflow: scroll;
    scrollbar-width: thin;
-   scrollbar-color: white transparent;
 
-   top: 54px;
-   left: 50%;
-   height: 465px;
-   width: 89%;
-   
-   padding: 10px;
-   transform: translate(-50%);
+   top: 72px;
+   left: 40px;
+   height: 50%;
+   width: 85%;
+}
+
+.general-chat p,
+.private-chat p {
+   font-size: 146%;
+}
+
+.general-chat p,
+.private-chat p,
+.message-receiver p,
+.chat-form input {
+   font-family: "Dimbo-Regular";
 }
 
 
 /* ========== General Chat ========== */
-.general-chat-btn {
-   left: 4px;
-   background: rgb(206, 83, 255);
+.general-plate {
+   left: 25px;
 }
 
 .general-chat {
-   z-index: 10;
-
-   border-radius: 0px 10px 10px 10px;
-   border: solid 4px rgb(206, 83, 255);
-   background: linear-gradient(to bottom, rgb(206, 83, 255), lightgray);
+   scrollbar-color: darkviolet transparent;
 }
 
 
 /* ========== Private Chat ========== */
-.private-chat-btn {
-   right: 4px;
-   background: orange;
+.private-plate {
+   left: 280px;
 }
 
 .private-chat {
-   z-index: 0;
+   scrollbar-color: orangered transparent;
+}
 
-   border-radius: 10px 0px 10px 10px;
-   border: solid 4px orange;
-   background: linear-gradient(to bottom, orange, lightgray);
+
+/* ========== InputField ========== */
+.receiver-container {
+   position: absolute;
+   top: 312px;
+   left: 30px;
+   
+   background: url("../images/playerUI/Game UI.png") no-repeat -1868px -317px;
+   width: 230px;
+   height: 58px;
+
+   transform: scale(95%, 75%);
 }
 
 .message-receiver {
-   z-index: 20;
+   font-size: 230%;
+   transform: scale(85%, 100%);
+}
+
+.chat-form {
    position: absolute;
-
+   bottom: 84px;
    left: 50%;
-   bottom: 125px;
-   height: 35px;
-   width: 90%;
-   
-   font-size: 20px;
-   text-align: center;
+   height: 36px;
+   width: 470px;
    transform: translate(-50%);
-   
-   border-radius: 30px;
-   border: solid 2px rgb(206, 83, 255);
-   background: linear-gradient(to bottom left, violet, white, lightblue, white);
 }
 
-.private-message-received {
-   animation: privateReceived linear 0.2s;
-}
-
-@keyframes privateReceived {
-   0% { background: red }
-   100% { background: orange }
-}
-
-
-/* ========== Btn Hover/Active ========== */
-.general-chat-btn:hover,
-.private-chat-btn:hover,
-.clear-chat-btn:hover {
-   box-shadow: none;
-}
-
-.general-chat-btn:active,
-.private-chat-btn:active {
-   border: none;
-}
-
-
-.general-chat,
-.chat-enter {
-   margin-bottom: 5px;
-}
-
-.chat {
-   width: 16%;
-}
-
-.message,
-.player-controls div p {
-   margin-bottom: 8px;
-}
-
-.chat-enter input {
+.chat-form input {
    height: 100%;
    width: 100%;
    padding-left: 15px;
    border: none;
-   background: rgb(105, 197, 255);
-}
-
-.chat-enter input,
-.clear-chat-btn  {
-   border-radius: 10px;
-}
-
-.general-chat,
-.chat-enter input,
-.controls-message div p {
-   font-size: 18px;
-   font-family: "Verdana";
-}
-
-.chat-enter,
-.clear-chat-btn {
-   height: 55px;
-}
-
-
-/* ========== Message Hover ========== */
-.message:hover {
-   cursor: pointer;
    color: white;
+   text-shadow: black 2px 2px 0px;
+   background: rgba(0, 0, 0, 0.6);
+   font-size: 150%;
+}
+
+.input-corner-top {
+   transform: scale(29%, 29%);
+   top: -49px;
+   left: -50px;
+}
+
+.input-corner-bottom {
+   transform: scale(-29%, -29%);
+   top: -47px;
+   left: 389px;
+}
+
+/* ========== Clear Chat ========== */
+.clear-plate {
+   top: 308px;
+   left: 276px;
+   transform: scale(70%, 65%);
+}
+
+
+/* ========== :active ========== */
+.chat-plate:active {
+   left: 50.7%;
+}
+
+.general-plate:active {
+   top: 19px;
+   left: 29px;
+}
+
+.private-plate:active {
+   top: 19px;
+   left: 284px;
+}
+
+.clear-plate:active {
+   top: 315px;
 }

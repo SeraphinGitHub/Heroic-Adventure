@@ -52,7 +52,7 @@ body {
 }
 
 h1, h2, h3, h4, p {
-   font-family: "Verdana";
+   font-family: "Dimbo-Regular";
 }
 
 h2 {
@@ -128,7 +128,6 @@ p {
 
    transition-duration: 1s;
 }
-
 
 
 /* ===================================================================== */

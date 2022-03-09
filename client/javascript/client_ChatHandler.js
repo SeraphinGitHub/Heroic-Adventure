@@ -4,11 +4,12 @@
 // =====================================================================
 // Classes Variables
 // =====================================================================
+const chatGlowing = document.querySelector(".chat-glowing");
 
 // ========== Buttons ==========
-const generalBtn = document.querySelector(".general-chat-btn");
-const privateBtn = document.querySelector(".private-chat-btn");
-const clearChatBtn = document.querySelector(".clear-chat-btn");
+const generalBtn = document.querySelector(".general-plate");
+const privateBtn = document.querySelector(".private-plate");
+const clearChatBtn = document.querySelector(".clear-plate");
 
 // ========== Channels ==========
 const generalChat = document.querySelector(".general-chat");
@@ -19,8 +20,8 @@ const receiver = document.querySelector(".message-receiver");
 const message = document.getElementsByClassName("message");
 
 // ========== Input Field ==========
-const chatEnter = document.querySelector(".chat-enter");
-const chatInput = document.querySelector(".chat-enter input");
+const chatForm = document.querySelector(".chat-form");
+const chatInput = document.querySelector(".chat-form input");
 
 
 // =====================================================================
@@ -38,8 +39,10 @@ const displayReceiverName = (receiverStr) => receiver.textContent = receiverStr;
 
 const showGeneralChat = () => {
 
-   generalChat.style = "z-index: 10";
-   privateChat.style = "z-index: 0";
+   generalChat.classList.add("visible");
+   privateChat.classList.remove("visible");
+   chatGlowing.classList.add("glow-purple");
+   chatGlowing.classList.remove("glow-orange");
    isGeneralChat = true;
    isPrivateChat = false;
 
@@ -48,8 +51,10 @@ const showGeneralChat = () => {
 
 const showPrivateChat = () => {
 
-   generalChat.style = "z-index: 0";
-   privateChat.style = "z-index: 10";
+   generalChat.classList.remove("visible");
+   privateChat.classList.add("visible");
+   chatGlowing.classList.remove("glow-purple");
+   chatGlowing.classList.add("glow-orange");
    isGeneralChat = false;
    isPrivateChat = true;
 
@@ -108,7 +113,7 @@ const chatEventListeners = (socket) => {
    generalBtn.addEventListener("click", () => showGeneralChat());
    privateBtn.addEventListener("click", () => showPrivateChat());
    
-   chatEnter.addEventListener("submit", (event) => {
+   chatForm.addEventListener("submit", (event) => {
       event.preventDefault();
       if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
       

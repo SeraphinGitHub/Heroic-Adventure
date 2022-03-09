@@ -4,6 +4,7 @@
 /* ===================================================================== */
 .hide-LogScreen {
    top: -900px !important;
+   /* visibility: hidden !important; */
 }
 
 .log-screen {
@@ -19,6 +20,19 @@
    height: 830px;
    width: 417px;
    animation-name: show_LogScreen;
+}
+
+.log-background {
+
+   /* ********************************************* Dev Mode ********************************************* */
+   visibility: hidden !important;
+   /* ********************************************* Dev Mode ********************************************* */
+   
+   position: absolute;
+   top: 0;
+   height: 100%;
+   width: 100%;
+   background: black;
 }
 
 .flag {
@@ -40,7 +54,6 @@
 
 .log-screen,
 .log-form {
-
    left: 50%;
    transform: translate(-50%);
 }
@@ -49,7 +62,6 @@
 .flag,
 .log-form,
 .hide-LogScreen {
-
    animation-iteration-count: 1;
    animation-timing-function: ease-in-out;
    animation-duration: 1.7s;
@@ -76,8 +88,6 @@
    85% { bottom: 200px; }
    100% { bottom: 380px; }
 }
-
-
 
 .log-form input {
    height: 50px;

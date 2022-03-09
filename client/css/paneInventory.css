@@ -1,0 +1,72 @@
+
+/* ===================================================================== */
+/* Inventory Pane
+/* ===================================================================== */
+.inventory-container {
+   align-content: flex-start;
+   position: relative;
+   top: 45px;
+   height: 90%;
+   width: 100%;
+}
+
+
+/* ===== Player Name ===== */
+.name-container {
+   transform: scale(85%, 80%);
+   top: -20px;
+   right: 5px;
+}
+
+.player-name {
+   position: absolute;
+   top: 19px;
+   left: 50%;
+   transform: translate(-50%) scale(240%, 190%);
+   color: lime;
+   font-family: "Dimbo-Regular";
+   text-shadow: black 1px 2px 0px;
+}
+
+
+/* ===== Character Frame ===== */
+.character-frame {
+   position: absolute;
+   height: 250px;
+   width: 200px;
+   top: 50px;
+   left: 170px;
+}
+
+.background-anim {
+   position: relative;
+   height: 100%;
+   width: 100%;
+   border-radius: 20px;
+   background: linear-gradient(to bottom left,black, black, dodgerblue, dodgerblue, white, dodgerblue, dodgerblue, black, black);
+}
+
+.character-anim {
+   position: absolute;
+   top: -50px;
+   left: -75px;
+   height: 350px;
+   width: 350px;
+   
+   background: url("../images/playerAnim/Idle + Blinking 350 x 350.png") no-repeat 0 0;
+   animation: inventoryIdle 3s linear infinite;
+   animation-timing-function: steps(90);
+}
+
+@keyframes inventoryIdle {
+   from {  background-position: 0px }
+   to {  background-position: -31500px }
+}
+
+.inventory-corner-top {
+   transform: translate(-18%, -208%) scale(70%, 70%);
+}
+
+.inventory-corner-bottom {
+   transform: translate(71%, -81%) scale(-70%, -70%);
+}

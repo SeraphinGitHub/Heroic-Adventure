@@ -21,8 +21,8 @@
     </head>
     
     <body class="flexCenter">
-        
-        <!-- Log Player -->
+    
+        <!-- ==================== Log Player ==================== -->
         <section class="log-screen">
             <div class="flag"></div>
             
@@ -39,15 +39,7 @@
             </form>
         </section>
 
-        <!-- NavBar -->
-        <nav class="UI-navBar toggle-navBar">
-            <button class="toggle-inventory">Inv</button>
-            <button class="toggle-player-stats">Stat</button>
-            <button class="toggle-player-score">Scr</button>
-            <button class="toggle-player-controls">Ctrl</button>
-        </nav>
-
-        <!-- Viewport -->
+        <!-- ==================== Viewport ==================== -->
         <section class="viewport">
 
             <!-- Artwork -->
@@ -62,10 +54,66 @@
             <div class="style-frame corner-bottom-left"></div>
             <div class="style-frame corner-bottom-right"></div>
 
-            <!-- Game window -->
+            <!--  ========== NavBar Left ========== -->
+            <nav class="flexCenter UI-navBar nav-left hide-nav-left">
+                
+                <!-- Inventory -->
+                <button class="flexCenter name-plate show-player-inventory">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Inventory</p>
+                </button>
+
+                <!-- Map -->
+                <button class="flexCenter name-plate show-player-map">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Map</p>
+                </button>
+
+                <!-- Social -->
+                <button class="flexCenter name-plate show-player-social">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Social</p>
+                </button>
+            </nav>
+
+            <!-- ========== NavBar Right ========== -->
+            <nav class="flexCenter UI-navBar nav-right hide-nav-right">
+
+                <!-- Stats -->
+                <button class="flexCenter name-plate show-player-stats">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Stats</p>
+                </button>
+
+                <!-- Score -->
+                <button class="flexCenter name-plate show-player-score">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Score</p>
+                </button>
+
+                <!-- Controls -->
+                <button class="flexCenter name-plate show-player-controls">
+                    <div class="background-plate"></div>
+                    <div class="blue-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Controls</p>
+                </button>
+            </nav>
+
+            <!-- ========== Game window ========== -->
             <section class="flexCenter game-window">
-                            
-                <!-- Canvas -->
+
+                <!-- ========== Canvas ========== -->
                 <canvas class="canvas-map"></canvas>
                 <canvas class="canvas-enemies"></canvas>
                 <canvas class="canvas-player"></canvas>
@@ -73,43 +121,163 @@
                 <canvas class="canvas-fixed-UI"></canvas>
                 <canvas class="canvas-UI"></canvas>
                 <canvas class="canvas-fixed-front"></canvas>
-    
 
-                <!-- Death Screen -->
+                <div class="log-background"></div>
+
+                <!-- ========== Death Screen ========== -->
                 <div class="death-screen">
-                    <p class="death-message"></p>
-                    <p class="respawn-timer"></p>
+                    <div class="paper-pane">
+                        <p class="death-message"></p>
+                        <p class="respawn-timer"></p>
+                    </div>
                 </div>
 
+                
+                <!-- ========== Inventory Panel ========== -->
+                <section class="wood-pane panel-left player-inventory">
 
-                <!-- Chat -->
-                <section class="flexCenter UI-frame chat">
-                    
-                    <button class="btn absolute general-chat-btn">General</button>
-                    <div class="UI-content absolute general-chat">
-                        <!-- <p></p> -->
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate hide-player-inventory">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Inventory</p>
+                    </div>
+
+                    <!-- Inventory Container -->
+                    <div class="flexCenter inventory-container">
+                        
+                        <!-- Player Name -->
+                        <div class="name-container orange-plate">
+                            <p class="player-name"></p>
+                        </div>
+
+                        <!-- Anim -->
+                        <div class="character-frame">
+                            <div class="background-anim"></div>
+                            <div class="character-anim"></div>
+                            <div class="inventory-corner-top spell-corner"></div>
+                            <div class="inventory-corner-bottom spell-corner"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========== Map Panel ========== -->
+                <section class="wood-pane panel-left player-map">
+
+                    <!-- Paper pane -->
+                    <div class="paper-pane"></div>
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate hide-player-map">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Map</p>
                     </div>
                     
-                    <button class="btn absolute private-chat-btn">Private</button>
-                    <div class="UI-content absolute private-chat">
-                        <!-- <p></p> -->
+                    <!-- Map Container -->
+                    <div class="map-container">
+                        <p>Sorry !</p>
+                        <br>
+                        <p>There is NO map yet !</p>
+                    </div>
+                </section>
+
+                <!-- ========== Social Panel ========== -->
+                <section class="wood-pane panel-left player-social">
+
+                    <!-- Paper pane -->
+                    <div class="paper-pane"></div>
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate hide-player-social">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Social</p>
                     </div>
                     
-                    <p class="flexCenter message-receiver"></p>
-
-                    <form class="flexCenter chat-enter">
-                        <input type="text" placeholder="Send message">
-                    </form>
-
-                    <button class="btn orange-btn clear-chat-btn">Clear Chat</button>
+                    <!-- Social Container -->
+                    <div class="society-container">
+                        <p>Sorry !</p>
+                        <br>
+                        <p>There is NO social section yet !</p>
+                    </div>
                 </section>
 
 
-                <!-- Stats -->
-                <section class="wood-pane panel player-stats">
+                <!-- ========== Chat ========== -->
+                <section class="player-chat">
+
+                    <div class="chat-glowing"></div>
+                    <div class="wood-pane"></div>
+                    <div class="paper-pane"></div>
 
                     <!-- Name Plate -->
-                    <div class="flexCenter name-plate">
+                    <div class="flexCenter name-plate chat-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Chat</p>
+                    </div>
+
+                    
+                    <!-- ========== General Chat ========== -->
+                    <div class="flexCenter name-plate general-plate">
+                        <div class="background-plate"></div>
+                        <div class="purple-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>General</p>
+                    </div>
+
+                    <div class="general-chat visible">
+                        <p></p>
+                    </div>
+
+
+                    <!-- ========== Private Chat ========== -->
+                    <div class="flexCenter name-plate private-plate">
+                        <div class="background-plate"></div>
+                        <div class="orange-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Private</p>
+                    </div>
+
+                    <div class="private-chat">
+                        <p></p>
+                    </div>
+
+
+                    <!-- ========== InputField ========== -->
+                    <div class="flexCenter receiver-container">
+                        <p class="message-receiver"></p>
+                    </div>
+
+                    <form class="flexCenter chat-form">
+                        <input type="text" placeholder="Send message">
+                        <div class="input-corner-top spell-corner"></div>
+                        <div class="input-corner-bottom spell-corner"></div>
+                    </form>
+
+                    <!-- ========== Clear Plate ========== -->
+                    <div class="flexCenter name-plate clear-plate">
+                        <div class="background-plate"></div>
+                        <div class="grey-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Clear Chat</p>
+                    </div>
+                </section>
+
+
+                <!-- ========== Bags ========== -->
+
+
+                <!-- ========== Stats Panel ========== -->
+                <section class="wood-pane panel-right player-stats">
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate hide-player-stats">
                         <div class="background-plate"></div>
                         <div class="blue-plate"></div>
                         <div class="white-plate"></div>
@@ -275,11 +443,11 @@
                 </section>
 
 
-                <!-- Player Score -->
-                <section class="wood-pane panel player-score">
+                <!-- ========== Score Panel ========== -->
+                <section class="wood-pane panel-right player-score">
 
                     <!-- Name Plate -->
-                    <div class="flexCenter name-plate">
+                    <div class="flexCenter name-plate hide-player-score">
                         <div class="background-plate"></div>
                         <div class="blue-plate"></div>
                         <div class="white-plate"></div>
@@ -394,14 +562,14 @@
                 </section>
 
 
-                <!-- Controls -->
-                <section class="wood-pane panel player-controls">
+                <!-- ========== Controls Panel ========== -->
+                <section class="wood-pane panel-right player-controls">
 
                     <!-- Paper pane -->
                     <div class="paper-pane"></div>
                     
                     <!-- Name Plate -->
-                    <div class="flexCenter name-plate">
+                    <div class="flexCenter name-plate hide-player-controls">
                         <div class="background-plate"></div>
                         <div class="blue-plate"></div>
                         <div class="white-plate"></div>
@@ -423,7 +591,6 @@
                         <p>Enjoy =)</p>
                     </div>
                 </section>
-                
             </section>
 
         </section>

@@ -42,6 +42,13 @@ class Player extends Character {
       this.speedGcD = this.GcD;
       this.attackSpeed = Math.floor(this.baseGcD /60 *10) /10;
 
+      // Player Mana
+      this.baseMana = 150;
+      this.mana = this.baseMana;
+      this.baseRegenMana = 6; // Per second
+      this.regenMana = Math.floor(this.baseRegenMana /this.deployFPS *this.syncCoeff *100) /100;
+      this.totalManaCost = 0;
+
       // Player Health
       this.baseHealth = 250;
       this.health = this.baseHealth;
@@ -50,15 +57,8 @@ class Player extends Character {
       this.baseEnergy = 200;
       this.energy = this.baseEnergy;
       this.energyCost = 0.7;
-      this.baseRegenEnergy = 0.15;
-      this.regenEnergy = Math.floor(this.baseRegenEnergy *this.syncCoeff *100) /100;
-
-      // Player Mana
-      this.baseMana = 150;
-      this.mana = this.baseMana;
-      this.baseRegenMana = 0.12;
-      this.regenMana = Math.floor(this.baseRegenMana *this.syncCoeff *100) /100;
-      this.totalManaCost = 0;
+      this.baseRegenEnergy = 9; // Per second
+      this.regenEnergy = Math.floor(this.baseRegenEnergy /this.deployFPS *this.syncCoeff *100) /100;      
 
       // Fame
       this.getFameCost = 600;
@@ -71,7 +71,7 @@ class Player extends Character {
       this.totalFameCost = 0;
 
       // Death
-      this.baseRespawnTimer = 10; //<== seconds
+      this.baseRespawnTimer = 20; //<== seconds
       this.respawnTimer = this.baseRespawnTimer;
       this.respawnRange = 1000;
       this.deathCounts = 0;
@@ -92,12 +92,12 @@ class Player extends Character {
       this.calcHealing;
       
       // Movements Speed
-      this.walkSpeed = Math.floor( 3 *this.syncFormula);
-      this.runSpeed = Math.floor( 7 *this.syncFormula);
+      this.walkSpeed_Percent = 100;
+      this.runSpeed_Percent = 200;
+      this.walkSpeed = Math.floor( this.walkSpeed_Percent /33.33 *this.syncFormula);
+      this.runSpeed = Math.floor( this.runSpeed_Percent /33.33 *this.syncFormula);
       this.baseWalkSpeed = this.walkSpeed;
       this.baseRunSpeed = this.runSpeed;
-      this.walkSpeed_Percent = Math.ceil(this.baseWalkSpeed *33.33);
-      this.runSpeed_Percent = Math.ceil(this.baseRunSpeed *33.33);
 
       // Movements Axis
       this.up = false;

@@ -90,12 +90,42 @@
 
 
 /* ===================================================================== */
+/* Spell Corner
+/* ===================================================================== */
+.spell-corner {
+   position: absolute;
+   background: url("../images/playerUI/Game UI.png") no-repeat -2119px -260px;
+   width: 131px;
+   height: 132px;
+}
+
+
+/* ===================================================================== */
+/* Transition Duration
+/* ===================================================================== */
+.panel-left,
+.panel-right,
+.toggle-panel-left,
+.toggle-panel-right,
+.toggle-from-bottom,
+.UI-navBar,
+.nav-left,
+.nav-right,
+.player-chat {
+   transition-duration: 0.8s;
+}
+
+
+/* ===================================================================== */
 /* Name Plate
 /* ===================================================================== */
 .name-plate {
    position: absolute;
-   top: -15px;
-   transform: scale(95%, 85%);
+   top: -35px;
+   left: 50%;
+   height: 65px;
+   width: 250px;
+   transform: translate(-50%) scale(95%, 85%);
 }
 
 .name-plate p {
@@ -115,20 +145,58 @@
    visibility: visible;
 }
 
+.name-plate:active {
+   top: -30px;
+   left: 51%;
+}
+
+
+/* ===================================================================== */
+/* Panel Top Position
+/* ===================================================================== */
+.player-inventory,
+.player-stats {
+   top: 35px;
+}
+
+.player-map,
+.player-score {
+   top: 173px;
+}
+
+.player-social,
+.player-controls {
+   top: 310px;
+}
+
 
 /* ===================================================================== */
 /* Pane Toggle
 /* ===================================================================== */
-.panel {
+.panel-left,
+.panel-right {
    visibility: hidden;
-   right: -400px;
    transform: scale(90%, 90%);
-   transition-duration: 0.8s;
 }
 
-.toggle-panel {
+.panel-left {
+   left: -400px;
+}
+
+.panel-right {
+   right: -400px;
+}
+
+.toggle-panel-left {
+   left: -12px !important;
+}
+
+.toggle-panel-right {
    right: -12px !important;
-   transition-duration: 0.8s;
+}
+
+.toggle-from-bottom {
+   bottom: 15px !important;
 }
 
 
@@ -136,42 +204,57 @@
 /* Nav Bar
 /* ===================================================================== */
 .UI-navBar {
-   visibility: hidden;
-   position: fixed;
+   position: absolute;
+   align-content: space-between;
    top: 50%;
-   right: 4px;
-   width: 65px;
+   height: 65%;
+   width: 37px;
    transform: translate(0%, -50%);
-   transition-duration: 0.8s;
 }
 
-.toggle-navBar {
-   right: -75px !important;
-   transition-duration: 0.8s;
+.nav-left {
+   left: -48px;
+}
+
+.nav-right {
+   right: -48px;
+}
+
+.hide-nav-left {
+   left: -8px !important;
+}
+
+.hide-nav-right {
+   right: -8px !important;
 }
 
 
 /* ===== Nav Buttons ===== */
 .UI-navBar button {
-   height: 65px;
-   width: 65px;
-   margin-bottom: 40px;
-   border: double black 6px;
-   border-radius: 8px;
-   background: linear-gradient(to bottom right, black, dodgerblue, black);
-
-
-   text-align: center;
-   font-size: 120%;
-   color: gold;
-   font-family: "Orbitron-Extrabold";
-   text-shadow: black 5px 5px 5px;
+   position: relative;
+   top: 0;
+   left: 0;
+   height: 60px;
+   width: 100%;
+   border: none;
+   transform: scale(65%, 65%) rotate(-90deg);
+   background-color: transparent;
 }
 
-.UI-navBar button:hover {
-   background: linear-gradient(to bottom right, black, darkturquoise, black);
+.nav-left button:active {
+   top: -4px;
+   left: 5px;
 }
 
-.UI-navBar button:active {
-   background: linear-gradient(to bottom right, black, red, black);
+.nav-right button:active {
+   top: -4px;
+   left: -5px;
+}
+
+.hide-left-nav-button {
+   left: 40px !important;
+}
+
+.hide-right-nav-button {
+   left: -40px !important;
 }

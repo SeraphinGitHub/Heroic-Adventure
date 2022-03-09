@@ -106,9 +106,13 @@ const onConnect = (socket) => {
       socket.emit("initEnemyPack", initPack_MobList);
       socket.emit("fameEvent", player.famePack());
 
-      socket.emit("playerStats", {
-         
-         // name: data,
+      // Inventory
+      socket.emit("playerInventory",{
+         name: data,
+      });
+
+      // Stats
+      socket.emit("playerStats", {         
          health: player.baseHealth,
          mana: player.baseMana,
          regenMana: player.baseRegenMana,
@@ -121,8 +125,8 @@ const onConnect = (socket) => {
          runSpeed: player.runSpeed_Percent,
       });
       
+      // Score
       socket.emit("playerScore", {
-         
          kills: player.kills,
          playersKills: player.playersKills,
          mobsKills: player.mobsKills,

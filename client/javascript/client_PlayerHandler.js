@@ -1,121 +1,6 @@
 
 "use strict"
 
-
-// =====================================================================
-// Pane Toggling
-// =====================================================================
-const togglePane = (button, pane) => {
-   
-   let isVisible = false;
-   button.addEventListener("click", () => {
-
-      if(!isVisible) {
-         isVisible = true;
-         pane.classList.add("visible");
-         pane.classList.add("toggle-panel");
-      }
-      else {
-         isVisible = false;
-         pane.classList.remove("visible");
-         pane.classList.remove("toggle-panel");
-      }
-   });
-}
-
-
-// =====================================================================
-// Player Stats Pane
-// =====================================================================
-const playerStats = (data) => {
-   
-   // const playerName = document.querySelector(".player-name");
-   // playerName.textContent = data.name;
-   
-   // Player Stats
-   const health = document.querySelector(".health-value");
-   const mana = document.querySelector(".mana-value");
-   const regenMana = document.querySelector(".mana-regen-value");
-   const energy = document.querySelector(".energy-value");
-   const regenEnergy = document.querySelector(".energy-regen-value");
-   const attackSpeed = document.querySelector(".attackSpeed-value");
-   const damage = document.querySelector(".damage-value");
-   const walkSpeed = document.querySelector(".walkSpeed-value");
-   const runSpeed = document.querySelector(".runSpeed-value");
-
-   // Set DOM text content
-   health.textContent = data.health;
-   mana.textContent = data.mana;
-   regenMana.textContent = `${data.regenMana} /s`;
-   energy.textContent = data.energy;
-   regenEnergy.textContent = `${data.regenEnergy} /s`;
-   attackSpeed.textContent = `${data.attackSpeed} s`;
-   damage.textContent = `${data.minDamage} - ${data.maxDamage}`;
-   walkSpeed.textContent = `${data.walkSpeed} %`;
-   runSpeed.textContent = `${data.runSpeed} %`;
-
-   // Toggle Stat Pane
-   const toggleStats = document.querySelector(".toggle-player-stats");
-   const statsPane = document.querySelector(".player-stats");
-
-   togglePane(toggleStats, statsPane);
-}
-
-
-// =====================================================================
-// Player Score Pane
-// =====================================================================
-const playerScore = (data) => {
-   const playerScore = document.querySelector(".player-score");
-
-   // Player score
-   const kills = playerScore.querySelector(".kills-value");
-   const playersKills = playerScore.querySelector(".players-kills-value");
-   const mobsKills = playerScore.querySelector(".mobs-kills-value");
-   const died = playerScore.querySelector(".died-value");
-   const fame = playerScore.querySelector(".fame-value");
-   const fameCount = playerScore.querySelector(".fame-count-value");
-
-   // Set DOM text content
-   kills.textContent = data.kills;
-   playersKills.textContent = data.playersKills;
-   mobsKills.textContent =  data.mobsKills;
-   died.textContent =  data.died;
-   fame.textContent =  data.fame;
-   fameCount.textContent =  data.fameCount;
-
-   // Toggle Score Pane
-   const toggleScore = document.querySelector(".toggle-player-score");
-   const scorePane = document.querySelector(".player-score");
-   
-   togglePane(toggleScore, scorePane);
-}
-
-
-// =====================================================================
-// Player Controls Pane
-// =====================================================================
-const playerControls = () => {
-
-   const toggleControls = document.querySelector(".toggle-player-controls");
-   const controlsPane = document.querySelector(".player-controls");
-   
-   togglePane(toggleControls, controlsPane);
-}
-
-
-// =====================================================================
-// Game UI Handler ==> Socket Listening
-// =====================================================================
-const handleGameUI = (socket) => {
-
-   socket.on("playerStats", (data) => playerStats(data));
-   socket.on("playerScore", (data) => playerScore(data));
-
-   playerControls();
-}
-
-
 // =====================================================================
 // Player Controls
 // =====================================================================
@@ -198,6 +83,7 @@ const onMouseInput = (socket) => {
 const deathScreen = (socket) => {
 
    const deathScreen = document.querySelector(".death-screen");
+   const deathPaper = document.querySelector(".death-screen .paper-pane");
    const deathMessage = document.querySelector(".death-message");
    const respawnTimer = document.querySelector(".respawn-timer");
    
@@ -209,14 +95,19 @@ const deathScreen = (socket) => {
       if(player.deathCounts === 3) textValue = "You died again !";
       if(player.deathCounts === 6) textValue = "Wasted !";
       if(player.deathCounts === 9) textValue = "You died like a bitch !";
-   
-      deathScreen.style = "visibility: visible";
+      
+      deathScreen.classList.add("visible");
+      deathScreen.classList.add("deathScreen-popUp");
+      deathPaper.classList.add("deathPaper-popUp");
+
       deathMessage.textContent = textValue;
       respawnTimer.textContent = timerValue;
    });
    
    socket.on("playerRespawn", () => {
-      deathScreen.style = "visibility: hidden";
+      deathScreen.classList.remove("visible");
+      deathScreen.classList.remove("deathScreen-popUp");
+      deathPaper.classList.remove("deathPaper-popUp");
    });
 }
 
@@ -266,13 +157,17 @@ const initPlayer = (socket, playerID) => {
    // Init Pack, Sync, Disconnect
    clientState(socket, playerID);
 
-   // Client UI, Stats, Controls
+   // Client UI ==> Fame, HUD
    clientPlayer.drawHUD_Frame();
    clientPlayer.drawFame_Frame();
    clientPlayer.initMapSpecs(socket);
    clientPlayer.initTextAndFluidity(socket);
+
+   // Client UI ==> Panels
    handleGameUI(socket);
    deathScreen(socket);
+
+   // Controls Events
    onKeyboardInput(socket);
    onMouseInput(socket);
 
