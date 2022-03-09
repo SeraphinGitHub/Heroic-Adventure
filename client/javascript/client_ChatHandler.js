@@ -10,6 +10,7 @@ const chatGlowing = document.querySelector(".chat-glowing");
 const generalBtn = document.querySelector(".general-plate");
 const privateBtn = document.querySelector(".private-plate");
 const clearChatBtn = document.querySelector(".clear-plate");
+const gotWhispPlate = document.querySelectorAll(".got-whisp");
 
 // ========== Channels ==========
 const generalChat = document.querySelector(".general-chat");
@@ -27,8 +28,6 @@ const chatInput = document.querySelector(".chat-form input");
 // =====================================================================
 // Handling Functions
 // =====================================================================
-let isChatting = false;
-
 let isGeneralChat = true;
 let isPrivateChat = false;
 
@@ -85,11 +84,11 @@ const extractPlayerName = (socket, messageIndexed) => {
    else receiverName = splitedName;
    
    if(receiverName !== ""
-   // && receiverName !== logged_PlayerName
+   && receiverName !== logged_PlayerName
    && !messageText.includes(offlineStr)) {
       
       socket.emit("chatReceiverName", receiverName);
-      receiverContent = `Send to : ${receiverName}`;
+      receiverContent = `To : ${receiverName}`;
       chatInput.value = "";
       showPrivateChat();
    }
@@ -107,8 +106,6 @@ const clearChat = (chatChannel) => {
 // Event Listeners
 // =====================================================================
 const chatEventListeners = (socket) => {
-   chatInput.addEventListener("focusin", () => isChatting = true);
-   chatInput.addEventListener("focusout", () => isChatting = false);
 
    generalBtn.addEventListener("click", () => showGeneralChat());
    privateBtn.addEventListener("click", () => showPrivateChat());
@@ -144,14 +141,15 @@ const chatEventListeners = (socket) => {
 const chatAddMessage = (socket) => {
 
    socket.on("evalResponse", (textMessage) => generalChatResponse(textMessage));
-   
    socket.on("addMessage_General", (textMessage) => getPlayerMessage(socket, generalChat, textMessage));
 
    socket.on("addMessage_Private", (textMessage) => {
       getPlayerMessage(socket, privateChat, textMessage);
    
-      if(!isPrivateChat) privateBtn.classList.add("private-message-received");
-      setTimeout(() => privateBtn.classList.remove("private-message-received"), 200);
+      if(!isPrivateChat) gotWhispPlate.forEach(plate => {
+         plate.classList.add("whisp-alert");
+         setTimeout(() => plate.classList.remove("whisp-alert"), 1000);
+      });
    });
 }
 

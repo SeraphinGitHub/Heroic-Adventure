@@ -59,7 +59,6 @@
 
 .general-plate,
 .private-plate {
-   z-index: 10;
    top: 15px;
    transform: scale(70%, 60%);
    background: transparent;
@@ -90,6 +89,22 @@
    font-family: "Dimbo-Regular";
 }
 
+/* ========== Private Mess Alert ========== */
+.got-whisp {
+   visibility: hidden;
+   opacity: 100%;
+}
+
+.whisp-alert {
+   visibility: visible !important;
+   animation: whispAlert 1s linear;
+}
+
+@keyframes whispAlert {
+   0% { opacity: 100%; }
+   100% { opacity: 0%; }
+}
+
 
 /* ========== General Chat ========== */
 .general-plate {
@@ -116,10 +131,6 @@
    position: absolute;
    top: 312px;
    left: 30px;
-   
-   background: url("../images/playerUI/Game UI.png") no-repeat -1868px -317px;
-   width: 230px;
-   height: 58px;
 
    transform: scale(95%, 75%);
 }
@@ -169,6 +180,28 @@
 }
 
 
+/* ========== Toggle Chat ========== */
+.toggle-chat {
+   bottom: 15px !important;
+}
+
+.hide-chat {
+   bottom: -420px !important;
+}
+
+
+/* ========== :hover ========== */
+.general-chat .message:hover {
+   color: darkviolet;
+   text-shadow: black 1px 1px 0px;
+}
+
+.private-chat .message:hover {
+   color: orangered;
+   text-shadow: black 1px 1px 0px;
+}
+
+
 /* ========== :active ========== */
 .chat-plate:active {
    left: 50.7%;
@@ -185,5 +218,6 @@
 }
 
 .clear-plate:active {
-   top: 315px;
+   top: 312px;
+   left: 50.5%;
 }

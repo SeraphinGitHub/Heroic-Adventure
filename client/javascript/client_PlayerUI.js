@@ -29,13 +29,26 @@ const toggleBottomPane = (button, panel, state, sideStr, glowPanel) => {
       
       if(!state) {
          state = true;
-         panel.classList.add("toggle-from-bottom");
-         if(sideStr === "chat") glowPanel.classList.add("glow-purple");
+         
+         if(sideStr === "chat") {
+            panel.classList.add("toggle-chat");
+            if(isGeneralChat) glowPanel.classList.add("glow-purple");
+            if(isPrivateChat) glowPanel.classList.add("glow-orange");
+         }
+
+         if(sideStr === "bag") panel.classList.add("toggle-bag");
       }
+
       else {
          state = false;
-         panel.classList.remove("toggle-from-bottom");
-         if(sideStr === "chat") glowPanel.classList.remove("glow-purple");
+         
+         if(sideStr === "chat") {
+            panel.classList.remove("toggle-chat");
+            glowPanel.classList.remove("glow-purple");
+            glowPanel.classList.remove("glow-orange");
+         }
+
+         if(sideStr === "bag") panel.classList.remove("toggle-bag");
       }
    });
 }
@@ -235,6 +248,17 @@ const playerChat = () => {
 
 
 // =====================================================================
+// Player Bag Pane
+// =====================================================================
+const playerBag = () => {
+
+   const bagPane = document.querySelector(".player-bag");
+   const bagButton = document.querySelector(".bag-plate");
+   toggleBottomPane(bagButton, bagPane, false, "bag");
+}
+
+
+// =====================================================================
 // Game UI Handler ==> Socket Listening
 // =====================================================================
 const handleGameUI = (socket) => {
@@ -248,4 +272,5 @@ const handleGameUI = (socket) => {
    playerControls();
 
    playerChat();
+   playerBag();
 }

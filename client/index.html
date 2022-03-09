@@ -12,10 +12,12 @@
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/cursor.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/general_UI.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneChat.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneBag.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneInventory.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneStats.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneScore.css">
         <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/paneControls.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost:3000/client/css/iconsStuff.css">
         <!-- <link rel="stylesheet" type="text/css" href="https://multi-game-01.herokuapp.com/client/style.css"> -->
         <title>Multi Player RPG</title>
     </head>
@@ -55,7 +57,7 @@
             <div class="style-frame corner-bottom-right"></div>
 
             <!--  ========== NavBar Left ========== -->
-            <nav class="flexCenter UI-navBar nav-left hide-nav-left">
+            <nav class="flexCenter fluid nav-left hide-nav-left">
                 
                 <!-- Inventory -->
                 <button class="flexCenter name-plate show-player-inventory">
@@ -83,7 +85,7 @@
             </nav>
 
             <!-- ========== NavBar Right ========== -->
-            <nav class="flexCenter UI-navBar nav-right hide-nav-right">
+            <nav class="flexCenter fluid nav-right hide-nav-right">
 
                 <!-- Stats -->
                 <button class="flexCenter name-plate show-player-stats">
@@ -132,9 +134,308 @@
                     </div>
                 </div>
 
+
+
+                <!-- ========== Chat ========== -->
+                <section class="fluid player-chat hide-chat">
+
+                    <div class="chat-glowing"></div>
+                    <div class="wood-pane"></div>
+                    <div class="paper-pane"></div>
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate chat-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="got-whisp red-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Chat</p>
+                    </div>
+
+                    
+                    <!-- ========== General Chat ========== -->
+                    <div class="flexCenter name-plate general-plate">
+                        <div class="background-plate"></div>
+                        <div class="purple-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>General</p>
+                    </div>
+
+                    <div class="general-chat visible">
+                        <!-- <p> message </p> -->
+                    </div>
+
+
+                    <!-- ========== Private Chat ========== -->
+                    <div class="flexCenter name-plate private-plate">
+                        <div class="background-plate"></div>
+                        <div class="orange-plate"></div>
+                        <div class="got-whisp red-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Private</p>
+                    </div>
+
+                    <div class="private-chat">
+                        <!-- <p> message </p> -->
+                    </div>
+
+
+                    <!-- ========== InputField ========== -->
+                    <div class="flexCenter receiver-container green-plate-borderless">
+                        <p class="message-receiver"></p>
+                    </div>
+
+                    <form class="flexCenter chat-form">
+                        <input type="text" placeholder="Send message">
+                        <div class="input-corner-top spell-corner"></div>
+                        <div class="input-corner-bottom spell-corner"></div>
+                    </form>
+
+                    <!-- ========== Clear Plate ========== -->
+                    <div class="flexCenter name-plate clear-plate">
+                        <div class="background-plate"></div>
+                        <div class="grey-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Clear Chat</p>
+                    </div>
+                </section>
+
+                <!-- ========== Bag ========== -->
+                <section class="wood-pane fluid player-bag hide-bag">
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate bag-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Bag</p>
+                    </div>
+                    
+                    <!-- Bag Container -->
+                    <div class="flexCenter bag-container">
+
+                        <!-- Slot Row N°1 -->
+                        <div class="flexCenter bag-row-1 visible">
+                            
+                            <div class="bag-slot-TopLeft"></div>
+                            <div class="bag-slot-TopRight"></div>
+                            
+                            <div class="bag-slot bag-slot-1">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot bag-slot-5">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°2 -->
+                        <div class="flexCenter bag-row-2 visible">
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°3 -->
+                        <div class="flexCenter bag-row-3 visible">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°4 -->
+                        <div class="flexCenter bag-row-4">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°5 -->
+                        <div class="flexCenter bag-row-5">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°6 -->
+                        <div class="flexCenter bag-row-6">
+                            
+                            <div class="bag-slot-BottomLeft"></div>
+                            <div class="bag-slot-BottomRight"></div>
+
+                            <div class="bag-slot bag-slot-26">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot bag-slot-30">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Corners Frame Cover -->
+                    <div class="panel-corner bag-corner-1"></div>
+                    <div class="panel-corner bag-corner-2"></div>
+                    <div class="panel-corner bag-corner-3"></div>
+                    <div class="panel-corner bag-corner-4"></div>
+                </section>
+
                 
+
                 <!-- ========== Inventory Panel ========== -->
-                <section class="wood-pane panel-left player-inventory">
+                <section class="wood-pane fluid panel-left player-inventory">
 
                     <!-- Name Plate -->
                     <div class="flexCenter name-plate hide-player-inventory">
@@ -148,7 +449,7 @@
                     <div class="flexCenter inventory-container">
                         
                         <!-- Player Name -->
-                        <div class="name-container orange-plate">
+                        <div class="name-container orange-plate-borderless">
                             <p class="player-name"></p>
                         </div>
 
@@ -159,11 +460,155 @@
                             <div class="inventory-corner-top spell-corner"></div>
                             <div class="inventory-corner-bottom spell-corner"></div>
                         </div>
+
+                        <!-- Stuff Container -->
+                        <div class="flexCenter stuff-container">
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="helmet-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="shoulders-icon"></div>
+                                </div>
+                                
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="chest-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="pants-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="hands-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="stuff-slot">
+                                <div class="stuff-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="stuff-icons">
+                                    <div class="feet-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Weapon Container -->
+                        <div class="flexCenter weapon-container">
+
+                            <div class="weapon-slot">
+                                <div class="weapon-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="weapon-icons">
+                                    <div class="sword-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="weapon-slot">
+                                <div class="weapon-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="weapon-icons">
+                                    <div class="shield-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Rings Container -->
+                        <div class="flexCenter rings-container">
+
+                            <div class="rings-slot">
+                                <div class="rings-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="rings-icons">
+                                    <div class="purple-ring-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="rings-slot">
+                                <div class="rings-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="rings-icons">
+                                    <div class="green-ring-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="rings-slot">
+                                <div class="rings-slot-glowing"></div>
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+
+                                <div class="rings-icons">
+                                    <div class="turquoise-ring-icon"></div>
+                                </div>
+
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 <!-- ========== Map Panel ========== -->
-                <section class="wood-pane panel-left player-map">
+                <section class="wood-pane fluid panel-left player-map">
 
                     <!-- Paper pane -->
                     <div class="paper-pane"></div>
@@ -185,7 +630,7 @@
                 </section>
 
                 <!-- ========== Social Panel ========== -->
-                <section class="wood-pane panel-left player-social">
+                <section class="wood-pane fluid panel-left player-social">
 
                     <!-- Paper pane -->
                     <div class="paper-pane"></div>
@@ -205,76 +650,11 @@
                         <p>There is NO social section yet !</p>
                     </div>
                 </section>
-
-
-                <!-- ========== Chat ========== -->
-                <section class="player-chat">
-
-                    <div class="chat-glowing"></div>
-                    <div class="wood-pane"></div>
-                    <div class="paper-pane"></div>
-
-                    <!-- Name Plate -->
-                    <div class="flexCenter name-plate chat-plate">
-                        <div class="background-plate"></div>
-                        <div class="blue-plate"></div>
-                        <div class="white-plate"></div>
-                        <p>Chat</p>
-                    </div>
-
-                    
-                    <!-- ========== General Chat ========== -->
-                    <div class="flexCenter name-plate general-plate">
-                        <div class="background-plate"></div>
-                        <div class="purple-plate"></div>
-                        <div class="white-plate"></div>
-                        <p>General</p>
-                    </div>
-
-                    <div class="general-chat visible">
-                        <p></p>
-                    </div>
-
-
-                    <!-- ========== Private Chat ========== -->
-                    <div class="flexCenter name-plate private-plate">
-                        <div class="background-plate"></div>
-                        <div class="orange-plate"></div>
-                        <div class="white-plate"></div>
-                        <p>Private</p>
-                    </div>
-
-                    <div class="private-chat">
-                        <p></p>
-                    </div>
-
-
-                    <!-- ========== InputField ========== -->
-                    <div class="flexCenter receiver-container">
-                        <p class="message-receiver"></p>
-                    </div>
-
-                    <form class="flexCenter chat-form">
-                        <input type="text" placeholder="Send message">
-                        <div class="input-corner-top spell-corner"></div>
-                        <div class="input-corner-bottom spell-corner"></div>
-                    </form>
-
-                    <!-- ========== Clear Plate ========== -->
-                    <div class="flexCenter name-plate clear-plate">
-                        <div class="background-plate"></div>
-                        <div class="grey-plate"></div>
-                        <div class="white-plate"></div>
-                        <p>Clear Chat</p>
-                    </div>
-                </section>
-
-
-                <!-- ========== Bags ========== -->
+                
 
 
                 <!-- ========== Stats Panel ========== -->
-                <section class="wood-pane panel-right player-stats">
+                <section class="wood-pane fluid panel-right player-stats">
 
                     <!-- Name Plate -->
                     <div class="flexCenter name-plate hide-player-stats">
@@ -444,7 +824,7 @@
 
 
                 <!-- ========== Score Panel ========== -->
-                <section class="wood-pane panel-right player-score">
+                <section class="wood-pane fluid panel-right player-score">
 
                     <!-- Name Plate -->
                     <div class="flexCenter name-plate hide-player-score">
@@ -529,7 +909,7 @@
                         <div class="stat">
                             <div class="stat-name">
                                 <div class="background-plate"></div>
-                                <div class="orange-plate"></div>
+                                <div class="purple-plate"></div>
                                 <div class="white-plate"></div>
                                 <p>Fame</p>
                             </div>
@@ -546,7 +926,7 @@
                         <div class="stat">
                             <div class="stat-name">
                                 <div class="background-plate"></div>
-                                <div class="orange-plate"></div>
+                                <div class="purple-plate"></div>
                                 <div class="white-plate"></div>
                                 <p>Fame Count</p>
                             </div>
@@ -563,7 +943,7 @@
 
 
                 <!-- ========== Controls Panel ========== -->
-                <section class="wood-pane panel-right player-controls">
+                <section class="wood-pane fluid panel-right player-controls">
 
                     <!-- Paper pane -->
                     <div class="paper-pane"></div>

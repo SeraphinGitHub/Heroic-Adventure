@@ -11,16 +11,130 @@
 }
 
 
-/* ===== Player Name ===== */
+/* ========== Stuff Container ========== */
+.stuff-container {
+   align-content: space-between;
+   position: absolute;
+   
+   left: 36px;
+   top: -15px;
+   height: auto;
+   width: 82px;
+}
+
+.stuff-slot {
+   position: relative;
+   height: 83px;
+   width: 100%;
+}
+
+.stuff-slot div {
+   top: -32px;
+   left: -32px;
+   transform: scale(55%, 55%);
+}
+
+
+.stuff-slot-glowing,
+.weapon-slot-glowing,
+.rings-slot-glowing {
+   visibility: hidden;
+   position: absolute;
+   height: 145px;
+   width: 145px;
+   box-shadow: yellow 0px 0px 30px;
+}
+
+.stuff-slot-glowing {
+   top: -32px !important;
+   left: -33px !important;
+}
+
+
+/* ========== Weapon Container ========== */
+.weapon-container {
+   justify-content: space-between;
+   position: absolute;
+   right: 23px;
+   bottom: 84px;
+   height: 95px;
+   width: auto;
+}
+
+.weapon-slot {
+   position: relative;
+   height: 100%;
+   width: 120px;
+}
+
+.weapon-slot div {
+   top: -25px;
+   left: 50%;
+   transform: translate(-50%) scale(65%, 65%);
+}
+
+.weapon-slot-glowing {
+   position: absolute;
+   top: -25px !important;
+   left: 60px !important;
+}
+
+
+/* ========== Rings Container ========== */
+.rings-container {
+   justify-content: space-between;
+   position: absolute;
+
+   right: 25px;
+   bottom: 17px;
+   height: 58px;
+   width: auto;
+}
+
+.rings-slot {
+   position: relative;
+   height: 100%;
+   width: 79px;
+}
+
+.rings-slot div {
+   top: -43px;
+   left: 50%;
+   transform: translate(-50%) scale(40%, 40%);
+}
+
+.rings-slot-glowing {
+   position: absolute;
+   top: -44px !important;
+   left: 40px !important;
+}
+
+
+/* ========== Slot :hover ========== */
+.stuff-slot:hover,
+.weapon-slot:hover,
+.rings-slot:hover {
+   transform: scale(110%, 110%);
+}
+
+.stuff-slot:hover .stuff-slot-glowing,
+.weapon-slot:hover .weapon-slot-glowing,
+.rings-slot:hover .rings-slot-glowing {
+   visibility: visible !important;
+}
+
+
+/* ========== Player Name ========== */
 .name-container {
+   position: absolute;
    transform: scale(85%, 80%);
-   top: -20px;
-   right: 5px;
+   top: -10px;
+   right: 35px;
 }
 
 .player-name {
    position: absolute;
-   top: 19px;
+   top: 16px;
    left: 50%;
    transform: translate(-50%) scale(240%, 190%);
    color: lime;
@@ -29,13 +143,13 @@
 }
 
 
-/* ===== Character Frame ===== */
+/* ========== Character Frame ========== */
 .character-frame {
    position: absolute;
-   height: 250px;
+   height: 240px;
    width: 200px;
-   top: 50px;
-   left: 170px;
+   top: 55px;
+   left: 150px;
 }
 
 .background-anim {
@@ -64,9 +178,33 @@
 }
 
 .inventory-corner-top {
-   transform: translate(-18%, -208%) scale(70%, 70%);
+   transform: translate(-18%, -201%) scale(70%, 70%);
 }
 
 .inventory-corner-bottom {
    transform: translate(71%, -81%) scale(-70%, -70%);
+}
+
+
+/* =============== Slots Icons =============== */
+.stuff-icons,
+.weapon-icons,
+.rings-icons {
+   position: absolute;
+   transform: scale(137%, 137%) !important;
+}
+
+.stuff-icons {
+   top: 19px !important;
+   left: 19px !important;
+}
+
+.weapon-icons {
+   top: 17px !important;
+   left: 61px !important;
+}
+
+.rings-icons {
+   top: 24px !important;
+   left: 41px !important;
 }

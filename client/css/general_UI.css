@@ -39,6 +39,8 @@
 	height: 64px;
 }
 
+
+/* ========== Grey Plate ========== */
 .grey-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1603px -246px;
@@ -46,6 +48,8 @@
 	height: 64px;
 }
 
+
+/* ========== Blue Plate ========== */
 .blue-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1858px -110px;
@@ -53,6 +57,8 @@
 	height: 64px;
 }
 
+
+/* ========== Red Plate ========== */
 .red-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1858px -178px;
@@ -60,6 +66,15 @@
 	height: 64px;
 }
 
+.red-plate-borderless {
+   position: absolute;
+   background: url("../images/playerUI/Game UI.png") no-repeat -1868px -181px;
+	width: 231px;
+	height: 58px;
+}
+
+
+/* ========== Orange Plate ========== */
 .orange-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1603px -314px;
@@ -67,6 +82,14 @@
 	height: 64px;
 }
 
+.orange-plate-borderless {
+   background: url("../images/playerUI/Game UI.png") no-repeat -1613px -317px;
+   width: 231px;
+   height: 58px;
+}
+
+
+/* ========== Green Plate ========== */
 .green-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1858px -314px;
@@ -74,6 +97,15 @@
 	height: 64px;
 }
 
+.green-plate-borderless {
+   position: absolute;
+   background: url("../images/playerUI/Game UI.png") no-repeat -1868px -317px;
+   width: 231px;
+   height: 58px;
+}
+
+
+/* ========== Purple Plate ========== */
 .purple-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1858px -246px;
@@ -81,6 +113,8 @@
 	height: 64px;
 }
 
+
+/* ========== Yellow Plate ========== */
 .yellow-plate {
    position: absolute;
    background: url("../images/playerUI/Game UI.png") no-repeat -1858px -382px;
@@ -99,19 +133,50 @@
    height: 132px;
 }
 
+.panel-corner {
+   position: absolute;
+   background: url("../images/playerUI/Game UI.png") no-repeat -2274px -268px;
+	width: 130px;
+	height: 109px;
+}
+
+
+/* ===================================================================== */
+/* Bar Square
+/* ===================================================================== */
+.square-frame {
+   position: absolute;
+	background: url("../images/playerUI/Game UI.png") no-repeat -2119px -111px;
+	width: 144px;
+	height: 144px;
+}
+
+.square-background {
+   position: absolute;
+   background: url("../images/playerUI/Game UI.png") no-repeat -2124px -396px;
+	width: 144px;
+	height: 144px;
+}
+
+.square-background-clear {
+   position: absolute;
+   visibility: hidden;
+   background: url("../images/playerUI/Game UI.png") no-repeat -2274px -396px;
+	width: 144px;
+	height: 144px;
+}
+
 
 /* ===================================================================== */
 /* Transition Duration
 /* ===================================================================== */
-.panel-left,
-.panel-right,
+.fluid,
 .toggle-panel-left,
 .toggle-panel-right,
-.toggle-from-bottom,
-.UI-navBar,
-.nav-left,
-.nav-right,
-.player-chat {
+.toggle-chat,
+.hide-chat,
+.toggle-bag,
+.hide-bag {
    transition-duration: 0.8s;
 }
 
@@ -195,15 +260,12 @@
    right: -12px !important;
 }
 
-.toggle-from-bottom {
-   bottom: 15px !important;
-}
-
 
 /* ===================================================================== */
 /* Nav Bar
 /* ===================================================================== */
-.UI-navBar {
+.nav-left,
+.nav-right {
    position: absolute;
    align-content: space-between;
    top: 50%;
@@ -230,7 +292,8 @@
 
 
 /* ===== Nav Buttons ===== */
-.UI-navBar button {
+.nav-left button,
+.nav-right button {
    position: relative;
    top: 0;
    left: 0;

@@ -13,11 +13,16 @@ const easyLogin = () => {
 
       const logScreen = document.querySelector(".log-screen");
       const logBackground = document.querySelector(".log-background");
+      
       const navLeft = document.querySelector(".nav-left");
       const navRight = document.querySelector(".nav-right");
+
+      const chat = document.querySelector(".player-chat");
+      const bag = document.querySelector(".player-bag");
       
       // Send player's name
       const socket = io();
+      logged_PlayerName = "Séraphin";
       socket.emit("send_initClient", "Séraphin");
       
       // Await for server response
@@ -34,11 +39,14 @@ const easyLogin = () => {
 
          navLeft.classList.remove("hide-nav-left");
          navRight.classList.remove("hide-nav-right");
+
+         chat.classList.remove("hide-chat");
+         bag.classList.remove("hide-bag");
       });
    }, 300);
 }
 
-easyLogin();
+// easyLogin();
 // =========================  Development  =========================
 
 
@@ -97,12 +105,14 @@ const loadClient = () => {
 
    const logScreen = document.querySelector(".log-screen");
    const logBackground = document.querySelector(".log-background");
-
    const navLeft = document.querySelector(".nav-left");
    const navRight = document.querySelector(".nav-right");
+   const chat = document.querySelector(".player-chat");
+   const bag = document.querySelector(".player-bag");
    
    // Send player's name
    const socket = io();
+   logged_PlayerName = logFormInput.value;
    socket.emit("send_initClient", logFormInput.value);
    
    // Await for server response
@@ -121,6 +131,10 @@ const loadClient = () => {
 
          navLeft.classList.remove("hide-nav-left");
          navRight.classList.remove("hide-nav-right");
+
+         chat.classList.remove("hide-chat");
+         bag.classList.remove("hide-bag");
+
       }, 500);
    });
 }
@@ -130,6 +144,7 @@ const loadClient = () => {
 // Login System
 // =====================================================================
 const logFormInput = document.querySelector(".log-form input");
+let logged_PlayerName = "";
 let isSocket = false;
 
 // Login Form & Button

@@ -1,0 +1,82 @@
+
+/* ========== Weapon ========== */
+.sword-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -1px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.shield-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -96px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+
+/* ========== Armor ========== */
+.helmet-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -191px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.shoulders-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -286px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.chest-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -381px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.pants-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -476px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.hands-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -571px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.feet-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -666px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+
+/* ========== Rings ========== */
+.purple-ring-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -761px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.green-ring-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -856px -1px;
+	width: 94px;
+	height: 94px;
+}
+
+.turquoise-ring-icon {
+   position: absolute;
+   background: url("../images/playerUI/Stuff Inventory - Icons.png") no-repeat -951px -1px;
+	width: 94px;
+	height: 94px;
+}

@@ -1,0 +1,148 @@
+
+/* ===================================================================== */
+/* Bag
+/* ===================================================================== */
+.player-bag {
+   transform: scale(95%, 85%);
+   bottom: -484px;
+   right: 80px;
+}
+
+.bag-plate {
+   transform: translate(-50%) scale(90%, 87%);
+}
+
+.bag-container {
+   align-content: flex-start;
+   position: absolute;
+
+   top: 33px;
+   left: 15px;
+   height: auto;
+   width: 92.5%;
+}
+
+.bag-row-1,
+.bag-row-2,
+.bag-row-3,
+.bag-row-4,
+.bag-row-5,
+.bag-row-6 {
+   visibility: hidden;
+   justify-content: space-between;
+   height: 78px;
+   width: 100%;
+   margin-bottom: 6px;
+}
+
+
+/* ========== Bag Slots ========== */
+.bag-slot {
+   position: relative;
+   justify-content: space-between;
+   height: 100%;
+   width: 68px;
+}
+
+.bag-slot div {
+   top: -33px;
+   left: -38px;
+   transform: scale(48%, 54%);
+}
+
+.bag-slot:hover .square-background-clear {
+   visibility: visible !important;
+   opacity: 0.5 !important;
+}
+
+.bag-slot:hover {
+   transform: scale(110%, 110%);
+}
+
+
+
+/* =============== Temporary =============== */
+/* Corner slot :hover */
+/* =============== Temporary =============== */
+.bag-slot-TopLeft,
+.bag-slot-TopRight,
+.bag-slot-BottomLeft,
+.bag-slot-BottomRight {
+   z-index: 10;
+   position: absolute;
+   width: 68px;
+   height: 78px;
+}
+
+.bag-slot-TopLeft {
+   top: 0px;
+   left: 0px;
+}
+
+.bag-slot-TopRight {
+   top: 0px;
+   right: 0px;
+}
+
+.bag-slot-BottomLeft {
+   bottom: 6px;
+   left: 0px;
+}
+
+.bag-slot-BottomRight {
+   bottom: 6px;
+   right: 0px;
+}
+
+.bag-slot-TopLeft:hover ~ .bag-slot-1 .square-background-clear,
+.bag-slot-TopRight:hover ~ .bag-slot-5 .square-background-clear,
+.bag-slot-BottomLeft:hover ~ .bag-slot-26 .square-background-clear,
+.bag-slot-BottomRight:hover ~ .bag-slot-30 .square-background-clear {
+   visibility: visible !important;
+   opacity: 0.5 !important;
+}
+
+.bag-slot-TopLeft:hover ~ .bag-slot-1,
+.bag-slot-TopRight:hover ~ .bag-slot-5,
+.bag-slot-BottomLeft:hover ~ .bag-slot-26,
+.bag-slot-BottomRight:hover ~ .bag-slot-30 {
+   transform: scale(110%, 110%);
+}
+/* =============== Temporary =============== */
+
+
+
+/* ===== Corners Frame Cover ===== */
+.bag-corner-1 {
+   top: -13px;
+   left: -16px;
+   transform: scale(75%, 75%);
+}
+
+.bag-corner-2 {
+   top: -13px;
+   right: -16px;
+   transform: scale(-75%, 75%);
+}
+
+.bag-corner-3 {
+   bottom: -14px;
+   left: -16px;
+   transform: rotate(90deg) scale(-63%, -89%);
+}
+
+.bag-corner-4 {
+   bottom: -14px;
+   right: -16px;
+   transform: rotate(90deg) scale(-63%, 89%);
+}
+
+
+/* ========== Toggle Bag ========== */
+.toggle-bag {
+   bottom: -30px !important;
+}
+
+.hide-bag {
+   bottom: -535px !important;
+}
