@@ -24,27 +24,57 @@
     
     <body class="flexCenter">
     
-        <!-- ==================== Log Player ==================== -->
+        <!-- ============================== Log Player ============================== -->
         <section class="log-screen">
             <div class="flag"></div>
             
+            <!-- Form -->
             <form class="flexCenter log-form">
-                <input type="text" placeholder="Player name" autofocus>
 
-                <p class="flexCenter alert empty-field">Empty field</p>
-                <p class="flexCenter alert invalid-chars">Invalid name</p>
-                <p class="flexCenter alert white-space">Cannot include space</p>
-                <p class="flexCenter alert min-chars">Min 4 characters</p>
-                <p class="flexCenter alert max-chars">Max 10 characters</p>
-                
-                <button class="btn green-btn log-btn">Enter Game</button>
+                <!-- InputFields -->
+                <div class="field-container">
+                    <input type="text" placeholder="Player name" autofocus>
+                    
+                    <div class="alert-container">
+                        <div class="alert red-plate-borderless empty-field">
+                            <p>Empty field</p>
+                        </div>
+    
+                        <div class="alert red-plate-borderless invalid-chars">
+                            <p>Invalid character</p>
+                        </div>
+    
+                        <div class="alert red-plate-borderless white-space">
+                            <p>Cannot include space</p>
+                        </div>
+    
+                        <div class="alert red-plate-borderless min-chars">
+                            <p>Min 4 characters</p>
+                        </div>
+    
+                        <div class="alert red-plate-borderless max-chars">
+                            <p>Max 12 characters</p>
+                        </div>
+                    </div>
+
+                    <div class="log-input-left spell-corner"></div>
+                    <div class="log-input-right spell-corner"></div>
+                </div>
+
+                <!-- Name Plate -->
+                <div class="flexCenter name-plate log-plate">
+                    <div class="background-plate"></div>
+                    <div class="orange-plate"></div>
+                    <div class="white-plate"></div>
+                    <p>Enter Game</p>
+                </div>
             </form>
         </section>
 
-        <!-- ==================== Viewport ==================== -->
+        <!-- ============================== Viewport ============================== -->
         <section class="viewport">
 
-            <!-- Artwork -->
+            <!-- ==================== Artwork ==================== -->
             <div class="style-frame top-side-left"></div>
             <div class="style-frame top-side-right"></div>
             <div class="style-frame bottom-side-left"></div>
@@ -56,7 +86,7 @@
             <div class="style-frame corner-bottom-left"></div>
             <div class="style-frame corner-bottom-right"></div>
 
-            <!--  ========== NavBar Left ========== -->
+            <!--  ==================== NavBar Left ==================== -->
             <nav class="flexCenter fluid nav-left hide-nav-left">
                 
                 <!-- Inventory -->
@@ -84,7 +114,7 @@
                 </button>
             </nav>
 
-            <!-- ========== NavBar Right ========== -->
+            <!-- ==================== NavBar Right ==================== -->
             <nav class="flexCenter fluid nav-right hide-nav-right">
 
                 <!-- Stats -->
@@ -112,7 +142,7 @@
                 </button>
             </nav>
 
-            <!-- ========== Game window ========== -->
+            <!-- ==================== Game window ==================== -->
             <section class="flexCenter game-window">
 
                 <!-- ========== Canvas ========== -->
@@ -153,7 +183,7 @@
                     </div>
 
                     
-                    <!-- ========== General Chat ========== -->
+                    <!-- General Chat -->
                     <div class="flexCenter name-plate general-plate">
                         <div class="background-plate"></div>
                         <div class="purple-plate"></div>
@@ -166,7 +196,7 @@
                     </div>
 
 
-                    <!-- ========== Private Chat ========== -->
+                    <!-- Private Chat -->
                     <div class="flexCenter name-plate private-plate">
                         <div class="background-plate"></div>
                         <div class="orange-plate"></div>
@@ -180,18 +210,18 @@
                     </div>
 
 
-                    <!-- ========== InputField ========== -->
+                    <!-- InputField -->
                     <div class="flexCenter receiver-container green-plate-borderless">
                         <p class="message-receiver"></p>
                     </div>
 
                     <form class="flexCenter chat-form">
                         <input type="text" placeholder="Send message">
-                        <div class="input-corner-top spell-corner"></div>
-                        <div class="input-corner-bottom spell-corner"></div>
+                        <div class="chat-input-left spell-corner"></div>
+                        <div class="chat-input-right spell-corner"></div>
                     </form>
 
-                    <!-- ========== Clear Plate ========== -->
+                    <!-- Clear Plate -->
                     <div class="flexCenter name-plate clear-plate">
                         <div class="background-plate"></div>
                         <div class="grey-plate"></div>
@@ -200,16 +230,8 @@
                     </div>
                 </section>
 
-                <!-- ========== Bag ========== -->
-                <section class="wood-pane fluid player-bag hide-bag">
-
-                    <!-- Name Plate -->
-                    <div class="flexCenter name-plate bag-plate">
-                        <div class="background-plate"></div>
-                        <div class="blue-plate"></div>
-                        <div class="white-plate"></div>
-                        <p>Bag</p>
-                    </div>
+                <!-- ========== Bags ========== -->
+                <section class="wood-pane fluid player-bag-left hide-bag">
                     
                     <!-- Bag Container -->
                     <div class="flexCenter bag-container">
@@ -320,7 +342,7 @@
                         </div>
 
                         <!-- Slot Row N°4 -->
-                        <div class="flexCenter bag-row-4">
+                        <div class="flexCenter bag-row-4 visible">
                             
                             <div class="bag-slot">
                                 <div class="square-background"></div>
@@ -354,7 +376,7 @@
                         </div>
 
                         <!-- Slot Row N°5 -->
-                        <div class="flexCenter bag-row-5">
+                        <div class="flexCenter bag-row-5 visible">
                             
                             <div class="bag-slot">
                                 <div class="square-background"></div>
@@ -388,7 +410,7 @@
                         </div>
 
                         <!-- Slot Row N°6 -->
-                        <div class="flexCenter bag-row-6">
+                        <div class="flexCenter bag-row-6 visible">
                             
                             <div class="bag-slot-BottomLeft"></div>
                             <div class="bag-slot-BottomRight"></div>
@@ -430,6 +452,247 @@
                     <div class="panel-corner bag-corner-2"></div>
                     <div class="panel-corner bag-corner-3"></div>
                     <div class="panel-corner bag-corner-4"></div>
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate left-bag-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Bag</p>
+                    </div>
+
+                </section>
+
+                <section class="wood-pane fluid player-bag-right hide-bag">
+                    
+                    <!-- Bag Container -->
+                    <div class="flexCenter bag-container">
+
+                        <!-- Slot Row N°1 -->
+                        <div class="flexCenter bag-row-1 visible">
+                            
+                            <div class="bag-slot-TopLeft"></div>
+                            <div class="bag-slot-TopRight"></div>
+                            
+                            <div class="bag-slot bag-slot-1">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot bag-slot-5">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°2 -->
+                        <div class="flexCenter bag-row-2 visible">
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°3 -->
+                        <div class="flexCenter bag-row-3 visible">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°4 -->
+                        <div class="flexCenter bag-row-4 visible">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°5 -->
+                        <div class="flexCenter bag-row-5 visible">
+                            
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slot Row N°6 -->
+                        <div class="flexCenter bag-row-6 visible">
+                            
+                            <div class="bag-slot-BottomLeft"></div>
+                            <div class="bag-slot-BottomRight"></div>
+
+                            <div class="bag-slot bag-slot-26">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+
+                            <div class="bag-slot bag-slot-30">
+                                <div class="square-background"></div>
+                                <div class="square-background-clear"></div>
+                                <div class="square-frame"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Corners Frame Cover -->
+                    <div class="panel-corner bag-corner-1"></div>
+                    <div class="panel-corner bag-corner-2"></div>
+                    <div class="panel-corner bag-corner-3"></div>
+                    <div class="panel-corner bag-corner-4"></div>
+
+                    <!-- Name Plate -->
+                    <div class="flexCenter name-plate right-bag-plate">
+                        <div class="background-plate"></div>
+                        <div class="blue-plate"></div>
+                        <div class="white-plate"></div>
+                        <p>Bag</p>
+                    </div>
+
                 </section>
 
                 

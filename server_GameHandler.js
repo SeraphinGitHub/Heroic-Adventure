@@ -49,7 +49,7 @@ let mobList = [];
 // Init Enemies
 // =====================================================================
 let enemyID = 0;
-// mobList = enemiesHandler.initEnemies();
+mobList = enemiesHandler.initEnemies();
 
 mobList.forEach(enemy => {
    enemyID++;

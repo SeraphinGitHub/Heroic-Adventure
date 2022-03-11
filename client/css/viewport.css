@@ -9,7 +9,7 @@
    transform: translate(-50%, -50%);
 
    height: 870px; /* ==> Check to match with viewport size in JS */
-   width: 1750px;
+   width: 1780px;
 
    background-color: black;
    animation: openGameWindow;
@@ -17,7 +17,7 @@
 
 @keyframes openGameWindow {
    0% { width: 0px; }
-   100% { width: 1750px; } /* ==> Check to match with viewport size in JS */
+   100% { width: 1780px; } /* ==> Check to match with viewport size in JS */
 }
 
 
@@ -84,7 +84,7 @@ canvas {
 /* ===== Left ===== */
 .top-side-left,
 .bottom-side-left  {
-   width: 950px;
+   width: 965px;
    background-position: 0 0;
 }
 
@@ -92,7 +92,7 @@ canvas {
 /* ===== Right ===== */
 .top-side-right,
 .bottom-side-right {
-   width: 950px;
+   width: 965px;
    background-position: -320px 0 !important;
 }
 
@@ -134,13 +134,13 @@ canvas {
 
 
 @keyframes leftSideWindow {
-   0% { width: 0px; background-position: -950px 0; }
-   100% { width: 950px; background-position: 0 0; }
+   0% { width: 0px; background-position: -965px 0; }
+   100% { width: 965px; background-position: 0 0; }
 }
 
 @keyframes rightSideWindow {
    0% { width: 0px; background-position: -1310px 0; }
-   100% { width: 950px; background-position: -320px 0; }
+   100% { width: 965px; background-position: -320px 0; }
 }
 
 
@@ -241,7 +241,6 @@ canvas {
 .death-message,
 .respawn-timer {
    text-align: center;
-   font-family: "Dimbo-Regular";
    color: red;
 }
 

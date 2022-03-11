@@ -6,7 +6,7 @@
 // =====================================================================
 const viewSize = {
    height: 870, // ==> Check to match with viewport size in CSS
-   width: 1750,
+   width: 1780,
 };
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
 
@@ -163,9 +163,6 @@ const barCoordArray = [
 // PNG Image Files
 // =====================================================================
 const set_ImageFiles = () => {
-
-   const mapTile_Img = new Image();
-   mapTile_Img.src = "client/images/map/map_tile_3_lands.png";
    
    const gameUI_Img = new Image();
    gameUI_Img.src = "client/images/playerUI/Game UI.png";
@@ -174,17 +171,14 @@ const set_ImageFiles = () => {
    player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
 
    return [
-      mapTile_Img,
       gameUI_Img,
       player_Img,
    ];
 }
 
 const imgPNG = {
-
-   mapTile_Img:   set_ImageFiles()[0],
-   gameUI_Img:    set_ImageFiles()[1],
-   player_Img:    set_ImageFiles()[2],
+   gameUI_Img:    set_ImageFiles()[0],
+   player_Img:    set_ImageFiles()[1],
 }
 
 
@@ -208,7 +202,7 @@ const cl_PlayerObj = {
    ctxFixedFront: ctx.fixedFront,
 
    // PNG Files
-   mapTile_Img:   imgPNG.mapTile_Img,
+   mapTile_Img:   mapSpecs.mapTile_Img,
    gameUI_Img:    imgPNG.gameUI_Img,
    player_Img:    imgPNG.player_Img,
 
@@ -270,13 +264,13 @@ const clientUpdate = () => {
    // ***************************************************************
    // ***************************************************************
 
-   ctx.player.fillStyle = "blue";
-   ctx.player.fillRect(
-      810 -viewport.x,
-      810 -viewport.y +90,
-      180 *2,
-      90 *2
-   );
+   // ctx.player.fillStyle = "blue";
+   // ctx.player.fillRect(
+   //    810 -viewport.x,
+   //    810 -viewport.y +90,
+   //    180 *2,
+   //    90 *2
+   // );
 
    // ***************************************************************
    // ***************************************************************

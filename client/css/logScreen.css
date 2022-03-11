@@ -89,23 +89,83 @@
    100% { bottom: 380px; }
 }
 
-.log-form input {
+
+/* ========== InputFields ========== */
+.field-container {
+   position: relative;
+   top: -20px;
    height: 50px;
    width: 100%;
-   padding-left: 20px;
-
-   font-size: 20px;
-   font-family: Verdana;
-
-   border: solid darkviolet 3px;
-   border-radius: 8px;
 }
 
-.log-btn {
-   height: 60px;
-   width: 75%;
-   margin-top: 50px;
+.field-container input {
+   text-align: center;
+   height: 100%;
+   width: 100%;
+   border: none;
+   color: white;
+   letter-spacing: 3px;
+   text-shadow: black 2px 2px 0px;
+   background: rgba(0, 0, 0, 0.9);
+   font-size: 230%;
+}
 
-   border-radius: 8px;
-   box-shadow: black 0px 15px 20px;
+.log-input-left {
+   transform: scale(41%, 41%);
+   top: -42px;
+   left: -43px;
+}
+
+.log-input-right {
+   transform: scale(-41%, -41%);
+   top: -40px;
+   right: -44px;
+}
+
+
+/* ========== Log Button ========== */
+.log-plate {
+   top: 65px !important;
+   transform: translate(-50%) scale(95%, 85%);
+   box-shadow: black 0px 20px 15px;
+}
+
+.log-plate p {
+   color: lime !important;
+}
+
+.log-plate:active {
+   top: 70px !important;
+}
+
+
+/* ===================================================================== */
+/* Alert Pop Up
+/* ===================================================================== */
+.alert-container {
+   visibility: hidden;
+   position: absolute;
+   overflow: hidden;
+   top: 0px;
+   left: 0;
+   height: 100%;
+   width: 100%;
+}
+
+.alert {
+   top: -4px;
+   left: -250px;
+   transform: scale(117%, 84%);
+   transition-duration: 0.5s;
+}
+
+.alert-slide {
+   left: 23px;
+}
+
+.alert p {
+   text-align: center;
+   position: relative;
+   top: 12px;
+   font-size: 170%;
 }

@@ -2,14 +2,30 @@
 /* ===================================================================== */
 /* Bag
 /* ===================================================================== */
-.player-bag {
-   transform: scale(95%, 85%);
-   bottom: -484px;
-   right: 80px;
+.player-bag-left,
+.player-bag-right {
+   transform: scale(75%, 65%);
+   bottom: -433px;
 }
 
-.bag-plate {
-   transform: translate(-50%) scale(90%, 87%);
+.player-bag-left {
+   right: 270px;
+}
+
+.player-bag-right {
+   right: -35px;
+}
+
+.left-bag-plate,
+.right-bag-plate {
+   top: -43px;
+   transform: translate(-50%) scale(114%, 109%);
+}
+
+.left-bag-plate:active,
+.right-bag-plate:active {
+   top: -36px;
+   left: 51.3% !important;
 }
 
 .bag-container {
@@ -140,9 +156,9 @@
 
 /* ========== Toggle Bag ========== */
 .toggle-bag {
-   bottom: -30px !important;
+   bottom: -85px !important;
 }
 
 .hide-bag {
-   bottom: -535px !important;
+   bottom: -484px !important;
 }

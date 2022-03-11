@@ -9,24 +9,31 @@ class Player extends Character {
       
       super();
 
+      // *****************
       this.isDEBUG_Position = false;
+      // this.isDEBUG_Position = true;
+      // *****************
 
       this.id = id;
       this.name = "";
-      this.x = 1080;
-      this.y = 800;
+      this.x = 1700;
+      this.y = 1280;
 
       // Viewport size in CSS & JS +200 for both
       this.detectViewport = {
          height: 1000,
-         width: 1900,
+         width: 1950 ,
+
+         // ========== DEBUG ==========
+         // height: 1000 -600,
+         // width: 1950 -1200,
       }
       
       // Env Variables
       this.devFPS = process.env.DEV_FRAME_RATE;
       this.deployFPS = process.env.DEPLOY_FRAME_RATE;
       this.syncCoeff = process.env.SYNC_COEFF;
-      this.syncFormula = this.syncCoeff *this.devFPS /this.deployFPS;
+      this.syncFormula = Math.floor(this.syncCoeff *this.devFPS /this.deployFPS *100) /100;
 
       // Player Hitbox
       this.radius = 45;
@@ -45,7 +52,7 @@ class Player extends Character {
       // Player Mana
       this.baseMana = 150;
       this.mana = this.baseMana;
-      this.baseRegenMana = 6; // Per second
+      this.baseRegenMana = 7; // Per second
       this.regenMana = Math.floor(this.baseRegenMana /this.deployFPS *this.syncCoeff *100) /100;
       this.totalManaCost = 0;
 
@@ -77,7 +84,7 @@ class Player extends Character {
       this.deathCounts = 0;
 
       // Damages
-      this.baseDamage = 23;
+      this.baseDamage = 27;
       this.calcDamage;
       this.damageRatioRnG = 0.62; // More high => Higher RnG Range => More damage
       this.minDamage = this.baseDamage;
@@ -88,7 +95,7 @@ class Player extends Character {
       
       // Spell - Healing
       this.healCost = 45;
-      this.baseHealing = this.baseHealth * 0.15; // <== Healing = 15% from MaxHealth
+      this.baseHealing = this.baseHealth * 0.2; // <== Healing = 20% from MaxHealth
       this.calcHealing;
       
       // Movements Speed
@@ -201,9 +208,9 @@ class Player extends Character {
    
       // Map Border Reached ==> Temporary (Await for Unwalkable Tiles)
       if(this.up && this.y < -15
-      || this.down && this.y > 1550
+      || this.down && this.y > 2500
       || this.left && this.x < 45
-      || this.right && this.x > 2120) {
+      || this.right && this.x > 3340) {
          return;
       }
    
@@ -745,7 +752,7 @@ class Player extends Character {
 
 
          // ***************************
-         this.test_unwakable();
+         // this.test_unwakable();
          // ***************************
 
          this.movements();

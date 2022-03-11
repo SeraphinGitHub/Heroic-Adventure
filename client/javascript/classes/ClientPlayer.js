@@ -45,7 +45,7 @@ class Player extends Character {
       this.mapScheme = cl_PlayerObj.mapSpecs.mapScheme;
       
       // Game UI ==> HUD
-      this.HUD_scale_X = 1.3;
+      this.HUD_scale_X = 1.2;
       this.HUD_scale_Y = 1;
       this.HUD = {
          x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
@@ -926,8 +926,8 @@ class Player extends Character {
    DEBUG_GENERAL() {
       
       this.DEBUG_DrawPlayer();
-      // this.DEBUG_DrawAttackArea();
-      // this.DEBUG_DrawHealthNumber();
+      this.DEBUG_DrawAttackArea();
+      this.DEBUG_DrawHealthNumber();
       // this.DEBUG_DrawDetectViewport();
       // this.DEBUG_DrawOrigin();
    }

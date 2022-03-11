@@ -1,1 +1,1 @@
-web: node server_GameHandler.js
+web: pm2 start server_GameHandler.js

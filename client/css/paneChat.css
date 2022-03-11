@@ -19,10 +19,12 @@
 
 .player-chat {
    position: absolute;
-   bottom: -368px;
-   left: 40px;
+   bottom: -339px;
+   left: 30px;
    height: 395px;
    width: 552px;
+
+   transform: scale(95%, 85%);
 }
 
 .chat-glowing {
@@ -54,13 +56,13 @@
 }
 
 .chat-plate {
-   transform: translate(-50%) scale(85%, 75%);
+   transform: translate(-50%) scale(90%, 85%);
 }
 
 .general-plate,
 .private-plate {
    top: 15px;
-   transform: scale(70%, 60%);
+   transform: scale(60%, 60%);
    background: transparent;
 }
 
@@ -71,23 +73,17 @@
    overflow: scroll;
    scrollbar-width: thin;
 
-   top: 72px;
+   top: 70px;
    left: 40px;
-   height: 50%;
+   height: 53%;
    width: 85%;
 }
 
 .general-chat p,
 .private-chat p {
-   font-size: 146%;
+   font-size: 154%;
 }
 
-.general-chat p,
-.private-chat p,
-.message-receiver p,
-.chat-form input {
-   font-family: "Dimbo-Regular";
-}
 
 /* ========== Private Mess Alert ========== */
 .got-whisp {
@@ -132,7 +128,7 @@
    top: 312px;
    left: 30px;
 
-   transform: scale(95%, 75%);
+   transform: scale(85%, 75%);
 }
 
 .message-receiver {
@@ -153,40 +149,41 @@
    height: 100%;
    width: 100%;
    padding-left: 15px;
-   border: none;
    color: white;
    text-shadow: black 2px 2px 0px;
    background: rgba(0, 0, 0, 0.6);
-   font-size: 150%;
+   font-size: 155%;
+   letter-spacing: 0.5px;
 }
 
-.input-corner-top {
+.chat-input-left {
    transform: scale(29%, 29%);
    top: -49px;
    left: -50px;
 }
 
-.input-corner-bottom {
+.chat-input-right {
    transform: scale(-29%, -29%);
    top: -47px;
    left: 389px;
 }
 
+
 /* ========== Clear Chat ========== */
 .clear-plate {
    top: 308px;
    left: 276px;
-   transform: scale(70%, 65%);
+   transform: scale(65%, 65%);
 }
 
 
 /* ========== Toggle Chat ========== */
 .toggle-chat {
-   bottom: 15px !important;
+   bottom: -18px !important;
 }
 
 .hide-chat {
-   bottom: -420px !important;
+   bottom: -390px !important;
 }
 
 

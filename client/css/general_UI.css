@@ -299,7 +299,6 @@
    left: 0;
    height: 60px;
    width: 100%;
-   border: none;
    transform: scale(65%, 65%) rotate(-90deg);
    background-color: transparent;
 }

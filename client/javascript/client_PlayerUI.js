@@ -248,13 +248,17 @@ const playerChat = () => {
 
 
 // =====================================================================
-// Player Bag Pane
+// Player Bags Pane
 // =====================================================================
-const playerBag = () => {
+const playerBags = () => {
 
-   const bagPane = document.querySelector(".player-bag");
-   const bagButton = document.querySelector(".bag-plate");
-   toggleBottomPane(bagButton, bagPane, false, "bag");
+   const leftBagPane = document.querySelector(".player-bag-left");
+   const rightBagPane = document.querySelector(".player-bag-right");
+   const leftBagButton = document.querySelector(".left-bag-plate");
+   const rightBagButton = document.querySelector(".right-bag-plate");
+   
+   toggleBottomPane(leftBagButton, leftBagPane, false, "bag");
+   toggleBottomPane(rightBagButton, rightBagPane, false, "bag");
 }
 
 
@@ -272,5 +276,5 @@ const handleGameUI = (socket) => {
    playerControls();
 
    playerChat();
-   playerBag();
+   playerBags();
 }

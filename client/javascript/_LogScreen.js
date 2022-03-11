@@ -13,12 +13,11 @@ const easyLogin = () => {
 
       const logScreen = document.querySelector(".log-screen");
       const logBackground = document.querySelector(".log-background");
-      
       const navLeft = document.querySelector(".nav-left");
       const navRight = document.querySelector(".nav-right");
-
       const chat = document.querySelector(".player-chat");
-      const bag = document.querySelector(".player-bag");
+      const leftBag = document.querySelector(".player-bag-left");
+      const rightBag = document.querySelector(".player-bag-right");
       
       // Send player's name
       const socket = io();
@@ -34,14 +33,14 @@ const easyLogin = () => {
          // Reset inputField's value
          logFormInput.value = ""
          logFormInput.blur();
+
          logScreen.classList.add("hide-LogScreen");
          logBackground.classList.add("hide-LogScreen");
-
          navLeft.classList.remove("hide-nav-left");
          navRight.classList.remove("hide-nav-right");
-
          chat.classList.remove("hide-chat");
-         bag.classList.remove("hide-bag");
+         leftBag.classList.remove("hide-bag");
+         rightBag.classList.remove("hide-bag");
       });
    }, 300);
 }
@@ -108,7 +107,8 @@ const loadClient = () => {
    const navLeft = document.querySelector(".nav-left");
    const navRight = document.querySelector(".nav-right");
    const chat = document.querySelector(".player-chat");
-   const bag = document.querySelector(".player-bag");
+   const leftBag = document.querySelector(".player-bag-left");
+   const rightBag = document.querySelector(".player-bag-right");
    
    // Send player's name
    const socket = io();
@@ -128,12 +128,11 @@ const loadClient = () => {
 
          logScreen.classList.add("hide-LogScreen");
          logBackground.classList.add("hide-LogScreen");
-
          navLeft.classList.remove("hide-nav-left");
          navRight.classList.remove("hide-nav-right");
-
          chat.classList.remove("hide-chat");
-         bag.classList.remove("hide-bag");
+         leftBag.classList.remove("hide-bag");
+         rightBag.classList.remove("hide-bag");
 
       }, 500);
    });
@@ -150,7 +149,7 @@ let isSocket = false;
 // Login Form & Button
 const loginForm = () => {
 
-   const logBtn = document.querySelector(".log-btn");
+   const logBtn = document.querySelector(".log-plate");
    const logForm = document.querySelector(".log-form");
    
    logForm.addEventListener("submit", (event) => {
@@ -200,9 +199,15 @@ const formValidation = () => {
 
 // Pop Up Alert Messages
 const alertMessage = (messageClass) => {
-   const duration = 2500;
-   messageClass.classList.add("visible");
-   setTimeout(() => messageClass.classList.remove("visible"), duration);
+
+   const duration = 2000;
+   messageClass.classList.add("alert-slide");
+   messageClass.parentElement.classList.add("visible");
+
+   setTimeout(() => {
+      messageClass.classList.remove("alert-slide");
+      messageClass.parentElement.classList.remove("visible");
+   }, duration);
 }
 
 

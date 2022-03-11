@@ -11,7 +11,9 @@ const mobSrc = "client/images/enemiesAnim/";
 const set_Golems = () => {
 
    const spawns = [
-      {x: 400, y: 1000},
+      {x: 1100, y: 760},
+      {x: 2300, y: 940},
+      {x: 1960, y: 1700},
    ];
 
    const stats = {
@@ -84,7 +86,9 @@ const set_Golems = () => {
 const set_Minotaurs = () => {
 
    const spawns = [
-      {x: 800, y: 400},
+      {x: 850, y: 260},
+      {x: 340, y: 510},
+      {x: 770, y: 2210},
    ];
 
    const stats = {
@@ -156,7 +160,9 @@ const set_Minotaurs = () => {
 const set_Orcs = () => {
 
    const spawns = [
-      {x: 1200, y: 400},
+      {x: 430, y: 1960},
+      {x: 420, y: 1270},
+      {x: 2720, y: 2210},
    ];
 
    const stats = {
@@ -228,7 +234,9 @@ const set_Orcs = () => {
 const set_Reapers = () => {
 
    const spawns = [
-      {x: 1600, y: 400},
+      {x: 3150, y: 1450},
+      {x: 1920, y: 260},
+      {x: 2900, y: 845},
    ];
 
    const stats = {
@@ -300,7 +308,9 @@ const set_Reapers = () => {
 const set_Wraiths = () => {
 
    const spawns = [
-      {x: 2000, y: 800},
+      {x: 1790, y: 2300},
+      {x: 3150, y: 260},
+      {x: 1110, y: 1610},
    ];
 
    const stats = {
