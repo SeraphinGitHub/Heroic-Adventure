@@ -49,7 +49,7 @@ class Player extends Character {
       this.HUD_scale_Y = 1;
       this.HUD = {
          x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
-         y: this.viewSize.height -110 * this.HUD_scale_Y,
+         y: this.viewSize.height -110 * this.HUD_scale_Y       -30,
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
@@ -82,7 +82,7 @@ class Player extends Character {
       this.fameScale_Y = 1;
       this.fame = {
          x: this.viewSize.width/2 -900/2 * this.fameScale_X,
-         y: this.viewSize.height -870,
+         y: this.viewSize.height -870     +60,
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
@@ -871,7 +871,7 @@ class Player extends Character {
    // =====================================================================
    // Client Sync (Every frame)
    // =====================================================================
-   render_ClientPlayer(updatePlayer, frame) {
+   render_ClientPlayer(updatePlayer, frame, debugPlayer) {
 
       this.updatePlayer = updatePlayer;
 
@@ -894,7 +894,7 @@ class Player extends Character {
       this.drawName();
 
       // ******************************
-      // this.DEBUG_GENERAL();
+      if(debugPlayer) this.DEBUG_GENERAL();
       // ******************************
    }
 
@@ -928,8 +928,8 @@ class Player extends Character {
       this.DEBUG_DrawPlayer();
       this.DEBUG_DrawAttackArea();
       this.DEBUG_DrawHealthNumber();
-      // this.DEBUG_DrawDetectViewport();
-      // this.DEBUG_DrawOrigin();
+      this.DEBUG_DrawDetectViewport();
+      this.DEBUG_DrawOrigin();
    }
 
    DEBUG_DrawOrigin() {

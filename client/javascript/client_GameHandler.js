@@ -5,7 +5,8 @@
 // Set Viewport
 // =====================================================================
 const viewSize = {
-   height: 870, // ==> Check to match with viewport size in CSS
+   height: 810, // ==> Temporary
+   // height: 870, // ==> Check to match with viewport size in CSS
    width: 1780,
 };
 const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
@@ -253,6 +254,8 @@ let updateMobList = {};
 // Client Update (Every frame)
 // =====================================================================
 let frame = 0;
+let debugPlayer = false;
+let debugMobs = false;
 
 const clientUpdate = () => {
 
@@ -288,7 +291,7 @@ const clientUpdate = () => {
 
          if(clientID === updatePlayer.id) {
             initPlayer.isClient = true;
-            initPlayer.render_ClientPlayer(updatePlayer, frame);
+            initPlayer.render_ClientPlayer(updatePlayer, frame, debugPlayer);
          }
          else initPlayer.render_OtherPlayer(updatePlayer, frame);
       }
@@ -299,7 +302,7 @@ const clientUpdate = () => {
       
       let updateEnemy = updateMobList[i];
       let initEnemy = initMobList[updateEnemy.id];
-      initEnemy.render_Enemy(updateEnemy, frame);
+      initEnemy.render_Enemy(updateEnemy, frame, debugMobs);
    };
 
    // Draw floating text

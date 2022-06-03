@@ -75,11 +75,11 @@ io.on("connection", (socket) => {
 
 
    // ==========  Debugging  ==========
-   socket.on("evalServer", (data) => {
-      if(process.env.DEBUG_MODE === "false") return;
-      const response = eval(data);
-      socket.emit("evalResponse", response);
-   });   
+   // socket.on("evalServer", (data) => {
+   //    if(process.env.DEBUG_MODE === "false") return;
+   //    const response = eval(data);
+   //    socket.emit("evalResponse", response);
+   // });   
 
 
    // ==========  Disconnection  ==========

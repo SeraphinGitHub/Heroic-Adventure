@@ -1,5 +1,5 @@
 {
-  "name": "01_multiplayer_rpg_game",
+  "name": "heroic_adventure",
   "version": "1.0.0",
   "description": "",
   "main": "server_GameHandler.js",

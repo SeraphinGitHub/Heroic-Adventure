@@ -264,7 +264,7 @@ class Enemy extends Character {
    // =====================================================================
    // Enemy Sync (Every frame)
    // =====================================================================
-   render_Enemy(updateEnemy, frame) {
+   render_Enemy(updateEnemy, frame, debugMobs) {
       
       this.updateEnemy = updateEnemy;
       
@@ -274,7 +274,7 @@ class Enemy extends Character {
          this.enemyState(frame);
          
          // ******************************
-         // this.DEBUG_GENERAL();
+         if(debugMobs) this.DEBUG_GENERAL();
          // ******************************
 
          this.drawRing()

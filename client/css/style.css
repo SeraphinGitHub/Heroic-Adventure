@@ -6,6 +6,7 @@
 body {
    justify-content: space-between !important;
    height: 100vh;
+   background-color: rgb(30, 30, 30);
    background: url("../images/Background Tile.jpg") repeat;
 }
 
@@ -83,12 +84,11 @@ p {
 @media screen and (min-width: 1550px) and (max-width: 1850px) {
 
    h2, h3, p {
-      font-size: 16px;
       line-height: 90%;
    }
 
    .viewport {
-      height: 790px !important;
-      width: 980px !important;
+      height: 820px !important;
+      width: 1400px !important;
    }
 }

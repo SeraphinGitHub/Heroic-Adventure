@@ -85,13 +85,7 @@ const initClientScripts = () => {
       "client_GameHandler.js",
    ];
 
-   scripts.forEach(script => {
-      const initPromise = new Promise((resolve, reject) => resolve(script));
-   
-      initPromise
-      .then((item) => instantiate(item))
-      .catch(() => console.log(`${script} could not be loaded !`));
-   });
+   scripts.forEach(script => instantiate(script));
 }
 
 
@@ -112,6 +106,7 @@ const loadClient = () => {
    
    // Send player's name
    const socket = io();
+
    logged_PlayerName = logFormInput.value;
    socket.emit("send_initClient", logFormInput.value);
    

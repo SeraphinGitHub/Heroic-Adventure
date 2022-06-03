@@ -13,7 +13,7 @@ const set_Golems = () => {
    const spawns = [
       {x: 1100, y: 760},
       {x: 2300, y: 940},
-      {x: 1960, y: 1700},
+      {x: 770, y: 2210},
    ];
 
    const stats = {
@@ -88,7 +88,7 @@ const set_Minotaurs = () => {
    const spawns = [
       {x: 850, y: 260},
       {x: 340, y: 510},
-      {x: 770, y: 2210},
+      {x: 1960, y: 1700},
    ];
 
    const stats = {
@@ -399,6 +399,8 @@ exports.initEnemies = () => {
    set_Orcs();
    set_Reapers();
    set_Wraiths();
+
+   // set_Minotaurs();
 
    return initMobList;
 }

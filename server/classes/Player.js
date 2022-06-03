@@ -22,7 +22,7 @@ class Player extends Character {
       // Viewport size in CSS & JS +200 for both
       this.detectViewport = {
          height: 1000,
-         width: 1950 ,
+         width: 1950,
 
          // ========== DEBUG ==========
          // height: 1000 -600,
@@ -34,7 +34,7 @@ class Player extends Character {
       this.deployFPS = process.env.DEPLOY_FRAME_RATE;
       this.syncCoeff = process.env.SYNC_COEFF;
       this.syncFormula = Math.floor(this.syncCoeff *this.devFPS /this.deployFPS *100) /100;
-
+      
       // Player Hitbox
       this.radius = 45;
 
@@ -53,7 +53,7 @@ class Player extends Character {
       this.baseMana = 150;
       this.mana = this.baseMana;
       this.baseRegenMana = 7; // Per second
-      this.regenMana = Math.floor(this.baseRegenMana /this.deployFPS *this.syncCoeff *100) /100;
+      this.regenMana = Math.floor(this.baseRegenMana /60 *this.syncCoeff *100) /100;
       this.totalManaCost = 0;
 
       // Player Health
@@ -65,7 +65,7 @@ class Player extends Character {
       this.energy = this.baseEnergy;
       this.energyCost = 0.7;
       this.baseRegenEnergy = 9; // Per second
-      this.regenEnergy = Math.floor(this.baseRegenEnergy /this.deployFPS *this.syncCoeff *100) /100;      
+      this.regenEnergy = Math.floor(this.baseRegenEnergy /60 *this.syncCoeff *100) /100;      
 
       // Fame
       this.getFameCost = 600;
