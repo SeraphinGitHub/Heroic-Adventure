@@ -400,7 +400,5 @@ exports.initEnemies = () => {
    set_Reapers();
    set_Wraiths();
 
-   // set_Minotaurs();
-
    return initMobList;
 }

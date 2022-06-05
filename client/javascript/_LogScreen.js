@@ -30,6 +30,9 @@ const easyLogin = () => {
          initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
          initChat(socket);             // ==> Client_ChatHandler.js
 
+         // Client Sync
+         clientUpdate();
+
          // Reset inputField's value
          logFormInput.value = ""
          logFormInput.blur();
@@ -45,13 +48,13 @@ const easyLogin = () => {
    }, 300);
 }
 
-// easyLogin();
+easyLogin();
 // =========================  Development  =========================
 
 
 
 // =====================================================================
-// Init Client
+// Init Scripts
 // =====================================================================
 const instantiate = (scriptName) => {
    const newScript = document.createElement("script");
@@ -60,7 +63,6 @@ const instantiate = (scriptName) => {
    document.body.insertAdjacentElement("beforeend", newScript);
 }
 
-// Instantiate client scripts
 const initClientScripts = () => {
 
    const scripts = [
@@ -90,62 +92,16 @@ const initClientScripts = () => {
 
 
 // =====================================================================
-// Load Client
-// =====================================================================
-const loadClient = () => {
-   
-   isSocket = true;
-
-   const logScreen = document.querySelector(".log-screen");
-   const logBackground = document.querySelector(".log-background");
-   const navLeft = document.querySelector(".nav-left");
-   const navRight = document.querySelector(".nav-right");
-   const chat = document.querySelector(".player-chat");
-   const leftBag = document.querySelector(".player-bag-left");
-   const rightBag = document.querySelector(".player-bag-right");
-   
-   // Send player's name
-   const socket = io();
-
-   logged_PlayerName = logFormInput.value;
-   socket.emit("send_initClient", logFormInput.value);
-   
-   // Await for server response
-   socket.on("received_initClient", (playerID) => {
-
-      initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
-      initChat(socket);             // ==> Client_ChatHandler.js
-
-      setTimeout(() => {
-         // Reset inputField's value
-         logFormInput.value = ""
-         logFormInput.blur();
-
-         logScreen.classList.add("hide-LogScreen");
-         logBackground.classList.add("hide-LogScreen");
-         navLeft.classList.remove("hide-nav-left");
-         navRight.classList.remove("hide-nav-right");
-         chat.classList.remove("hide-chat");
-         leftBag.classList.remove("hide-bag");
-         rightBag.classList.remove("hide-bag");
-
-      }, 500);
-   });
-}
-
-
-// =====================================================================
 // Login System
 // =====================================================================
 const logFormInput = document.querySelector(".log-form input");
 let logged_PlayerName = "";
 let isSocket = false;
 
-// Login Form & Button
 const loginForm = () => {
 
-   const logBtn = document.querySelector(".log-plate");
    const logForm = document.querySelector(".log-form");
+   const logBtn = document.querySelector(".log-plate");
    
    logForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -157,7 +113,6 @@ const loginForm = () => {
    });
 }
 
-// Form Validation
 const formValidation = () => {
    
    const emptyFieldAlert = document.querySelector(".empty-field");
@@ -192,7 +147,50 @@ const formValidation = () => {
    else if(!isSocket) loadClient();
 }
 
-// Pop Up Alert Messages
+const loadClient = () => {
+   
+   isSocket = true;
+
+   const logScreen = document.querySelector(".log-screen");
+   const logBackground = document.querySelector(".log-background");
+   const navLeft = document.querySelector(".nav-left");
+   const navRight = document.querySelector(".nav-right");
+   const chat = document.querySelector(".player-chat");
+   const leftBag = document.querySelector(".player-bag-left");
+   const rightBag = document.querySelector(".player-bag-right");
+   
+   // Send player's name
+   const socket = io();
+
+   logged_PlayerName = logFormInput.value;
+   socket.emit("send_initClient", logFormInput.value);
+   
+   // Await for server response
+   socket.on("received_initClient", (playerID) => {
+
+      initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
+      initChat(socket);             // ==> Client_ChatHandler.js
+      
+      // Client Sync
+      clientUpdate();
+
+      setTimeout(() => {
+         // Reset inputField's value
+         logFormInput.value = ""
+         logFormInput.blur();
+
+         logScreen.classList.add("hide-LogScreen");
+         logBackground.classList.add("hide-LogScreen");
+         navLeft.classList.remove("hide-nav-left");
+         navRight.classList.remove("hide-nav-right");
+         chat.classList.remove("hide-chat");
+         leftBag.classList.remove("hide-bag");
+         rightBag.classList.remove("hide-bag");
+
+      }, 500);
+   });
+}
+
 const alertMessage = (messageClass) => {
 
    const duration = 2000;

@@ -311,8 +311,8 @@ const clientUpdate = () => {
    frame++;
 
    if(showFPS) frameRate++;
-
-   window.requestAnimationFrame(clientUpdate);
+      
+   requestAnimationFrame(clientUpdate);
 }
 
 
@@ -322,9 +322,9 @@ const clientUpdate = () => {
 let showFPS = false;
 let frameRate = 0;
 
-if(showFPS) {
-   setInterval(() => {
-      console.log(frameRate);
-      frameRate = 0;
-   }, 1000);
-}
+// setInterval(() => {
+//    if(showFPS) {
+//       console.log(frameRate);
+//       frameRate = 0;
+//    }
+// }, 1000);

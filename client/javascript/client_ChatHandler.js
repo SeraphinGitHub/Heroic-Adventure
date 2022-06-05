@@ -112,9 +112,8 @@ const chatEventListeners = (socket) => {
    
    chatForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      if(chatInput.value[0] === "/") socket.emit("evalServer", chatInput.value.slice(1));
-      
-      else if(chatInput.value !== "") {
+
+      if(chatInput.value !== "") {
    
          if(isGeneralChat) {
             socket.emit("generalMessage", chatInput.value);
@@ -139,8 +138,7 @@ const chatEventListeners = (socket) => {
 // Chat Add Message
 // =====================================================================
 const chatAddMessage = (socket) => {
-
-   socket.on("evalResponse", (textMessage) => generalChatResponse(textMessage));
+   
    socket.on("addMessage_General", (textMessage) => getPlayerMessage(socket, generalChat, textMessage));
 
    socket.on("addMessage_Private", (textMessage) => {

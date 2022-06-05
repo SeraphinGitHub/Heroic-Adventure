@@ -170,7 +170,4 @@ const initPlayer = (socket, playerID) => {
    // Controls Events
    onKeyboardInput(socket);
    onMouseInput(socket);
-
-   // Client Sync
-   clientUpdate();
 }

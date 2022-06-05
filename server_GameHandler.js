@@ -67,20 +67,10 @@ io.on("connection", (socket) => {
    // console.log("User connected !");
 
    // ==========  Generate ID  ==========
-   // socket.id = Math.floor(playerMax * Math.random());
    socket.id = playersID++;
 
    socketList[socket.id] = socket;
-   onConnect(socket);
-
-
-   // ==========  Debugging  ==========
-   // socket.on("evalServer", (data) => {
-   //    if(process.env.DEBUG_MODE === "false") return;
-   //    const response = eval(data);
-   //    socket.emit("evalResponse", response);
-   // });   
-
+   onConnect(socket); 
 
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
@@ -343,7 +333,7 @@ setInterval(() => {
    frame++;
    if(process.env.SHOW_FPS) frameRate++;
 
-}, 1000/process.env.DEPLOY_FRAME_RATE);
+}, Math.floor(1000/process.env.DEPLOY_FRAME_RATE));
 
 
 let frameRate = 0;

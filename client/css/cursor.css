@@ -1,4 +1,4 @@
 
 * {
-   cursor: url("../images/playerUI/cursors.png"), auto;
+   cursor: url("../images/playerUI/cursors.png"), auto !important;
 }
