@@ -5,7 +5,7 @@
 // Player
 // =====================================================================
 class Player extends Character {
-   constructor(cl_PlayerObj, initPlayer) {
+   constructor(cl_Player, initPlayer) {
       
       super();
 
@@ -16,40 +16,36 @@ class Player extends Character {
 
       // Viewport
       this.detectViewport = initPlayer.detectViewport;
-      this.viewSize = cl_PlayerObj.viewSize;
-      this.viewport = cl_PlayerObj.viewport;
-      this.centerVp = {
-         x: this.viewSize.width/2 - this.viewport.width/2,
-         y: this.viewSize.height/2 - this.viewport.height/2,
-      };
+      this.viewport = cl_Player.viewport;
      
       // Canvas
-      this.ctxMap = cl_PlayerObj.ctxMap;
-      this.ctxEnemies = cl_PlayerObj.ctxEnemies;
-      this.ctxPlayer = cl_PlayerObj.ctxPlayer;
-      this.ctxFixedBack = cl_PlayerObj.ctxFixedBack;
-      this.ctxFixedUI = cl_PlayerObj.ctxFixedUI;
-      this.ctxUI = cl_PlayerObj.ctxUI;
-      this.ctxFixedFront = cl_PlayerObj.ctxFixedFront;
+      this.ctxMap = cl_Player.ctxMap;
+      this.ctxEnemies = cl_Player.ctxEnemies;
+      this.ctxPlayer = cl_Player.ctxPlayer;
+      this.ctxFixedBack = cl_Player.ctxFixedBack;
+      this.ctxFixedUI = cl_Player.ctxFixedUI;
+      this.ctxUI = cl_Player.ctxUI;
+      this.ctxFixedFront = cl_Player.ctxFixedFront;
 
       // PNG Files
-      this.mapTile_Img = cl_PlayerObj.mapTile_Img;
-      this.gameUI_Img = cl_PlayerObj.gameUI_Img;
-      this.player_Img = cl_PlayerObj.player_Img;
+      this.mapTile_Img = cl_Player.mapTile_Img;
+      this.gameUI_Img = cl_Player.gameUI_Img;
+      this.player_Img = cl_Player.player_Img;
 
       // Map
-      this.mapSpriteSize = cl_PlayerObj.mapSpecs.mapSpriteSize;
-      this.cellSize = cl_PlayerObj.mapSpecs.cellSize;
-      this.columns = cl_PlayerObj.mapSpecs.columns;
-      this.rows = cl_PlayerObj.mapSpecs.rows;      
-      this.mapScheme = cl_PlayerObj.mapSpecs.mapScheme;
+      this.mapSpriteSize = cl_Player.mapSpecs.mapSpriteSize;
+      this.cellSize = cl_Player.mapSpecs.cellSize;
+      this.columns = cl_Player.mapSpecs.columns;
+      this.rows = cl_Player.mapSpecs.rows;      
+      this.mapScheme = cl_Player.mapSpecs.mapScheme;
       
       // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
       this.HUD_scale_Y = 1;
       this.HUD = {
-         x: this.viewSize.width/2 -400/2 * this.HUD_scale_X,
-         y: this.viewSize.height -110 * this.HUD_scale_Y       -30,
+         x: this.viewport.width/2 -400/2 * this.HUD_scale_X,
+         y: this.viewport.height -110 * this.HUD_scale_Y,
+         // y: this.viewport.height -110 * this.HUD_scale_Y       -30,
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
@@ -73,16 +69,17 @@ class Player extends Character {
       this.flashFrame = 0;
 
       // Game UI ==> Mini Bars
-      this.barWidth = cl_PlayerObj.barWidth;
-      this.barHeight = cl_PlayerObj.barHeight;
-      this.barCoordArray = cl_PlayerObj.barCoordArray;
+      this.barWidth = cl_Player.barWidth;
+      this.barHeight = cl_Player.barHeight;
+      this.barCoordArray = cl_Player.barCoordArray;
 
       // Game UI ==> Fame Bar
       this.fameScale_X = 1.5;
       this.fameScale_Y = 1;
       this.fame = {
-         x: this.viewSize.width/2 -900/2 * this.fameScale_X,
-         y: this.viewSize.height -870     +60,
+         x: this.viewport.width/2 -900/2 * this.fameScale_X,
+         y: this.viewport.height -870,
+         // y: this.viewport.height -870     +60,
          width: 900 * this.fameScale_X,
          height: 53 * this.fameScale_Y,
       }
@@ -104,8 +101,8 @@ class Player extends Character {
    pos(playerPos) {
       
       if(this.isClient) return {
-         x: this.viewSize.width/2,
-         y: this.viewSize.height/2
+         x: this.viewport.width/2,
+         y: this.viewport.height/2
       }
 
       else if(playerPos) return {
@@ -134,11 +131,12 @@ class Player extends Character {
          this.rows = data.rows;
       });
    }
-   
+
    // Camera
    scrollCam() {
 
-      this.viewport.scrollTo(this.updatePlayer.x, this.updatePlayer.y);
+      this.viewport.x = this.updatePlayer.x -this.viewport.width/2;
+      this.viewport.y = this.updatePlayer.y -this.viewport.height/2;
       
       // Viewport bounderies
       let vpLeftCol_Nbr = Math.floor(this.viewport.x / this.cellSize);
@@ -154,7 +152,7 @@ class Player extends Character {
       
       // ================ DEBUG ================
       // this.ctxPlayer.strokeStyle = "red";
-      // this.ctxPlayer.strokeRect(this.centerVp.x, this.centerVp.y, this.viewport.width, this.viewport.height);
+      // this.ctxPlayer.strokeRect(0, 0, this.viewport.width, this.viewport.height);
       // ================ DEBUG ================
 
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
@@ -163,8 +161,8 @@ class Player extends Character {
             let tileIndex = y *this.columns +x;
             let tileToDraw = this.mapScheme[tileIndex];
             
-            let tile_X = x *this.cellSize -this.viewport.x +this.centerVp.x;
-            let tile_Y = y *this.cellSize -this.viewport.y +this.centerVp.y;
+            let tile_X = x *this.cellSize -this.viewport.x;
+            let tile_Y = y *this.cellSize -this.viewport.y;
             
             this.ctxMap.drawImage(
                this.mapTile_Img,
@@ -399,7 +397,7 @@ class Player extends Character {
    // Draw Fame
    fameEvent(eventPack) {
 
-      this.ctxFixedUI.clearRect(0, 0, viewSize.width, viewSize.height);
+      this.ctxFixedUI.clearRect(0, 0, this.viewport.width, this.viewport.height);
       
       this.drawFame_Bar(eventPack);
       this.drawFame_Count(eventPack);
@@ -589,8 +587,8 @@ class Player extends Character {
       
       const clientPlayerBar = {
          ctx: this.ctxToRender(),
-         x: this.viewSize.width/2 - this.barWidth/2,
-         y: this.viewSize.height/2,
+         x: this.viewport.width/2 - this.barWidth/2,
+         y: this.viewport.height/2,
          width: this.barWidth,
          height: this.barHeight,
       }
@@ -892,10 +890,9 @@ class Player extends Character {
       this.drawPlayer();
       this.drawBars_Client();
       this.drawName();
-
-      // ******************************
+      
+      // DEBUG
       if(debugPlayer) this.DEBUG_GENERAL();
-      // ******************************
    }
 
 
@@ -970,8 +967,8 @@ class Player extends Character {
       this.ctxFixedBack.lineWidth = 4;
       
       this.ctxFixedBack.strokeRect(
-         this.viewSize.width/2 - this.detectViewport.width/2,
-         this.viewSize.height/2 - this.detectViewport.height/2,
+         this.viewport.width/2 - this.detectViewport.width/2,
+         this.viewport.height/2 - this.detectViewport.height/2,
          this.detectViewport.width,
          this.detectViewport.height,
       );

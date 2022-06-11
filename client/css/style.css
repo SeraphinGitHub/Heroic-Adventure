@@ -79,6 +79,19 @@ p {
 
 
 /* ===================================================================== */
+/* Full HD
+/* ===================================================================== */
+@media screen and (min-width: 1851px) {
+
+   .viewport {
+      height: 870px;
+      width: 1780px;
+      animation: openGameWindow_1920px;
+   }
+}
+
+
+/* ===================================================================== */
 /* Responsive 17" Screen
 /* ===================================================================== */
 @media screen and (min-width: 1550px) and (max-width: 1850px) {
@@ -88,7 +101,8 @@ p {
    }
 
    .viewport {
-      height: 820px !important;
-      width: 1400px !important;
+      height: 820px;
+      width: 1400px;
+      animation: openGameWindow_1550px;
    }
 }

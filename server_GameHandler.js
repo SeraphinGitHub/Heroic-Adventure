@@ -5,6 +5,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const http = require("http");
+const { emit } = require("process");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
@@ -150,7 +151,10 @@ const onConnect = (socket) => {
 
    // General Chat
    socket.on("generalMessage", (textMessage) => {
-      for(let i in socketList) socketList[i].emit("addMessage_General", `${player.name}: ${textMessage}`);
+      
+      if(!textMessage.includes("</")) {
+         for(let i in socketList) socketList[i].emit("addMessage_General", `${player.name}: ${textMessage}`);
+      }
    });
    
    // Private Chat
@@ -158,11 +162,14 @@ const onConnect = (socket) => {
       const prefix = "To >";
       let receiver = socketList[receiverID];
       
-      if(receiver) {
-         receiver.emit("addMessage_Private", `${player.name}: ${textMessage}`);
-         socket.emit("addMessage_Private", `${prefix}${receiverName}: ${textMessage}`);
+      if(!textMessage.includes("</")) {
+
+         if(receiver) {
+            receiver.emit("addMessage_Private", `${player.name}: ${textMessage}`);
+            socket.emit("addMessage_Private", `${prefix}${receiverName}: ${textMessage}`);
+         }
+         else socket.emit("addMessage_Private", `>${receiverName}< Has gone offline !`);
       }
-      else socket.emit("addMessage_Private", `>${receiverName}< Has gone offline !`);
    });
    
    // Get reveiver ID for private chat 

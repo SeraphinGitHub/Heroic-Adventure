@@ -41,5 +41,3 @@ const initMap = () => {
       mapTile_Img: mapTile_Img,
    }
 }
-
-const mapSpecs = initMap();

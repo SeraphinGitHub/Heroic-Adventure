@@ -164,7 +164,6 @@ const initPlayer = (socket, playerID) => {
    clientPlayer.initTextAndFluidity(socket);
 
    // Client UI ==> Panels
-   handleGameUI(socket);
    deathScreen(socket);
 
    // Controls Events

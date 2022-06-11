@@ -1,18 +1,34 @@
 
+/* ********************************************* Dev Mode ********************************************* */
+
+.viewport,
+.top-side-left,
+.top-side-right,
+.bottom-side-left,
+.bottom-side-right {
+   animation-duration: 0s !important;
+}
+
+.log-screen {
+   visibility: hidden !important;
+}
+
+.log-background {
+   visibility: hidden !important;
+}
+
+/* ********************************************* Dev Mode ********************************************* */
+
+
+
 /* ===================================================================== */
 /* Log Screen
 /* ===================================================================== */
 .hide-LogScreen {
    top: -900px !important;
-   /* visibility: hidden !important; */
 }
 
 .log-screen {
-
-   /* ********************************************* Dev Mode ********************************************* */
-   visibility: hidden !important;
-   /* ********************************************* Dev Mode ********************************************* */
-
    z-index: 100;
    position: fixed;
    overflow: hidden;
@@ -22,12 +38,7 @@
    animation-name: show_LogScreen;
 }
 
-.log-background {
-
-   /* ********************************************* Dev Mode ********************************************* */
-   visibility: hidden !important;
-   /* ********************************************* Dev Mode ********************************************* */
-   
+.log-background {   
    position: absolute;
    top: 0;
    height: 100%;

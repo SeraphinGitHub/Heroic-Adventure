@@ -263,9 +263,9 @@ const playerBags = () => {
 
 
 // =====================================================================
-// Game UI Handler ==> Socket Listening
+// Panels UI Handler ==> Socket Listening
 // =====================================================================
-const handleGameUI = (socket) => {
+const initPanelsUI = (socket) => {
 
    playerInventory(socket);
    playerMap();

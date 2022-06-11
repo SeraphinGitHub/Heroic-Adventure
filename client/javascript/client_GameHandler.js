@@ -2,14 +2,33 @@
 "use strict"
 
 // =====================================================================
-// Set Viewport
+// Set Viewport between 1920px - 1550px
 // =====================================================================
-const viewSize = {
-   height: 810, // ==> Temporary
-   // height: 870, // ==> Check to match with viewport size in CSS
-   width: 1780,
-};
-const viewport = new Viewport(0, 0, viewSize.width, viewSize.height);
+const setViewport = () => {
+
+   if(document.body.clientWidth > 1850) {
+
+      const viewport = {
+         x: 0,
+         y: 0,
+         height: 870,
+         width: 1780,
+      };
+      return viewport;
+   }
+   
+   else {
+      const viewport = {
+         x: 0,
+         y: 0,
+         height: 810,
+         width: 1410,
+      };
+      return viewport;
+   }
+}
+
+const viewport = setViewport();
 
 
 // =====================================================================
@@ -30,7 +49,7 @@ canvasUIFront.oncontextmenu = (event) => {
 // =====================================================================
 // Set All Canvas & Contexts
 // =====================================================================
-const set_Canvas = () => {
+const setContexts = () => {
 
    const allCanvas = document.getElementsByTagName("canvas");
    let ctxArray = [];
@@ -39,37 +58,36 @@ const set_Canvas = () => {
       let canvasIndexed = allCanvas[i];
       ctxArray.push(canvasIndexed.getContext("2d"));
    
-      canvasIndexed.height = viewSize.height;
-      canvasIndexed.width = viewSize.width;
+      canvasIndexed.height = viewport.height;
+      canvasIndexed.width = viewport.width;
       ctxArray[i].imageSmoothingEnabled = false;
    }
 
    return ctxArray;
 }
 
-const ctx = {
+const ctxArray = setContexts();
 
-   map:        set_Canvas()[0],
-   enemies:    set_Canvas()[1],
-   player:     set_Canvas()[2],
-   fixedBack:  set_Canvas()[3],
-   fixedUI:    set_Canvas()[4],
-   UI:         set_Canvas()[5],
-   fixedFront: set_Canvas()[6],
+const ctx = {
+   map:        ctxArray[0],
+   enemies:    ctxArray[1],
+   player:     ctxArray[2],
+   fixedBack:  ctxArray[3],
+   fixedUI:    ctxArray[4],
+   UI:         ctxArray[5],
+   fixedFront: ctxArray[6],
 }
 
 
 // =====================================================================
 // Canvas Clearing
 // =====================================================================
-const ctxFixedBack_index = 3;
-const ctxFixedUI_index = 4;
-const ctxFixedFront_index = 6;
-
-const ctxArray = set_Canvas();
-
 const canvasClearing = () => {
-   
+
+   const ctxFixedBack_index = 3;
+   const ctxFixedUI_index = 4;
+   const ctxFixedFront_index = 6;
+
    for(let i = 0; i < ctxArray.length; i++) {
       let ctxIndexed = ctxArray[i];
       
@@ -77,7 +95,7 @@ const canvasClearing = () => {
       || i === ctxFixedUI_index
       || i === ctxFixedFront_index) continue;
 
-      ctxIndexed.clearRect(0, 0, viewSize.width, viewSize.height);
+      ctxIndexed.clearRect(0, 0, viewport.width, viewport.height);
    }
 }
 
@@ -86,7 +104,6 @@ const canvasClearing = () => {
 // Mini Bars Coordinates
 // =====================================================================
 const miniBarSpecs = {
-   
    barWidth: 115,
    barHeight: 8,
 }
@@ -161,9 +178,9 @@ const barCoordArray = [
 
 
 // =====================================================================
-// PNG Image Files
+// Image Files
 // =====================================================================
-const set_ImageFiles = () => {
+const imgFile = () => {
    
    const gameUI_Img = new Image();
    gameUI_Img.src = "client/images/playerUI/Game UI.png";
@@ -171,15 +188,10 @@ const set_ImageFiles = () => {
    const player_Img = new Image();
    player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
 
-   return [
-      gameUI_Img,
-      player_Img,
-   ];
-}
-
-const imgPNG = {
-   gameUI_Img:    set_ImageFiles()[0],
-   player_Img:    set_ImageFiles()[1],
+   return {
+      gameUI_Img: gameUI_Img,
+      player_Img: player_Img,
+   }
 }
 
 
@@ -189,7 +201,6 @@ const imgPNG = {
 const cl_PlayerObj = {
 
    // Viewport
-   viewSize:      viewSize,
    viewport:      viewport,
 
    // Canvas
@@ -203,12 +214,12 @@ const cl_PlayerObj = {
    ctxFixedFront: ctx.fixedFront,
 
    // PNG Files
-   mapTile_Img:   mapSpecs.mapTile_Img,
-   gameUI_Img:    imgPNG.gameUI_Img,
-   player_Img:    imgPNG.player_Img,
+   mapTile_Img:   initMap().mapTile_Img,
+   gameUI_Img:    imgFile().gameUI_Img,
+   player_Img:    imgFile().player_Img,
 
    // Map
-   mapSpecs:      mapSpecs,
+   mapSpecs:      initMap(),
 
    // Game UI ==> Mini Bars
    barWidth:      miniBarSpecs.barWidth,
@@ -219,13 +230,13 @@ const cl_PlayerObj = {
 const cl_EnemyObj = {
 
    // Viewport
-   viewport:      viewport,
+   viewport:         viewport,
 
    // Canvas
    ctxEnemies:       ctx.enemies,
 
    // PNG Files
-   gameUI_Img:    imgPNG.gameUI_Img,
+   gameUI_Img:       imgFile().gameUI_Img,
 
    // Game UI ==> Mini Bars
    barWidth:         miniBarSpecs.barWidth,

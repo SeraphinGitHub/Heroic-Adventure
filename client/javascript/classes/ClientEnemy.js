@@ -5,7 +5,7 @@
 // Enemy
 // =====================================================================
 class Enemy extends Character {
-   constructor(cl_EnemyObj, initEnemy) {
+   constructor(cl_Enemy, initEnemy) {
       
       super();
 
@@ -14,18 +14,18 @@ class Enemy extends Character {
       this.updateEnemy;
 
       // Viewport
-      this.viewport = cl_EnemyObj.viewport;
+      this.viewport = cl_Enemy.viewport;
 
       // Canvas
-      this.ctxEnemies = cl_EnemyObj.ctxEnemies;
+      this.ctxEnemies = cl_Enemy.ctxEnemies;
 
       // PNG Files
-      this.gameUI_Img = cl_EnemyObj.gameUI_Img;
+      this.gameUI_Img = cl_Enemy.gameUI_Img;
 
       // Game UI ==> Mini Bars
-      this.barWidth = cl_EnemyObj.barWidth;
-      this.barHeight = cl_EnemyObj.barHeight;
-      this.barCoordArray = cl_EnemyObj.barCoordArray;
+      this.barWidth = cl_Enemy.barWidth;
+      this.barHeight = cl_Enemy.barHeight;
+      this.barCoordArray = cl_Enemy.barCoordArray;
 
       this.shadowSize = 0.7;
       this.ringSize = 8;

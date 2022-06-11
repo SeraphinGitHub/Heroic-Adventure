@@ -27,9 +27,10 @@ const easyLogin = () => {
       // Await for server response
       socket.on("received_initClient", (playerID) => {
 
-         initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
-         initChat(socket);             // ==> Client_ChatHandler.js
-
+         initPlayer(socket, playerID);
+         initChat(socket);
+         initPanelsUI(socket);
+         
          // Client Sync
          clientUpdate();
 
@@ -75,10 +76,10 @@ const initClientScripts = () => {
       "classes/Fluidity.js",
       "classes/GameBar.js",
       "classes/Tile.js",
-      "classes/Viewport.js",
-      
+
       // Scripts
-      "client_PlayerUI.js",
+      "client_PanelsUI.js",
+      "client_GameUI.js",
       "client_PlayerHandler.js",
       "client_MapHandler.js",
       "client_ChatHandler.js",
@@ -168,8 +169,9 @@ const loadClient = () => {
    // Await for server response
    socket.on("received_initClient", (playerID) => {
 
-      initPlayer(socket, playerID); // ==> Client_PlayerHandler.js
-      initChat(socket);             // ==> Client_ChatHandler.js
+      initPlayer(socket, playerID);
+      initChat(socket);
+      initPanelsUI(socket);
       
       // Client Sync
       clientUpdate();

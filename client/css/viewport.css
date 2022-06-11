@@ -8,16 +8,17 @@
    left: 50%;
    transform: translate(-50%, -50%);
 
-   height: 870px; /* ==> Check to match with viewport size in JS */
-   width: 1780px;
-
    background-color: black;
-   animation: openGameWindow;
 }
 
-@keyframes openGameWindow {
+@keyframes openGameWindow_1920px {
    0% { width: 0px; }
-   100% { width: 1780px; } /* ==> Check to match with viewport size in JS */
+   100% { width: 1780px; }
+}
+
+@keyframes openGameWindow_1550px {
+   0% { width: 0px; }
+   100% { width: 1410px; }
 }
 
 
@@ -152,10 +153,6 @@ canvas {
 .bottom-side-right {
    animation-duration: 2s;
    animation-timing-function: linear;
-
-   /* ********************************************* Dev Mode ********************************************* */
-   animation-duration: 0s;
-   /* ********************************************* Dev Mode ********************************************* */
 }
 
 
