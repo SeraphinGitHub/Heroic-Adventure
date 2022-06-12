@@ -8,165 +8,168 @@
 
 
 // =====================================================================
-// Player HUD
+// Set Player HUD
 // =====================================================================
 const HUD_Scale = {
    x: 1.2,
    y: 1,
+}  
+
+const HUD_Offset = {
+   x: 0,
+   y: 0,
 }
 
-const initHUD = (viewport) => {
+const setHUD = (viewport) => {
 
    const HUD = {
-      x: viewport.width/2 -400/2 *HUD_Scale.x,
-      y: viewport.height -110 *HUD_Scale.y,
-      // y: viewport.height -110 * HUD_Scale.y    -30,
-      width: 400 *HUD_Scale.x,
-      height: 100 *HUD_Scale.y,
-
-      healthOffset: {
-         x: 15,
-         y: 39,
-         width: 30,
-         height: 9,
+      position: {
+         x: viewport.width/2 -400/2 *HUD_Scale.x +HUD_Offset.x,
+         y: viewport.height -110 *HUD_Scale.y +HUD_Offset.y,
+         width: 400 *HUD_Scale.x,
+         height: 100 *HUD_Scale.y,
       },
-
+   
       manaOffset: {
          x: 82,
          y: 10,
          width: 165,
          height: 8,
       },
+   
+      healthOffset: {
+         x: 15,
+         y: 39,
+         width: 30,
+         height: 9,
+      },
+   
+      energyOffset: {
+         x: 82,
+         y: 65,
+         width: 165,
+         height: 8,
+      },
+   
+      flashing: {
+         frame: 0,
+         speed: 6,      // Lower ==> faster
+         minRatio: 0.3, // Min Health before flash (%)
+      }
    }
 
-   HUD_DrawFrame(HUD);
+   return HUD;
 }
 
-const HUD_DrawFrame = (hud) => {
+// Template Bar
+const HUD_BaseBar = (sx, sy, sw, sh, ratio, offset)  => {
+   
+   let barWidth = Math.floor(
+      (HUD.position.width - (offset.width * HUD_Scale.x) ) *ratio
+   );
+
+   ctx.UI.drawImage(
+      imgFile().gameUI_Img,
+      sx, sy, sw *ratio, sh,
+      HUD.position.x + (offset.x * HUD_Scale.x),
+      HUD.position.y + (offset.y * HUD_Scale.y),
+      barWidth,
+      HUD.position.height/3 - (offset.height * HUD_Scale.y)
+   );
+}
+
+// Frame & Backgroud
+const HUD_DrawFrame = () => {
 
    ctx.fixedFront.shadowBlur = "2";
    ctx.fixedFront.shadowColor = "black";
 
    // Background
-   ctx.fixedBack.drawImage( imgFile().gameUI_Img,
+   ctx.fixedBack.drawImage(
+      imgFile().gameUI_Img,
       5, 181, 729, 141,
-      hud.x + (15 * HUD_Scale.x),     // Pos X
-      hud.y + (10 * HUD_Scale.y),     // Pos Y
-      hud.width - (30 * HUD_Scale.x), // Width
-      hud.height - (20 * HUD_Scale.y) // Height
+      HUD.position.x + (15 * HUD_Scale.x),     // Pos X
+      HUD.position.y + (10 * HUD_Scale.y),     // Pos Y
+      HUD.position.width - (30 * HUD_Scale.x), // Width
+      HUD.position.height - (20 * HUD_Scale.y) // Height
    );
 
    // HUD Sprite
-   this.ctxFixedFront.drawImage( imgFile().gameUI_Img,
-      5, 4, 782, 173,
-      hud.x, hud.x, hud.width, hud.height
-   );
-}
-
-const HUD_DrawBaseBar = (hud, ratio, sx, sy, sw, sh, offX, offY, offW, offH)  => {
-   
-   let barWidth = Math.floor(
-      (hud.width - (offW * HUD_Scale.x) ) *ratio
-   );
-
-   this.ctxUI.drawImage(
+   ctx.fixedFront.drawImage(
       imgFile().gameUI_Img,
-      sx, sy, sw *ratio, sh,
-      hud.x + (offX * HUD_Scale.x),
-      hud.x + (offY * HUD_Scale.y),
-      barWidth,
-      hud.height/3 - (offH * HUD_Scale.y)
+      5, 4, 782, 173,
+      HUD.position.x,
+      HUD.position.y,
+      HUD.position.width,
+      HUD.position.height
    );
 }
 
-const HUD_DrawMana = () => {
+// Mana Bar
+const HUD_DrawMana = (initPlayer, updatePlayer) => {
    
-   let manaRatio = this.updatePlayer.mana / this.initPlayer.baseMana;
+   let manaRatio = updatePlayer.mana / initPlayer.baseMana;
    
    // Still Castable Mana
-   if(this.updatePlayer.mana >= this.initPlayer.healCost) {
-
-      this.drawHUD_BaseBar(
-         manaRatio,
-         6, 528, 460, 47,
-         this.manaOffset.x,
-         this.manaOffset.y,
-         this.manaOffset.width,
-         this.manaOffset.height
-      );
-   }
+   if(updatePlayer.mana >= initPlayer.healCost) HUD_BaseBar(
+      6, 528, 460, 47,
+      manaRatio,
+      HUD.manaOffset
+   );
    
    // Low Mana
-   else {
-      this.drawHUD_BaseBar(
-         manaRatio,
-         5, 475, 461, 47,
-         this.manaOffset.x,
-         this.manaOffset.y,
-         this.manaOffset.width,
-         this.manaOffset.height
-      );
-   }
+   else HUD_BaseBar(
+      5, 475, 461, 47,
+      manaRatio,
+      HUD.manaOffset
+   ); 
 }
 
-const HUD_DrawHealth = () => {
+// Health Bar
+const HUD_DrawHealth = (initPlayer, updatePlayer) => {
 
-   let healthRatio = this.updatePlayer.health /this.initPlayer.baseHealth;
+   let healthRatio = updatePlayer.health /initPlayer.baseHealth;
 
-   // if Health Over 30%
-   if(this.updatePlayer.health > this.initPlayer.baseHealth * this.minHealthRatio) {
+   // if Health Over 30% ==> Normal Bar
+   if(updatePlayer.health > initPlayer.baseHealth * HUD.flashing.minRatio) HUD_BaseBar(
+      5, 327, 729, 45,
+      healthRatio,
+      HUD.healthOffset
+   );
 
-      // Normal Bar
-      this.drawHUD_BaseBar(
-         healthRatio,
-         5, 327, 729, 45,
-         this.healthOffset.x,
-         this.healthOffset.y,
-         this.healthOffset.width,
-         this.healthOffset.height
-      );
-   }
-
-   // if Health Under 30%
+   // if Health Under 30% ==> Flashing Bar
    else {
-
-      // Flashing Bar
-      this.drawHUD_BaseBar(
-         healthRatio,
+      HUD_BaseBar(
          6, 424, 729, 45,
-         this.healthOffset.x,
-         this.healthOffset.y,
-         this.healthOffset.width,
-         this.healthOffset.height
+         healthRatio,
+         HUD.healthOffset
       );
 
-      this.flashFrame++;
+      HUD.flashing.frame++;
 
-      if(this.flashFrame > this.flashingSpeed) {
+      if(HUD.flashing.frame > HUD.flashing.speed) {
 
          // Normal Bar
-         this.drawHUD_BaseBar(
-            healthRatio,
+         HUD_BaseBar(
             5, 327, 729, 45,
-            this.healthOffset.x,
-            this.healthOffset.y,
-            this.healthOffset.width,
-            this.healthOffset.height
+            healthRatio,
+            HUD.healthOffset
          );
       }
 
-      if(this.flashFrame > this.flashingSpeed *2) this.flashFrame = 0;
+      if(HUD.flashing.frame > HUD.flashing.speed *2) HUD.flashing.frame = 0;
    }
 }
 
-const HUD_DrawEnergy = () => {
+// Energy Bar
+const HUD_DrawEnergy = (initPlayer, updatePlayer) => {
    
-   let energyRatio = this.updatePlayer.energy / this.initPlayer.baseEnergy;
+   let energyRatio = updatePlayer.energy / initPlayer.baseEnergy;
 
    // Yellow Bar
-   this.drawHUD_BaseBar(
-      energyRatio,
+   HUD_BaseBar(
       6, 582, 460, 46,
-      82, 65, 165, 8
+      energyRatio,
+      HUD.energyOffset
    );
 }

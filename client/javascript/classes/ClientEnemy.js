@@ -9,24 +9,14 @@ class Enemy extends Character {
       
       super();
 
-      // Init Server Enemy
       this.initEnemy = initEnemy;
       this.updateEnemy;
-
-      // Viewport
       this.viewport = cl_Enemy.viewport;
-
-      // Canvas
       this.ctxEnemies = cl_Enemy.ctxEnemies;
-
-      // PNG Files
       this.gameUI_Img = cl_Enemy.gameUI_Img;
-
-      // Game UI ==> Mini Bars
-      this.barWidth = cl_Enemy.barWidth;
-      this.barHeight = cl_Enemy.barHeight;
+      this.miniBars = cl_Enemy.miniBars;
       this.barCoordArray = cl_Enemy.barCoordArray;
-
+      
       this.shadowSize = 0.7;
       this.ringSize = 8;
 
@@ -67,11 +57,11 @@ class Enemy extends Character {
          ctx: this.ctxEnemies,
          x: this.pos().x,
          y: this.pos().y,
-         width: this.barWidth,
-         height: this.barHeight,
+         width: this.miniBars.width,
+         height: this.miniBars.height,
       }
 
-      const offsetX = -this.barWidth/2;
+      const offsetX = -this.miniBars.width/2;
       const offsetY = -80;
       
       const gameBar = new GameBar(enemyBar, offsetX, offsetY, this.initEnemy.baseHealth, this.updateEnemy.health);

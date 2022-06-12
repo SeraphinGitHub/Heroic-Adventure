@@ -44,8 +44,8 @@ class Player extends Character {
       this.attkRadius = 32;
       
       // GcD
-      this.baseGcD = 40;
-      this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
+      this.baseGcD = 40; // Lower ==> Faster
+      this.GcD = Math.floor(this.baseGcD *this.syncCoeff);
       this.speedGcD = this.GcD;
       this.attackSpeed = Math.floor(this.baseGcD /60 *10) /10;
 

@@ -4,25 +4,28 @@
 // =====================================================================
 // Classes Variables
 // =====================================================================
-const chatGlowing = document.querySelector(".chat-glowing");
+const chat = {
+   window: document.querySelector(".player-chat"),
+   chatGlowing: document.querySelector(".chat-glowing"),
 
-// ========== Buttons ==========
-const generalBtn = document.querySelector(".general-plate");
-const privateBtn = document.querySelector(".private-plate");
-const clearChatBtn = document.querySelector(".clear-plate");
-const gotWhispPlate = document.querySelectorAll(".got-whisp");
+   // Buttons
+   generalBtn: document.querySelector(".general-plate"),
+   privateBtn: document.querySelector(".private-plate"),
+   clearChatBtn: document.querySelector(".clear-plate"),
+   gotWhispPlate: document.querySelector(".got-whisp"),
 
-// ========== Channels ==========
-const generalChat = document.querySelector(".general-chat");
-const privateChat = document.querySelector(".private-chat");
+   // Channels
+   generalChat: document.querySelector(".general-chat"),
+   privateChat: document.querySelector(".private-chat"),
 
-// ========== Receiver Tag ==========
-const receiver = document.querySelector(".message-receiver");
-const message = document.getElementsByClassName("message");
-
-// ========== Input Field ==========
-const chatForm = document.querySelector(".chat-form");
-const chatInput = document.querySelector(".chat-form input");
+   // Receiver Tag
+   receiver: document.querySelector(".message-receiver"),
+   message: document.getElementsByClassName("message"),
+   
+   // Input Field
+   chatForm: document.querySelector(".chat-form"),
+   chatInput: document.querySelector(".chat-form input"),
+}
 
 
 // =====================================================================
@@ -34,14 +37,14 @@ let isPrivateChat = false;
 let worldContent = "Everyone";
 let receiverContent = "";
 
-const displayReceiverName = (receiverStr) => receiver.textContent = receiverStr;
+const displayReceiverName = (receiverStr) => chat.receiver.textContent = receiverStr;
 
 const showGeneralChat = () => {
 
-   generalChat.classList.add("visible");
-   privateChat.classList.remove("visible");
-   chatGlowing.classList.add("glow-purple");
-   chatGlowing.classList.remove("glow-orange");
+   chat.generalChat.classList.add("visible");
+   chat.privateChat.classList.remove("visible");
+   chat.chatGlowing.classList.add("glow-purple");
+   chat.chatGlowing.classList.remove("glow-orange");
    isGeneralChat = true;
    isPrivateChat = false;
 
@@ -50,10 +53,10 @@ const showGeneralChat = () => {
 
 const showPrivateChat = () => {
 
-   generalChat.classList.remove("visible");
-   privateChat.classList.add("visible");
-   chatGlowing.classList.remove("glow-purple");
-   chatGlowing.classList.add("glow-orange");
+   chat.generalChat.classList.remove("visible");
+   chat.privateChat.classList.add("visible");
+   chat.chatGlowing.classList.remove("glow-purple");
+   chat.chatGlowing.classList.add("glow-orange");
    isGeneralChat = false;
    isPrivateChat = true;
 
@@ -63,8 +66,8 @@ const showPrivateChat = () => {
 const getPlayerMessage = (socket, chatChannel, textMessage) => {
    chatChannel.innerHTML += `<p class="message">${textMessage}</p>`;
 
-   for(let i = 0; i < message.length; i++) {
-      let messageIndexed = message[i];
+   for(let i = 0; i < chat.message.length; i++) {
+      let messageIndexed = chat.message[i];
 
       messageIndexed.addEventListener("mousedown", (event) => {
          if(event.which === 1) extractPlayerName(socket, messageIndexed);
@@ -73,6 +76,7 @@ const getPlayerMessage = (socket, chatChannel, textMessage) => {
 }
 
 const extractPlayerName = (socket, messageIndexed) => {
+
    const prefix = "To >";
    const offlineStr = "< Has gone offline !";
    const messageText = messageIndexed.textContent;
@@ -89,7 +93,7 @@ const extractPlayerName = (socket, messageIndexed) => {
       
       socket.emit("chatReceiverName", receiverName);
       receiverContent = `To : ${receiverName}`;
-      chatInput.value = "";
+      chat.chatInput.value = "";
       showPrivateChat();
    }
 }
@@ -103,33 +107,34 @@ const clearChat = (chatChannel) => {
 
 
 // =====================================================================
-// Event Listeners
+// Chat System
 // =====================================================================
-const chatEventListeners = (socket) => {
+const chatSystem = (socket) => {
 
-   generalBtn.addEventListener("click", () => showGeneralChat());
-   privateBtn.addEventListener("click", () => showPrivateChat());
+   chat.window.addEventListener("mouseleave", () => chat.chatInput.blur());
+   chat.generalBtn.addEventListener("click", () => showGeneralChat());
+   chat.privateBtn.addEventListener("click", () => showPrivateChat());
    
-   chatForm.addEventListener("submit", (event) => {
+   chat.chatForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      if(chatInput.value !== "") {
+      if(chat.chatInput.value !== "") {
    
          if(isGeneralChat) {
-            socket.emit("generalMessage", chatInput.value);
-            chatInput.value = "";
+            socket.emit("generalMessage", chat.chatInput.value);
+            chat.chatInput.value = "";
          }
          
-         if(isPrivateChat && receiver.textContent !== "") {
-            socket.emit("privateMessage", chatInput.value);
-            chatInput.value = "";
+         if(isPrivateChat && chat.receiver.textContent !== "") {
+            socket.emit("privateMessage", chat.chatInput.value);
+            chat.chatInput.value = "";
          }
       }
    });
    
-   clearChatBtn.addEventListener("click", () => {
-      if(isGeneralChat) clearChat(generalChat);
-      if(isPrivateChat) clearChat(privateChat);
+   chat.clearChatBtn.addEventListener("click", () => {
+      if(isGeneralChat) clearChat(chat.generalChat);
+      if(isPrivateChat) clearChat(chat.privateChat);
    });
 }
 
@@ -139,12 +144,12 @@ const chatEventListeners = (socket) => {
 // =====================================================================
 const chatAddMessage = (socket) => {
    
-   socket.on("addMessage_General", (textMessage) => getPlayerMessage(socket, generalChat, textMessage));
+   socket.on("addMessage_General", (textMessage) => getPlayerMessage(socket, chat.generalChat, textMessage));
 
    socket.on("addMessage_Private", (textMessage) => {
-      getPlayerMessage(socket, privateChat, textMessage);
+      getPlayerMessage(socket, chat.privateChat, textMessage);
    
-      if(!isPrivateChat) gotWhispPlate.forEach(plate => {
+      if(!isPrivateChat) chat.gotWhispPlate.forEach(plate => {
          plate.classList.add("whisp-alert");
          setTimeout(() => plate.classList.remove("whisp-alert"), 1000);
       });
@@ -159,6 +164,5 @@ const initChat = (socket) => {
 
    chatAddMessage(socket)
    displayReceiverName(worldContent);
-   
-   chatEventListeners(socket);
+   chatSystem(socket);
 }

@@ -5,29 +5,17 @@
 // Player
 // =====================================================================
 class Player extends Character {
-   constructor(cl_Player, initPlayer) {
+   constructor(cl_Player, initPack) {
       
       super();
-
-      // Init Server Player
+      
       this.isClient = false;
-      this.initPlayer = initPlayer;
       this.updatePlayer;
+      this.initPack = initPack;
+      this.detectViewport = initPack.detectViewport;
 
-      // Viewport
-      this.detectViewport = initPlayer.detectViewport;
       this.viewport = cl_Player.viewport;
-     
-      // Canvas
-      this.ctxMap = cl_Player.ctxMap;
-      this.ctxEnemies = cl_Player.ctxEnemies;
-      this.ctxPlayer = cl_Player.ctxPlayer;
-      this.ctxFixedBack = cl_Player.ctxFixedBack;
-      this.ctxFixedUI = cl_Player.ctxFixedUI;
-      this.ctxUI = cl_Player.ctxUI;
-      this.ctxFixedFront = cl_Player.ctxFixedFront;
-
-      // PNG Files
+      this.ctx = cl_Player.ctx;
       this.mapTile_Img = cl_Player.mapTile_Img;
       this.gameUI_Img = cl_Player.gameUI_Img;
       this.player_Img = cl_Player.player_Img;
@@ -37,8 +25,13 @@ class Player extends Character {
       this.cellSize = cl_Player.mapSpecs.cellSize;
       this.columns = cl_Player.mapSpecs.columns;
       this.rows = cl_Player.mapSpecs.rows;      
-      this.mapScheme = cl_Player.mapSpecs.mapScheme;
+      this.mapScheme = cl_Player.mapSpecs.mapScheme;      
       
+      this.miniBars = cl_Player.miniBars;
+      this.barCoordArray = cl_Player.barCoordArray;
+
+
+
       // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
       this.HUD_scale_Y = 1;
@@ -49,29 +42,23 @@ class Player extends Character {
          width: 400 * this.HUD_scale_X,
          height: 100 * this.HUD_scale_Y,
       }
-
       this.healthOffset = {
          x: 15,
          y: 39,
          width: 30,
          height: 9,
       };      
-      
       this.manaOffset = {
          x: 82,
          y: 10,
          width: 165,
          height: 8,
       }
-
       this.minHealthRatio = 0.3; // Min Health before flash (%)
       this.flashingSpeed = 6; // Lower = faster
       this.flashFrame = 0;
 
-      // Game UI ==> Mini Bars
-      this.barWidth = cl_Player.barWidth;
-      this.barHeight = cl_Player.barHeight;
-      this.barCoordArray = cl_Player.barCoordArray;
+
 
       // Game UI ==> Fame Bar
       this.fameScale_X = 1.5;
@@ -86,7 +73,7 @@ class Player extends Character {
       this.fame_OffW = 65;
 
       // Player Sprites
-      this.sprites = initPlayer.sprites;
+      this.sprites = initPack.sprites;
       this.shadowSize = 0.75;
       this.ringSize = 7;
 
@@ -95,7 +82,7 @@ class Player extends Character {
       this.frameToJump = 4;
       this.isAnimable = true;
       this.animState;
-      this.animSpecs = initPlayer.animSpecs;
+      this.animSpecs = initPack.animSpecs;
    }
    
    pos(playerPos) {
@@ -117,8 +104,8 @@ class Player extends Character {
    }
 
    ctxToRender() {
-      if(this.updatePlayer.isCtxPlayer) return this.ctxPlayer;
-      else return this.ctxEnemies;
+      if(this.updatePlayer.isCtxPlayer) return this.ctx.player;
+      else return this.ctx.enemies;
    }
 
    // Init Map
@@ -151,8 +138,8 @@ class Player extends Character {
       if(vpBottomRow_Nbr > this.rows) vpBottomRow_Nbr = this.rows;
       
       // ================ DEBUG ================
-      // this.ctxPlayer.strokeStyle = "red";
-      // this.ctxPlayer.strokeRect(0, 0, this.viewport.width, this.viewport.height);
+      // this.ctx.player.strokeStyle = "red";
+      // this.ctx.player.strokeRect(0, 0, this.viewport.width, this.viewport.height);
       // ================ DEBUG ================
 
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
@@ -164,7 +151,7 @@ class Player extends Character {
             let tile_X = x *this.cellSize -this.viewport.x;
             let tile_Y = y *this.cellSize -this.viewport.y;
             
-            this.ctxMap.drawImage(
+            this.ctx.map.drawImage(
                this.mapTile_Img,
                (tileToDraw -1) *this.mapSpriteSize, 0, this.mapSpriteSize, this.mapSpriteSize,
                tile_X, tile_Y, this.cellSize, this.cellSize
@@ -177,7 +164,7 @@ class Player extends Character {
    toggleFloatingText(playerPos, textObj) {
       
       const newText = new FloatingText(
-         this.ctxPlayer,
+         this.ctx.player,
          this.pos(playerPos).x,
          this.pos(playerPos).y,
          textObj.x,
@@ -390,14 +377,13 @@ class Player extends Character {
    // Fluidity
    baseFluidity(barSpecs) {
       
-      const newFluidBar = new Fluidity(this.ctxUI, this.gameUI_Img, barSpecs);
+      const newFluidBar = new Fluidity(this.ctx.UI, this.gameUI_Img, barSpecs);
       this.fluidBarArray.push(newFluidBar);
    }
    
    // Draw Fame
    fameEvent(eventPack) {
-
-      this.ctxFixedUI.clearRect(0, 0, this.viewport.width, this.viewport.height);
+      this.ctx.fixedUI.clearRect(0, 0, this.viewport.width, this.viewport.height);
       
       this.drawFame_Bar(eventPack);
       this.drawFame_Count(eventPack);
@@ -406,7 +392,7 @@ class Player extends Character {
    drawFame_Frame() {
 
       // Background
-      this.ctxFixedBack.drawImage(this.gameUI_Img,
+      this.ctx.fixedBack.drawImage(this.gameUI_Img,
          522, 477, 26, 48,
          this.fame.x + (32 * this.fameScale_X),
          this.fame.y + 19,
@@ -415,7 +401,7 @@ class Player extends Character {
       );
 
       // Fame Sprite
-      this.ctxFixedFront.drawImage(this.gameUI_Img,
+      this.ctx.fixedFront.drawImage(this.gameUI_Img,
          794, 7, 1701, 87,
          this.fame.x,
          this.fame.y,
@@ -431,7 +417,7 @@ class Player extends Character {
       );
    
       // Fame Bar
-      this.ctxFixedUI.drawImage(this.gameUI_Img,
+      this.ctx.fixedUI.drawImage(this.gameUI_Img,
          522, 529, 26, 48,
          this.fame.x + (32 * this.fameScale_X),
          this.fame.y + 19,
@@ -443,143 +429,10 @@ class Player extends Character {
    drawFame_Count(eventPack) {
    
       // Fame Count   
-      this.ctxFixedUI.fillStyle = "darkviolet";
-      this.ctxFixedUI.font = "40px Dimbo-Regular";
-      this.ctxFixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
-      this.ctxFixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
-   }
-   
-   // Draw HUD
-   drawHUD_Frame() {
-
-      this.ctxFixedFront.shadowBlur = "2";
-      this.ctxFixedFront.shadowColor = "black";
-
-      // Background
-      this.ctxFixedBack.drawImage(this.gameUI_Img,
-         5, 181, 729, 141,
-         this.HUD.x + (15 * this.HUD_scale_X),     // Pos X
-         this.HUD.y + (10 * this.HUD_scale_Y),     // Pos Y
-         this.HUD.width - (30 * this.HUD_scale_X), // Width
-         this.HUD.height - (20 * this.HUD_scale_Y) // Height
-      );
-
-      // HUD Sprite
-      this.ctxFixedFront.drawImage(this.gameUI_Img,
-         5, 4, 782, 173,
-         this.HUD.x,
-         this.HUD.y,
-         this.HUD.width,
-         this.HUD.height
-      );
-   }
-
-   drawHUD_BaseBar(ratio, sx, sy, sw, sh, offX, offY, offW, offH) {
-      
-      let barWidth = Math.floor(
-         (this.HUD.width - (offW * this.HUD_scale_X) ) *ratio
-      );
-
-      this.ctxUI.drawImage(
-         this.gameUI_Img,
-         sx, sy, sw *ratio, sh,
-         this.HUD.x + (offX * this.HUD_scale_X),
-         this.HUD.y + (offY * this.HUD_scale_Y),
-         barWidth,
-         this.HUD.height/3 - (offH * this.HUD_scale_Y)
-      );
-   }
-
-   drawHUD_Mana() {
-      
-      let manaRatio = this.updatePlayer.mana / this.initPlayer.baseMana;
-      
-      // Still Castable Mana
-      if(this.updatePlayer.mana >= this.initPlayer.healCost) {
-
-         this.drawHUD_BaseBar(
-            manaRatio,
-            6, 528, 460, 47,
-            this.manaOffset.x,
-            this.manaOffset.y,
-            this.manaOffset.width,
-            this.manaOffset.height
-         );
-      }
-      
-      // Low Mana
-      else {
-         this.drawHUD_BaseBar(
-            manaRatio,
-            5, 475, 461, 47,
-            this.manaOffset.x,
-            this.manaOffset.y,
-            this.manaOffset.width,
-            this.manaOffset.height
-         );
-      }
-   }
-
-   drawHUD_Health() {
-
-      let healthRatio = this.updatePlayer.health /this.initPlayer.baseHealth;
-
-      // if Health Over 30%
-      if(this.updatePlayer.health > this.initPlayer.baseHealth * this.minHealthRatio) {
-
-         // Normal Bar
-         this.drawHUD_BaseBar(
-            healthRatio,
-            5, 327, 729, 45,
-            this.healthOffset.x,
-            this.healthOffset.y,
-            this.healthOffset.width,
-            this.healthOffset.height
-         );
-      }
-
-      // if Health Under 30%
-      else {
-
-         // Flashing Bar
-         this.drawHUD_BaseBar(
-            healthRatio,
-            6, 424, 729, 45,
-            this.healthOffset.x,
-            this.healthOffset.y,
-            this.healthOffset.width,
-            this.healthOffset.height
-         );
-
-         this.flashFrame++;
-
-         if(this.flashFrame > this.flashingSpeed) {
-
-            // Normal Bar
-            this.drawHUD_BaseBar(
-               healthRatio,
-               5, 327, 729, 45,
-               this.healthOffset.x,
-               this.healthOffset.y,
-               this.healthOffset.width,
-               this.healthOffset.height
-            );
-         }
-
-         if(this.flashFrame > this.flashingSpeed *2) this.flashFrame = 0;
-      }
-   }
-
-   drawHUD_Energy() {
-      
-      let energyRatio = this.updatePlayer.energy / this.initPlayer.baseEnergy;
-
-      // Yellow Bar
-      this.drawHUD_BaseBar(
-         energyRatio,
-         6, 582, 460, 46,
-         82, 65, 165, 8
-      );
+      this.ctx.fixedUI.fillStyle = "darkviolet";
+      this.ctx.fixedUI.font = "40px Dimbo-Regular";
+      this.ctx.fixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
+      this.ctx.fixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
    }
    
    // Draw Mini Bars
@@ -587,13 +440,13 @@ class Player extends Character {
       
       const clientPlayerBar = {
          ctx: this.ctxToRender(),
-         x: this.viewport.width/2 - this.barWidth/2,
+         x: this.viewport.width/2 - this.miniBars.width/2,
          y: this.viewport.height/2,
-         width: this.barWidth,
-         height: this.barHeight,
+         width: this.miniBars.width,
+         height: this.miniBars.height,
       }
       
-      const attackBar = new GameBar(clientPlayerBar, 0, 55, this.initPlayer.GcD, this.updatePlayer.speedGcD);
+      const attackBar = new GameBar(clientPlayerBar, 0, 55, this.initPack.GcD, this.updatePlayer.speedGcD);
       const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
@@ -611,19 +464,19 @@ class Player extends Character {
       const barValueArray = [
          {
             name: "health",
-            maxValue: this.initPlayer.baseHealth,
+            maxValue: this.initPack.baseHealth,
             value: this.updatePlayer.health,
          },
 
          {
             name: "mana",
-            maxValue: this.initPlayer.baseMana,
+            maxValue: this.initPack.baseMana,
             value: this.updatePlayer.mana,
          },
 
          {
             name: "energy",
-            maxValue: this.initPlayer.baseEnergy,
+            maxValue: this.initPack.baseEnergy,
             value: this.updatePlayer.energy,
          }
       ];
@@ -632,8 +485,8 @@ class Player extends Character {
          ctx: this.ctxToRender(),
          x: this.updatePlayer.x - this.viewport.x,
          y: this.updatePlayer.y - this.viewport.y,
-         width: this.barWidth,
-         height: this.barHeight,
+         width: this.miniBars.width,
+         height: this.miniBars.height,
       }
       
       let barGap = 0;
@@ -643,18 +496,18 @@ class Player extends Character {
 
          let index;
          let bar = barValueArray[i];
-         const gameBar = new GameBar(otherPlayerBar, -this.barWidth/2, -95 +barGap, bar.maxValue, bar.value);
+         const gameBar = new GameBar(otherPlayerBar, -this.miniBars.width/2, -95 +barGap, bar.maxValue, bar.value);
 
          // Health Bar
          if(bar.name === "health") {
             index = 0;
-            if(this.updatePlayer.health <= this.initPlayer.baseHealth * this.minHealthRatio) index = 3;
+            if(this.updatePlayer.health <= this.initPack.baseHealth * this.minHealthRatio) index = 3;
          }
 
          // Mana Bar
          if(bar.name === "mana") {
             index = 5;
-            if(this.updatePlayer.mana < this.initPlayer.healCost) index = 6;
+            if(this.updatePlayer.mana < this.initPack.healCost) index = 6;
          }
 
          // Energy Bar
@@ -768,8 +621,8 @@ class Player extends Character {
       
       ctx.lineWidth = "1";
       ctx.strokeStyle = "black";
-      ctx.fillText(this.initPlayer.name, namePos_X, namePos_Y);
-      ctx.strokeText(this.initPlayer.name, namePos_X, namePos_Y);
+      ctx.fillText(this.initPack.name, namePos_X, namePos_Y);
+      ctx.strokeText(this.initPack.name, namePos_X, namePos_Y);
    }
 
    // Animation
@@ -873,16 +726,8 @@ class Player extends Character {
 
       this.updatePlayer = updatePlayer;
 
-      // Animation State
       this.playerState(frame);
-      
-      // Camera 
       this.scrollCam();
-      
-      // UI
-      this.drawHUD_Mana();
-      this.drawHUD_Health();
-      this.drawHUD_Energy();
       
       // Player
       this.drawRing();
@@ -932,41 +777,41 @@ class Player extends Character {
    DEBUG_DrawOrigin() {
       
       const lineSize = 100;
-      this.ctxUI.lineWidth = 2;
-      this.ctxUI.strokeStyle = "red";
+      this.ctx.UI.lineWidth = 2;
+      this.ctx.UI.strokeStyle = "red";
 
       // Horizontal Line
-      this.ctxUI.beginPath();
-      this.ctxUI.moveTo(
+      this.ctx.UI.beginPath();
+      this.ctx.UI.moveTo(
          this.pos().x -lineSize,
          this.pos().y,
       );
-      this.ctxUI.lineTo(
+      this.ctx.UI.lineTo(
          this.pos().x +lineSize,
          this.pos().y,
       );
-      this.ctxUI.stroke();
+      this.ctx.UI.stroke();
 
 
       // Vertical Line
-      this.ctxUI.beginPath();
-      this.ctxUI.moveTo(
+      this.ctx.UI.beginPath();
+      this.ctx.UI.moveTo(
          this.pos().x,
          this.pos().y -lineSize,
       );
-      this.ctxUI.lineTo(
+      this.ctx.UI.lineTo(
          this.pos().x,
          this.pos().y +lineSize,
       );
-      this.ctxUI.stroke();
+      this.ctx.UI.stroke();
    }
 
    DEBUG_DrawDetectViewport() {
 
-      this.ctxFixedBack.strokeStyle = "yellow";
-      this.ctxFixedBack.lineWidth = 4;
+      this.ctx.fixedBack.strokeStyle = "yellow";
+      this.ctx.fixedBack.lineWidth = 4;
       
-      this.ctxFixedBack.strokeRect(
+      this.ctx.fixedBack.strokeRect(
          this.viewport.width/2 - this.detectViewport.width/2,
          this.viewport.height/2 - this.detectViewport.height/2,
          this.detectViewport.width,
@@ -976,35 +821,35 @@ class Player extends Character {
 
    DEBUG_DrawPlayer() {
       
-      this.ctxPlayer.fillStyle = "darkviolet";
-      this.ctxPlayer.beginPath();
-      this.ctxPlayer.arc(
+      this.ctx.player.fillStyle = "darkviolet";
+      this.ctx.player.beginPath();
+      this.ctx.player.arc(
          this.pos().x,
          this.pos().y,
-         this.initPlayer.radius, 0, Math.PI * 2
+         this.initPack.radius, 0, Math.PI * 2
       );
-      this.ctxPlayer.fill();
-      this.ctxPlayer.closePath();
+      this.ctx.player.fill();
+      this.ctx.player.closePath();
    }
 
    DEBUG_DrawAttackArea() {
 
-      this.ctxPlayer.fillStyle = "orangered";
-      this.ctxPlayer.beginPath();
-      this.ctxPlayer.arc(
+      this.ctx.player.fillStyle = "orangered";
+      this.ctx.player.beginPath();
+      this.ctx.player.arc(
          this.pos().x + this.updatePlayer.attkOffset_X,
          this.pos().y + this.updatePlayer.attkOffset_Y,
-         this.initPlayer.attkRadius, 0, Math.PI * 2
+         this.initPack.attkRadius, 0, Math.PI * 2
       );
-      this.ctxPlayer.fill();
-      this.ctxPlayer.closePath();
+      this.ctx.player.fill();
+      this.ctx.player.closePath();
    }
 
    DEBUG_DrawHealthNumber() {
 
-      this.ctxPlayer.fillStyle = "black";
-      this.ctxPlayer.font = "26px Dimbo-Regular";
-      this.ctxPlayer.fillText(
+      this.ctx.player.fillStyle = "black";
+      this.ctx.player.font = "26px Dimbo-Regular";
+      this.ctx.player.fillText(
          Math.round(this.updatePlayer.health),
          this.pos().x,
          this.pos().y -15

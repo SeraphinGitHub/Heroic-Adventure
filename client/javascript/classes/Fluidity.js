@@ -156,7 +156,7 @@ class Fluidity {
          start_X, sY, healWidth, sH,
 
          this.bar.x + (this.bar.off_X * this.bar.scale_X) +this.origin_X,
-         this.bar.y + (this.bar.off_Y * this.bar.scale_Y),
+         this.bar.y + (this.bar.off_Y * this.bar.scale_Y)-40,
          this.fluidWidth *modifier,
          this.bar.height/3 - (this.bar.off_H * this.bar.scale_Y)
       );

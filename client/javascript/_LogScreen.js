@@ -78,11 +78,11 @@ const initClientScripts = () => {
       "classes/Tile.js",
 
       // Scripts
+      "client_MapHandler.js",
+      "client_ChatHandler.js",
       "client_PanelsUI.js",
       "client_GameUI.js",
       "client_PlayerHandler.js",
-      "client_MapHandler.js",
-      "client_ChatHandler.js",
       
       // Game Handler (Last)
       "client_GameHandler.js",

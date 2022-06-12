@@ -45,7 +45,7 @@ const playerCommand = (socket, event, ctrlObj, state) => {
 const onKeyboardInput = (socket) => {
 
    window.addEventListener("keydown", (event) => {
-      if(insideCanvas) {
+      if(insideViewport) {
    
          const state = true;
          playerCommand(socket, event, controls.movements, state);
@@ -65,7 +65,7 @@ const onKeyboardInput = (socket) => {
 // Attack
 // =====================================================================
 const playerAttackCommand = (socket, event, state) => {
-   if(event.which === 1 && insideCanvas) {
+   if(event.which === 1 && insideViewport) {
       socket.emit("attack", state);
    }
 }
@@ -120,7 +120,7 @@ const clientState = (socket, playerID) => {
    // Set Enemies OnConnect
    socket.on("initEnemyPack", (initPack_MobList) => {
 
-      initPack_MobList.forEach(enemy => initMobList[enemy.id] = new Enemy(cl_EnemyObj, enemy) );
+      initPack_MobList.forEach(enemy => initMobList[enemy.id] = new Enemy(cl_Enemy, enemy) );
    });
 
    // Set other players OnConnect
@@ -129,8 +129,8 @@ const clientState = (socket, playerID) => {
       clientID = playerID;
    
       for(let i in initPack_PlayerList) {
-         let initPlayer = initPack_PlayerList[i];
-         initPlayerList[initPlayer.id] = new Player(cl_PlayerObj, initPlayer);
+         let initPack = initPack_PlayerList[i];
+         initPlayerList[initPack.id] = new Player(cl_Player, initPack);
       }
    });
 
@@ -158,7 +158,7 @@ const initPlayer = (socket, playerID) => {
    clientState(socket, playerID);
 
    // Client UI ==> Fame, HUD
-   clientPlayer.drawHUD_Frame();
+   // clientPlayer.drawHUD_Frame();
    clientPlayer.drawFame_Frame();
    clientPlayer.initMapSpecs(socket);
    clientPlayer.initTextAndFluidity(socket);

@@ -6,43 +6,23 @@
 // =====================================================================
 const setViewport = () => {
 
-   if(document.body.clientWidth > 1850) {
-
-      const viewport = {
-         x: 0,
-         y: 0,
-         height: 870,
-         width: 1780,
-      };
-      return viewport;
-   }
+   const viewport = {
+      x: 0,
+      y: 0,
+      height: 870,
+      width: 1780,
+   };
    
-   else {
-      const viewport = {
-         x: 0,
-         y: 0,
-         height: 810,
-         width: 1410,
-      };
-      return viewport;
+   if(document.body.clientWidth <= 1850) {
+      viewport.height = 810;
+      viewport.width = 1410;
+
+      HUD_Offset.y = -40;
+      HUD_Scale.x = 1.1;
+      HUD_Scale.y = 0.9;
    }
-}
 
-const viewport = setViewport();
-
-
-// =====================================================================
-// Inside Canvas Detection
-// =====================================================================
-let insideCanvas = false;
-const canvasUIFront = document.querySelector(".canvas-fixed-front");
-
-canvasUIFront.addEventListener("mouseenter", () => insideCanvas = true);
-canvasUIFront.addEventListener("mouseleave", () => insideCanvas = false);
-
-canvasUIFront.oncontextmenu = (event) => {
-   event.preventDefault();
-   event.stopPropagation();
+   return viewport;
 }
 
 
@@ -51,64 +31,98 @@ canvasUIFront.oncontextmenu = (event) => {
 // =====================================================================
 const setContexts = () => {
 
-   const allCanvas = document.getElementsByTagName("canvas");
    let ctxArray = [];
+   const allCanvas = document.getElementsByTagName("canvas");
    
    for(let i = 0; i < allCanvas.length; i++) {
-      let canvasIndexed = allCanvas[i];
-      ctxArray.push(canvasIndexed.getContext("2d"));
-   
-      canvasIndexed.height = viewport.height;
-      canvasIndexed.width = viewport.width;
+      let canvas = allCanvas[i];
+      
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      ctxArray.push(canvas.getContext("2d"));
       ctxArray[i].imageSmoothingEnabled = false;
    }
 
-   return ctxArray;
-}
-
-const ctxArray = setContexts();
-
-const ctx = {
-   map:        ctxArray[0],
-   enemies:    ctxArray[1],
-   player:     ctxArray[2],
-   fixedBack:  ctxArray[3],
-   fixedUI:    ctxArray[4],
-   UI:         ctxArray[5],
-   fixedFront: ctxArray[6],
+   const ctx = {
+      map:        ctxArray[0],
+      enemies:    ctxArray[1],
+      player:     ctxArray[2],
+      fixedBack:  ctxArray[3],
+      fixedUI:    ctxArray[4],
+      UI:         ctxArray[5],
+      fixedFront: ctxArray[6],
+   }
+   
+   return ctx;
 }
 
 
 // =====================================================================
-// Canvas Clearing
+// Inside Viewport Detection
 // =====================================================================
-const canvasClearing = () => {
+let insideViewport = false;
 
-   const ctxFixedBack_index = 3;
-   const ctxFixedUI_index = 4;
-   const ctxFixedFront_index = 6;
+const viewportDetection = () => {
 
-   for(let i = 0; i < ctxArray.length; i++) {
-      let ctxIndexed = ctxArray[i];
-      
-      if(i === ctxFixedBack_index
-      || i === ctxFixedUI_index
-      || i === ctxFixedFront_index) continue;
+   const canvasUIFront = document.querySelector(".canvas-fixed-front");
+   canvasUIFront.addEventListener("mouseenter", () => insideViewport = true);
+   canvasUIFront.addEventListener("mouseleave", () => insideViewport = false);
+}
 
-      ctxIndexed.clearRect(0, 0, viewport.width, viewport.height);
+
+// =====================================================================
+// Disable right click menu
+// =====================================================================
+document.body.oncontextmenu = (event) => {
+   event.preventDefault();
+   event.stopPropagation();
+}
+
+
+// =====================================================================
+// Image Files
+// =====================================================================
+const imgFile = () => {
+   
+   const gameUI_Img = new Image();
+   gameUI_Img.src = "client/images/playerUI/Game UI.png";
+   
+   const player_Img = new Image();
+   player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
+
+   return {
+      gameUI_Img: gameUI_Img,
+      player_Img: player_Img,
    }
 }
 
 
 // =====================================================================
-// Mini Bars Coordinates
+// Client Sync with Server
 // =====================================================================
-const miniBarSpecs = {
-   barWidth: 115,
-   barHeight: 8,
+let clientID;
+let clientLoaded = false;
+let initPlayerList = {};
+let initMobList = {};
+let updatePlayerList = {};
+let updateMobList = {};
+
+const viewport = setViewport();
+const ctx = setContexts(viewport);
+const HUD = setHUD(viewport);
+
+viewportDetection();
+HUD_DrawFrame();
+
+
+// =====================================================================
+// Init Classes
+// =====================================================================
+const miniBars = {
+   height: 8,
+   width: 115,
 }
 
-// Coordinates PNG file
 const barCoordArray = [
    
    // Green
@@ -176,89 +190,40 @@ const barCoordArray = [
    },
 ];
 
-
-// =====================================================================
-// Image Files
-// =====================================================================
-const imgFile = () => {
-   
-   const gameUI_Img = new Image();
-   gameUI_Img.src = "client/images/playerUI/Game UI.png";
-   
-   const player_Img = new Image();
-   player_Img.src = "client/images/playerAnim/playerAnim_x4.png";
-
-   return {
-      gameUI_Img: gameUI_Img,
-      player_Img: player_Img,
-   }
-}
-
-
-// =====================================================================
-// Init Classes
-// =====================================================================
-const cl_PlayerObj = {
-
-   // Viewport
+const cl_Player = {
    viewport:      viewport,
-
-   // Canvas
-   ctxMap:        ctx.map,
-   ctxEnemies:    ctx.enemies,
-   ctxOtherPlay:  ctx.otherPlay,
-   ctxPlayer:     ctx.player,
-   ctxFixedBack:  ctx.fixedBack,
-   ctxFixedUI:    ctx.fixedUI,
-   ctxUI:         ctx.UI,
-   ctxFixedFront: ctx.fixedFront,
-
-   // PNG Files
+   ctx:           ctx,
    mapTile_Img:   initMap().mapTile_Img,
    gameUI_Img:    imgFile().gameUI_Img,
    player_Img:    imgFile().player_Img,
-
-   // Map
    mapSpecs:      initMap(),
-
-   // Game UI ==> Mini Bars
-   barWidth:      miniBarSpecs.barWidth,
-   barHeight:     miniBarSpecs.barHeight,
+   miniBars:      miniBars,
    barCoordArray: barCoordArray,
 }
 
-const cl_EnemyObj = {
-
-   // Viewport
+const cl_Enemy = {
    viewport:         viewport,
-
-   // Canvas
    ctxEnemies:       ctx.enemies,
-
-   // PNG Files
    gameUI_Img:       imgFile().gameUI_Img,
-
-   // Game UI ==> Mini Bars
-   barWidth:         miniBarSpecs.barWidth,
-   barHeight:        miniBarSpecs.barHeight,
+   miniBars:         miniBars,
    barCoordArray:    barCoordArray,
 }
 
 const character = new Character();
-const clientPlayer = new Player(cl_PlayerObj, {});
-const clientEnemy = new Enemy(cl_EnemyObj, {});
+const clientPlayer = new Player(cl_Player, {});
+const clientEnemy = new Enemy(cl_Enemy, {});
 
 
 // =====================================================================
-// Client Sync with Server
+// Canvas Clearing
 // =====================================================================
-let clientID;
+const canvasClearing = () => {
 
-let initPlayerList = {};
-let initMobList = {};
-
-let updatePlayerList = {};
-let updateMobList = {};
+   ctx.map.clearRect(0, 0, viewport.width, viewport.height);
+   ctx.enemies.clearRect(0, 0, viewport.width, viewport.height);
+   ctx.player.clearRect(0, 0, viewport.width, viewport.height);
+   ctx.UI.clearRect(0, 0, viewport.width, viewport.height);
+}
 
 
 // =====================================================================
@@ -272,8 +237,6 @@ const clientUpdate = () => {
 
    // Clear contexts
    canvasClearing();
-
-
 
    // ***************************************************************
    // ***************************************************************
@@ -290,8 +253,6 @@ const clientUpdate = () => {
    // ***************************************************************
 
 
-
-
    // Players Update
    for(let i in updatePlayerList) {
       
@@ -299,10 +260,14 @@ const clientUpdate = () => {
       let initPlayer = initPlayerList[updatePlayer.id];
       
       if(initPlayer) {
-
          if(clientID === updatePlayer.id) {
+            
             initPlayer.isClient = true;
             initPlayer.render_ClientPlayer(updatePlayer, frame, debugPlayer);
+
+            HUD_DrawMana(initPlayer.initPack, updatePlayer);
+            HUD_DrawHealth(initPlayer.initPack, updatePlayer);
+            HUD_DrawEnergy(initPlayer.initPack, updatePlayer);
          }
          else initPlayer.render_OtherPlayer(updatePlayer, frame);
       }
@@ -320,22 +285,6 @@ const clientUpdate = () => {
    clientPlayer.drawFloatingText();
    clientPlayer.drawFluidBar();
    frame++;
-
-   if(showFPS) frameRate++;
       
    requestAnimationFrame(clientUpdate);
 }
-
-
-// =====================================================================
-// Toggle Frame Rate
-// =====================================================================
-let showFPS = false;
-let frameRate = 0;
-
-// setInterval(() => {
-//    if(showFPS) {
-//       console.log(frameRate);
-//       frameRate = 0;
-//    }
-// }, 1000);
