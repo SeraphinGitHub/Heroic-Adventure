@@ -15,7 +15,7 @@ const io = new Server(server);
 // Scrips import
 // =====================================================================
 const Player = require("./server/classes/Player.js");
-const enemiesHandler = require("./server/server_EnemiesHandler.js");
+const enemiesHandler = require("./server/scripts/srv_EnemiesHandler.js");
 
 
 // =====================================================================

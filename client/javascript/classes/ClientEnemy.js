@@ -13,7 +13,7 @@ class Enemy extends Character {
       this.updateEnemy;
       this.viewport = cl_Enemy.viewport;
       this.ctxEnemies = cl_Enemy.ctxEnemies;
-      this.gameUI_Img = cl_Enemy.gameUI_Img;
+      this.imgFiles = cl_Enemy.imgFiles;
       this.miniBars = cl_Enemy.miniBars;
       this.barCoordArray = cl_Enemy.barCoordArray;
       
@@ -72,7 +72,7 @@ class Enemy extends Character {
       if(this.updateEnemy.health <= this.initEnemy.baseHealth * colorBar.red) index = 3;
    
       gameBar.draw(
-         this.gameUI_Img,
+         this.imgFiles.gameUI,
          this.barCoordArray[index].x,
          this.barCoordArray[index].y,
          this.barCoordArray[index].width,

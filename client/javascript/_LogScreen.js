@@ -11,6 +11,7 @@ const easyLogin = () => {
    setTimeout(() => {
       isSocket = true;
 
+      const formInput = document.querySelector(".log-form input");
       const logScreen = document.querySelector(".log-screen");
       const logBackground = document.querySelector(".log-background");
       const navLeft = document.querySelector(".nav-left");
@@ -27,16 +28,16 @@ const easyLogin = () => {
       // Await for server response
       socket.on("received_initClient", (playerID) => {
 
-         initPlayer(socket, playerID);
+         initMap();
          initChat(socket);
          initPanelsUI(socket);
-         
-         // Client Sync
+         initPlayer(socket, playerID);
+
          clientUpdate();
 
          // Reset inputField's value
-         logFormInput.value = ""
-         logFormInput.blur();
+         formInput.value = ""
+         formInput.blur();
 
          logScreen.classList.add("hide-LogScreen");
          logBackground.classList.add("hide-LogScreen");
@@ -67,7 +68,7 @@ const instantiate = (scriptName) => {
 const initClientScripts = () => {
 
    const scripts = [
-      
+
       // Classes
       "classes/ClientCharacter.js",
       "classes/ClientEnemy.js",
@@ -78,14 +79,17 @@ const initClientScripts = () => {
       "classes/Tile.js",
 
       // Scripts
-      "client_MapHandler.js",
-      "client_ChatHandler.js",
-      "client_PanelsUI.js",
-      "client_GameUI.js",
-      "client_PlayerHandler.js",
+      "scripts/cli_MapHandler.js",
+      "scripts/cli_ChatHandler.js",
+      "scripts/cli_PanelsUI.js",
+      "scripts/cli_ViewportHandler.js",
+      "scripts/cli_GameUI.js",
+
+      // Player Handler (BeforeLast)
+      "scripts/cli_PlayerHandler.js",
       
       // Game Handler (Last)
-      "client_GameHandler.js",
+      "_ClientGameHandler.js",
    ];
 
    scripts.forEach(script => instantiate(script));
@@ -95,7 +99,6 @@ const initClientScripts = () => {
 // =====================================================================
 // Login System
 // =====================================================================
-const logFormInput = document.querySelector(".log-form input");
 let logged_PlayerName = "";
 let isSocket = false;
 
@@ -116,6 +119,7 @@ const loginForm = () => {
 
 const formValidation = () => {
    
+   const formInput = document.querySelector(".log-form input");
    const emptyFieldAlert = document.querySelector(".empty-field");
    const invalidAlert = document.querySelector(".invalid-chars");
    const whiteSpaceAlert = document.querySelector(".white-space");
@@ -130,25 +134,25 @@ const formValidation = () => {
 
 
    // if Empty Field
-   if(logFormInput.value === "") alertMessage(emptyFieldAlert);
+   if(formInput.value === "") alertMessage(emptyFieldAlert);
 
    // if player name is less than 4 characters
-   else if(logFormInput.value.length < 4) alertMessage(minCharsAlert);
+   else if(formInput.value.length < 4) alertMessage(minCharsAlert);
 
    // if player name is more than 10 characters
-   else if(logFormInput.value.length > 12) alertMessage(maxCharsAlert);
+   else if(formInput.value.length > 12) alertMessage(maxCharsAlert);
 
    // if include white space
-   else if(includeSpaceRegEx.test(logFormInput.value)) alertMessage(whiteSpaceAlert);
+   else if(includeSpaceRegEx.test(formInput.value)) alertMessage(whiteSpaceAlert);
 
    // if include any special characters or number
-   else if(!playerNameRegEx.test(logFormInput.value)) alertMessage(invalidAlert);
+   else if(!playerNameRegEx.test(formInput.value)) alertMessage(invalidAlert);
 
    // if everything's fine ==> Connect Player
-   else if(!isSocket) loadClient();
+   else if(!isSocket) loadClient(formInput);
 }
 
-const loadClient = () => {
+const loadClient = (formInput) => {
    
    isSocket = true;
 
@@ -163,23 +167,23 @@ const loadClient = () => {
    // Send player's name
    const socket = io();
 
-   logged_PlayerName = logFormInput.value;
-   socket.emit("send_initClient", logFormInput.value);
+   logged_PlayerName = formInput.value;
+   socket.emit("send_initClient", formInput.value);
    
    // Await for server response
    socket.on("received_initClient", (playerID) => {
 
-      initPlayer(socket, playerID);
+      initMap();
       initChat(socket);
       initPanelsUI(socket);
-      
-      // Client Sync
+      initPlayer(socket, playerID);
+
       clientUpdate();
 
       setTimeout(() => {
          // Reset inputField's value
-         logFormInput.value = ""
-         logFormInput.blur();
+         formInput.value = ""
+         formInput.blur();
 
          logScreen.classList.add("hide-LogScreen");
          logBackground.classList.add("hide-LogScreen");

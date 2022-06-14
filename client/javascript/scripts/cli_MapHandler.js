@@ -6,9 +6,6 @@
 // =====================================================================
 const initMap = () => {
 
-   const mapTile_Img = new Image();
-   mapTile_Img.src = "client/images/map/Map Tiles.png";
-
    const mapSpriteSize = 256;
    const cellSize = 170;
    const columns = 20;
@@ -38,6 +35,7 @@ const initMap = () => {
       columns: columns,
       rows: rows,
       mapScheme: mapScheme,
-      mapTile_Img: mapTile_Img,
    }
 }
+
+const MapSpecs = initMap();

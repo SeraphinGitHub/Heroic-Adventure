@@ -16,21 +16,10 @@ class Player extends Character {
 
       this.viewport = cl_Player.viewport;
       this.ctx = cl_Player.ctx;
-      this.mapTile_Img = cl_Player.mapTile_Img;
-      this.gameUI_Img = cl_Player.gameUI_Img;
-      this.player_Img = cl_Player.player_Img;
-
-      // Map
-      this.mapSpriteSize = cl_Player.mapSpecs.mapSpriteSize;
-      this.cellSize = cl_Player.mapSpecs.cellSize;
-      this.columns = cl_Player.mapSpecs.columns;
-      this.rows = cl_Player.mapSpecs.rows;      
-      this.mapScheme = cl_Player.mapSpecs.mapScheme;      
-      
+      this.imgFiles = cl_Player.imgFiles,
+      this.mapSpecs = cl_Player.mapSpecs,
       this.miniBars = cl_Player.miniBars;
       this.barCoordArray = cl_Player.barCoordArray;
-
-
 
       // Game UI ==> HUD
       this.HUD_scale_X = 1.2;
@@ -108,17 +97,6 @@ class Player extends Character {
       else return this.ctx.enemies;
    }
 
-   // Init Map
-   initMapSpecs(socket) {
-      
-      socket.on("initMap", (data) => {
-         this.mapSpriteSize = data.mapSpriteSize;
-         this.cellSize = data.cellSize;
-         this.columns = data.columns;
-         this.rows = data.rows;
-      });
-   }
-
    // Camera
    scrollCam() {
 
@@ -126,16 +104,16 @@ class Player extends Character {
       this.viewport.y = this.updatePlayer.y -this.viewport.height/2;
       
       // Viewport bounderies
-      let vpLeftCol_Nbr = Math.floor(this.viewport.x / this.cellSize);
-      let vpRightCol_Nbr = Math.ceil((this.viewport.x + this.viewport.width) / this.cellSize);
-      let vpTopRow_Nbr = Math.floor(this.viewport.y / this.cellSize);
-      let vpBottomRow_Nbr = Math.ceil((this.viewport.y + this.viewport.height) / this.cellSize);
+      let vpLeftCol_Nbr = Math.floor(this.viewport.x / this.mapSpecs.cellSize);
+      let vpRightCol_Nbr = Math.ceil((this.viewport.x + this.viewport.width) / this.mapSpecs.cellSize);
+      let vpTopRow_Nbr = Math.floor(this.viewport.y / this.mapSpecs.cellSize);
+      let vpBottomRow_Nbr = Math.ceil((this.viewport.y + this.viewport.height) / this.mapSpecs.cellSize);
 
       // Map bounderies ==> no repeat
       if(vpLeftCol_Nbr < 0) vpLeftCol_Nbr = 0;
       if(vpTopRow_Nbr < 0) vpTopRow_Nbr = 0;
-      if(vpRightCol_Nbr > this.columns) vpRightCol_Nbr = this.columns;
-      if(vpBottomRow_Nbr > this.rows) vpBottomRow_Nbr = this.rows;
+      if(vpRightCol_Nbr > this.mapSpecs.columns) vpRightCol_Nbr = this.mapSpecs.columns;
+      if(vpBottomRow_Nbr > this.mapSpecs.rows) vpBottomRow_Nbr = this.mapSpecs.rows;
       
       // ================ DEBUG ================
       // this.ctx.player.strokeStyle = "red";
@@ -145,16 +123,16 @@ class Player extends Character {
       for(let x = vpLeftCol_Nbr; x < vpRightCol_Nbr; x++) {
          for(let y = vpTopRow_Nbr; y < vpBottomRow_Nbr; y++) {
             
-            let tileIndex = y *this.columns +x;
-            let tileToDraw = this.mapScheme[tileIndex];
+            let tileIndex = y *this.mapSpecs.columns +x;
+            let tileToDraw = this.mapSpecs.mapScheme[tileIndex];
             
-            let tile_X = x *this.cellSize -this.viewport.x;
-            let tile_Y = y *this.cellSize -this.viewport.y;
+            let tile_X = x *this.mapSpecs.cellSize -this.viewport.x;
+            let tile_Y = y *this.mapSpecs.cellSize -this.viewport.y;
             
             this.ctx.map.drawImage(
-               this.mapTile_Img,
-               (tileToDraw -1) *this.mapSpriteSize, 0, this.mapSpriteSize, this.mapSpriteSize,
-               tile_X, tile_Y, this.cellSize, this.cellSize
+               this.imgFiles.mapTile,
+               (tileToDraw -1) *this.mapSpecs.mapSpriteSize, 0, this.mapSpecs.mapSpriteSize, this.mapSpecs.mapSpriteSize,
+               tile_X, tile_Y, this.mapSpecs.cellSize, this.mapSpecs.cellSize
             );
          }
       }
@@ -377,62 +355,8 @@ class Player extends Character {
    // Fluidity
    baseFluidity(barSpecs) {
       
-      const newFluidBar = new Fluidity(this.ctx.UI, this.gameUI_Img, barSpecs);
+      const newFluidBar = new Fluidity(this.ctx.UI, this.imgFiles.gameUI, barSpecs);
       this.fluidBarArray.push(newFluidBar);
-   }
-   
-   // Draw Fame
-   fameEvent(eventPack) {
-      this.ctx.fixedUI.clearRect(0, 0, this.viewport.width, this.viewport.height);
-      
-      this.drawFame_Bar(eventPack);
-      this.drawFame_Count(eventPack);
-   }
-   
-   drawFame_Frame() {
-
-      // Background
-      this.ctx.fixedBack.drawImage(this.gameUI_Img,
-         522, 477, 26, 48,
-         this.fame.x + (32 * this.fameScale_X),
-         this.fame.y + 19,
-         this.fame.width - (65 * this.fameScale_X),
-         this.fame.height - 27
-      );
-
-      // Fame Sprite
-      this.ctx.fixedFront.drawImage(this.gameUI_Img,
-         794, 7, 1701, 87,
-         this.fame.x,
-         this.fame.y,
-         this.fame.width,
-         this.fame.height
-      );
-   }
-
-   drawFame_Bar(eventPack) {
-      
-      let fameBarWidth = Math.floor(
-         (eventPack.fameValue /eventPack.baseFame) * (this.fame.width - (this.fame_OffW * this.fameScale_X))
-      );
-   
-      // Fame Bar
-      this.ctx.fixedUI.drawImage(this.gameUI_Img,
-         522, 529, 26, 48,
-         this.fame.x + (32 * this.fameScale_X),
-         this.fame.y + 19,
-         fameBarWidth,
-         this.fame.height - 27
-      );
-   }
-   
-   drawFame_Count(eventPack) {
-   
-      // Fame Count   
-      this.ctx.fixedUI.fillStyle = "darkviolet";
-      this.ctx.fixedUI.font = "40px Dimbo-Regular";
-      this.ctx.fixedUI.fillText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
-      this.ctx.fixedUI.strokeText(eventPack.fameCount, this.fame.x + this.fame.width -20, this.fame.y +80);
    }
    
    // Draw Mini Bars
@@ -450,7 +374,7 @@ class Player extends Character {
       const attackCoord = this.barCoordArray[3];
 
       attackBar.draw(
-         this.gameUI_Img,
+         this.imgFiles.gameUI,
          attackCoord.x,
          attackCoord.y,
          attackCoord.width,
@@ -515,7 +439,7 @@ class Player extends Character {
          
          // Draw Bar
          gameBar.draw(
-            this.gameUI_Img,
+            this.imgFiles.gameUI,
             barCoordArray[index].x,
             barCoordArray[index].y,
             barCoordArray[index].width,
@@ -589,7 +513,7 @@ class Player extends Character {
       let ctx = this.ctxToRender();
 
       ctx.drawImage(
-         this.player_Img,
+         this.imgFiles.player,
 
          // Source
          (this.updatePlayer.frameX + this.animState) * this.sprites.width,

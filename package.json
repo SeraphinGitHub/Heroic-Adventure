@@ -2,9 +2,9 @@
   "name": "heroic_adventure",
   "version": "1.0.0",
   "description": "",
-  "main": "server_GameHandler.js",
+  "main": "_ServerGameHandler.js",
   "scripts": {
-    "start": "node server_GameHandler.js"
+    "start": "node _ServerGameHandler.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,7 +1,7 @@
 
 "use strict"
 
-const Enemy = require("./classes/Enemy.js");
+const Enemy = require("../classes/Enemy.js");
 
 const mobSrc = "client/images/enemiesAnim/";
 
