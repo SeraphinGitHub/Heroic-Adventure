@@ -1,11 +1,7 @@
 
 "use strict"
 
-
 // =========================  Development  =========================
-// CSS ==> logScreen l.12
-// CSS ==> viewport l.154
-
 const easyLogin = () => {
    
    setTimeout(() => {
@@ -31,6 +27,7 @@ const easyLogin = () => {
          initMap();
          initChat(socket);
          initPanelsUI(socket);
+         initGameUI(socket);
          initPlayer(socket, playerID);
 
          clientUpdate();
@@ -54,6 +51,12 @@ easyLogin();
 // =========================  Development  =========================
 
 
+const removeIndex = (array, item) => {
+   let index = array.indexOf(item);
+   array.splice(index, 1);
+   index--;
+}
+
 
 // =====================================================================
 // Init Scripts
@@ -70,7 +73,6 @@ const initClientScripts = () => {
    const scripts = [
 
       // Classes
-      "classes/ClientCharacter.js",
       "classes/ClientEnemy.js",
       "classes/ClientPlayer.js",
       "classes/FloatingText.js",
@@ -176,6 +178,7 @@ const loadClient = (formInput) => {
       initMap();
       initChat(socket);
       initPanelsUI(socket);
+      initGameUI(socket);
       initPlayer(socket, playerID);
 
       clientUpdate();

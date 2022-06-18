@@ -4,10 +4,8 @@
 // =====================================================================
 // Player
 // =====================================================================
-class Player extends Character {
+class Player {
    constructor(cl_Player, initPack) {
-      
-      super();
       
       this.isClient = false;
       this.updatePlayer;
@@ -20,46 +18,6 @@ class Player extends Character {
       this.mapSpecs = cl_Player.mapSpecs,
       this.miniBars = cl_Player.miniBars;
       this.barCoordArray = cl_Player.barCoordArray;
-
-      // Game UI ==> HUD
-      this.HUD_scale_X = 1.2;
-      this.HUD_scale_Y = 1;
-      this.HUD = {
-         x: this.viewport.width/2 -400/2 * this.HUD_scale_X,
-         y: this.viewport.height -110 * this.HUD_scale_Y,
-         // y: this.viewport.height -110 * this.HUD_scale_Y       -30,
-         width: 400 * this.HUD_scale_X,
-         height: 100 * this.HUD_scale_Y,
-      }
-      this.healthOffset = {
-         x: 15,
-         y: 39,
-         width: 30,
-         height: 9,
-      };      
-      this.manaOffset = {
-         x: 82,
-         y: 10,
-         width: 165,
-         height: 8,
-      }
-      this.minHealthRatio = 0.3; // Min Health before flash (%)
-      this.flashingSpeed = 6; // Lower = faster
-      this.flashFrame = 0;
-
-
-
-      // Game UI ==> Fame Bar
-      this.fameScale_X = 1.5;
-      this.fameScale_Y = 1;
-      this.fame = {
-         x: this.viewport.width/2 -900/2 * this.fameScale_X,
-         y: this.viewport.height -870,
-         // y: this.viewport.height -870     +60,
-         width: 900 * this.fameScale_X,
-         height: 53 * this.fameScale_Y,
-      }
-      this.fame_OffW = 65;
 
       // Player Sprites
       this.sprites = initPack.sprites;
@@ -74,21 +32,16 @@ class Player extends Character {
       this.animSpecs = initPack.animSpecs;
    }
    
-   pos(playerPos) {
+   pos() {
       
       if(this.isClient) return {
          x: this.viewport.width/2,
          y: this.viewport.height/2
       }
 
-      else if(playerPos) return {
-         x: playerPos.x - this.viewport.x,
-         y: playerPos.y - this.viewport.y
-      }
-
       else return {
-         x: this.updatePlayer.x - this.viewport.x,
-         y: this.updatePlayer.y - this.viewport.y
+         x: this.updatePlayer.x -this.viewport.x,
+         y: this.updatePlayer.y -this.viewport.y
       }
    }
 
@@ -136,227 +89,6 @@ class Player extends Character {
             );
          }
       }
-   }
-   
-   // Floating Text
-   toggleFloatingText(playerPos, textObj) {
-      
-      const newText = new FloatingText(
-         this.ctx.player,
-         this.pos(playerPos).x,
-         this.pos(playerPos).y,
-         textObj.x,
-         textObj.y,
-         textObj.size,
-         textObj.color,
-         textObj.value
-      );
-      
-      this.floatTextArray.push(newText);
-   }
-
-   // Fluidity
-   initTextAndFluidity(socket) {
-   
-      const mainTexSize = 42;
-
-      // ========== Fame ==========
-      socket.on("fameEvent", (eventPack) => {
-
-         this.fameEvent(eventPack);
-      });
-
-      socket.on("getFame", (playerPos, serverFame) => {
-         
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: 0,
-               y: 180,
-               size: mainTexSize *1.2,
-               color: "darkviolet",
-               value: `+${serverFame.fameCost} Fame`,
-            }
-         );
-         
-         this.baseFluidity({
-            stateStr: "getFame",
-
-            x: this.fame.x,
-            y: this.fame.y,
-            width: this.fame.width,
-            height: this.fame.height,
-            off_W: this.fame_OffW,
-            scale_X: this.fameScale_X,
-            
-            baseStat: serverFame.baseFame,
-            stat: serverFame.fameValue,
-            calcStat: serverFame.fameCost,
-            statFluidValue: 0,
-
-            isFameReseted: false,
-            fame: serverFame.fame,
-            fameCount: serverFame.fameCount,
-            fluidSpeed: serverFame.fluidSpeed,
-         });
-      });
-      
-      socket.on("looseFame", (playerPos, serverFame) => {
-
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: 0,
-               y: 180,
-               size: mainTexSize *1.2,
-               color: "red",
-               value: `-${serverFame.fameCost} Fame`,
-            }
-         );
-
-         this.baseFluidity({
-            stateStr: "looseFame",
-
-            x: this.fame.x,
-            y: this.fame.y,
-            width: this.fame.width,
-            height: this.fame.height,
-            off_W: this.fame_OffW,
-            scale_X: this.fameScale_X,
-            
-            baseStat: serverFame.baseFame,
-            stat: serverFame.fameValue,
-            calcStat: serverFame.fameCost,
-            statFluidValue: serverFame.fameCost,
-            
-            isFameReseted: false,
-            fame: serverFame.fame,
-            fameCount: serverFame.fameCount,
-            fluidSpeed: serverFame.fluidSpeed,
-         });
-      });
-
-
-      // ========== Mana ==========
-      socket.on("looseMana", (serverMana) => {
-
-         this.baseFluidity({
-            stateStr: "looseMana",
-
-            x: this.HUD.x,
-            y: this.HUD.y,
-            width: this.HUD.width,
-            height: this.HUD.height,
-            scale_X: this.HUD_scale_X,
-            scale_Y: this.HUD_scale_Y,
-            
-            off_X: this.manaOffset.x,
-            off_Y: this.manaOffset.y,
-            off_W: this.manaOffset.width,
-            off_H: this.manaOffset.height,
-
-            baseStat: serverMana.baseMana,
-            stat: serverMana.mana,
-            calcStat: serverMana.calcManaCost,
-            statFluidValue: serverMana.calcManaCost,
-            fluidSpeed: serverMana.fluidSpeed,
-         });
-      });
-
-
-      // ========== Health ==========
-      socket.on("getHeal", (playerPos, serverHealing) => {
-
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -75,
-               size: mainTexSize,
-               color: "lime",
-               value: `+${serverHealing.calcHealing}`,
-            }
-         );
-
-         this.baseFluidity({
-            stateStr: "getHealth",
-
-            x: this.HUD.x,
-            y: this.HUD.y,
-            width: this.HUD.width,
-            height: this.HUD.height,
-            scale_X: this.HUD_scale_X,
-            scale_Y: this.HUD_scale_Y,
-            
-            off_X: this.healthOffset.x,
-            off_Y: this.healthOffset.y,
-            off_W: this.healthOffset.width,
-            off_H: this.healthOffset.height,
-
-            baseStat: serverHealing.baseHealth,
-            stat: serverHealing.health,
-            calcStat: serverHealing.calcHealing,
-            statFluidValue: serverHealing.calcHealing,
-            fluidSpeed: serverHealing.fluidSpeed,
-         });
-      });
-   
-      socket.on("giveDamage", (playerPos, calcDamage) => {
-
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -100,
-               size: mainTexSize,
-               color: "yellow",
-               value: `-${calcDamage}`,
-            }
-         );
-      });
-   
-      socket.on("getDamage", (playerPos, serverDamage) => {
-
-         this.toggleFloatingText(
-            playerPos,
-            {
-               x: -5,
-               y: -85,
-               size: mainTexSize,
-               color: "red",
-               value: `-${serverDamage.calcDamage}`,
-            }
-         );
-
-         this.baseFluidity({
-            stateStr: "looseHealth",
-
-            x: this.HUD.x,
-            y: this.HUD.y,
-            width: this.HUD.width,
-            height: this.HUD.height,
-            scale_X: this.HUD_scale_X,
-            scale_Y: this.HUD_scale_Y,
-            
-            off_X: this.healthOffset.x,
-            off_Y: this.healthOffset.y,
-            off_W: this.healthOffset.width,
-            off_H: this.healthOffset.height,
-
-            baseStat: serverDamage.baseHealth,
-            stat: serverDamage.health,
-            calcStat: serverDamage.calcDamage,
-            statFluidValue: serverDamage.calcDamage,
-            fluidSpeed: serverDamage.fluidSpeed,
-         });
-      });
-   }
-
-   // Fluidity
-   baseFluidity(barSpecs) {
-      
-      const newFluidBar = new Fluidity(this.ctx.UI, this.imgFiles.gameUI, barSpecs);
-      this.fluidBarArray.push(newFluidBar);
    }
    
    // Draw Mini Bars

@@ -4,10 +4,8 @@
 // =====================================================================
 // Enemy
 // =====================================================================
-class Enemy extends Character {
+class Enemy {
    constructor(cl_Enemy, initEnemy) {
-      
-      super();
 
       this.initEnemy = initEnemy;
       this.updateEnemy;

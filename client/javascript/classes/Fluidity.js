@@ -10,12 +10,6 @@ class Fluidity {
       this.ctx = ctx;
       this.img = img;
       this.bar = bar;
-      
-      // Position
-      this.x = bar.x;
-      this.y = bar.y;
-      this.width = bar.width;
-      this.height = bar.height;
 
       // Specs
       this.stateStr = bar.stateStr;
@@ -34,7 +28,7 @@ class Fluidity {
       this.statRatio = this.bar.stat /this.bar.baseStat;
       this.calcStatRatio = this.bar.calcStat /this.bar.baseStat;
 
-      this.fullBarWidth = this.width - (this.bar.off_W *this.bar.scale_X);
+      this.fullBarWidth = this.bar.position.width - (this.bar.offset.width *this.bar.scaleX);
       this.miniBarWidth = Math.floor(this.calcStatRatio *this.fullBarWidth);      
       this.fluidWidth = Math.floor((this.bar.statFluidValue /this.bar.calcStat) *this.miniBarWidth);
    }
@@ -77,10 +71,10 @@ class Fluidity {
       this.ctx.drawImage(
          this.img,
          sX ,sY, sW, sH,
-         this.bar.x + (32 * this.bar.scale_X) +this.origin_X,
-         this.bar.y +19,
+         this.bar.position.x + (32 * this.bar.scaleX) +this.origin_X,
+         this.bar.position.y +19,
          this.fluidWidth,
-         this.bar.height - 27
+         this.bar.position.height - 27
       );
    }
 
@@ -149,16 +143,16 @@ class Fluidity {
    drawHUD_Fluid(sX, sY, sW, sH, modifier) {
 
       const healWidth = sW *(this.bar.statFluidValue /this.bar.baseStat);
-      const start_X = sX + sW *this.statRatio -healWidth/2 + (healWidth/2 *modifier);
+      const startX = sX + sW *this.statRatio -healWidth/2 + (healWidth/2 *modifier);
 
       this.ctx.drawImage(
          this.img,
-         start_X, sY, healWidth, sH,
+         startX, sY, healWidth, sH,
 
-         this.bar.x + (this.bar.off_X * this.bar.scale_X) +this.origin_X,
-         this.bar.y + (this.bar.off_Y * this.bar.scale_Y)-40,
+         this.bar.position.x + (this.bar.offset.x * this.bar.scaleX) +this.origin_X,
+         this.bar.position.y + (this.bar.offset.y * this.bar.scaleY),
          this.fluidWidth *modifier,
-         this.bar.height/3 - (this.bar.off_H * this.bar.scale_Y)
+         this.bar.position.height/3 - (this.bar.offset.height * this.bar.scaleY)
       );
    }
 

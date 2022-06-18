@@ -12,13 +12,6 @@ const io = new Server(server);
 
 
 // =====================================================================
-// Scrips import
-// =====================================================================
-const Player = require("./server/classes/Player.js");
-const enemiesHandler = require("./server/scripts/srv_EnemiesHandler.js");
-
-
-// =====================================================================
 // App init
 // =====================================================================
 app.get("/", (req, res) => {
@@ -30,6 +23,13 @@ app.use("/client", express.static(__dirname + "/client"));
 server.listen(process.env.PORT || 3000, () => {
    console.log(`Listening on port ${process.env.PORT}`);
 });
+
+
+// =====================================================================
+// Scrips import
+// =====================================================================
+const Player = require("./server/classes/Player.js");
+const enemiesHandler = require("./server/scripts/srv_EnemiesHandler.js");
 
 
 // =====================================================================

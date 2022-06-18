@@ -7,26 +7,38 @@
 const setViewport = () => {
 
    const viewport = {
+
       x: 0,
       y: 0,
       height: 870,
       width: 1780,
+
+      HUD: {
+         scaleX: 1.2,
+         scaleY: 1,
+         width: 400,
+         offsetY: 0,
+      },
+
+      Fame: {
+         scaleX: 1.5,
+         scaleY: 1,
+         width: 900,
+         offsetY: 0,
+      },
    };
    
    if(document.body.clientWidth <= 1850) {
       viewport.height = 810;
       viewport.width = 1410;
 
-      Fame_Offset.y = 60;
-      Fame_Scale.x = 1.3;
-      Fame_Scale.y = 0.9;
+      viewport.Fame.scaleX = 1.3;
+      viewport.Fame.scaleY = 0.9;
+      viewport.Fame.offsetY = 0;
 
-      FameCount_Offset.x = 0;
-      FameCount_Offset.y = 0;
-
-      HUD_Offset.y = -40;
-      HUD_Scale.x = 1.1;
-      HUD_Scale.y = 0.9;
+      viewport.HUD.scaleX = 1.1;
+      viewport.HUD.scaleY = 0.9;
+      viewport.HUD.offsetY = -40;
    }
 
    return viewport;

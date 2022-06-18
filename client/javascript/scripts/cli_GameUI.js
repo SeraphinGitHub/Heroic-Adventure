@@ -26,30 +26,70 @@ const ImgFiles = imgFiles();
 
 
 // =====================================================================
-// Set Player Fame Bar
+// Floating Text
 // =====================================================================
-const Fame_Scale = {
-   x: 1.5,
-   y: 1,
-}  
+let FloatTextArray = [];
 
-const Fame_Offset = {
-   x: 0,
-   y: 0,
+const initFloatingText = (playerPos, textObj) => {
+      
+   const newText = new FloatingText(
+      ctx.player,
+      playerPos.x -viewport.x,
+      playerPos.y -viewport.y,
+      textObj.x,
+      textObj.y,
+      textObj.size,
+      textObj.color,
+      textObj.value
+   );
+   
+   FloatTextArray.push(newText);
 }
 
-const FameCount_Offset = {
-   x: -20,
-   y: 80,
+const drawFloatingText = () => {
+
+   FloatTextArray.forEach(text => {
+      text.drawText();
+      if(text.displayDuration <= 0) removeIndex(FloatTextArray, text);
+   });
 }
 
+
+// =====================================================================
+// Fluidity for Game Bars
+// =====================================================================
+let FluidBarArray = [];
+
+const initFluidBar = (barSpecs) => {
+      
+   const newFluidBar = new Fluidity(ctx.UI, ImgFiles.gameUI, barSpecs);
+   FluidBarArray.push(newFluidBar);
+}
+
+const drawFluidBar = () => {
+   
+   FluidBarArray.forEach(fluidBar => {
+      if(fluidBar.stateStr === "getFame") fluidBar.getFameFluid();
+      if(fluidBar.stateStr === "looseFame") fluidBar.looseFameFluid();
+      if(fluidBar.stateStr === "getHealth") fluidBar.getHealthFluid();
+      if(fluidBar.stateStr === "looseHealth") fluidBar.looseHealthFluid();
+      if(fluidBar.stateStr === "looseMana") fluidBar.looseManaFluid();
+      
+      if(fluidBar.fluidDuration <= 0) removeIndex(FluidBarArray, fluidBar);
+   });
+}
+
+
+// =====================================================================
+// Fame Bar
+// =====================================================================
 const Fame = {
 
    position: {
-      x: viewport.width/2 -900/2 * Fame_Scale.x,
-      y: viewport.height -870,
-      width: 900 * Fame_Scale.x,
-      height: 53 * Fame_Scale.y,
+      x: viewport.width/2 - viewport.Fame.width *viewport.Fame.scaleX /2,
+      y: viewport.Fame.offsetY,
+      width: viewport.Fame.width *viewport.Fame.scaleX,
+      height: 53 *viewport.Fame.scaleY,
    },
 
    offset: {
@@ -57,6 +97,11 @@ const Fame = {
       y: 19,
       width: 65,
       height: 27,
+   },
+
+   countOffset: {
+      x: -20,
+      y: 80,
    },
 }
 
@@ -67,9 +112,9 @@ const FAME_DrawFrame = () => {
    ctx.fixedBack.drawImage(
       ImgFiles.gameUI,
       522, 477, 26, 48,
-      Fame.position.x + (Fame.offset.x *Fame_Scale.x),
+      Fame.position.x + (Fame.offset.x *viewport.Fame.scaleX),
       Fame.position.y + Fame.offset.y,
-      Fame.position.width - (Fame.offset.width *Fame_Scale.x),
+      Fame.position.width - (Fame.offset.width *viewport.Fame.scaleX),
       Fame.position.height - Fame.offset.height
    );
 
@@ -88,14 +133,14 @@ const FAME_DrawFrame = () => {
 const FAME_DrawBar = (eventPack) => {
    
    let fameBarWidth = Math.floor(
-      (eventPack.fameValue /eventPack.baseFame) * (Fame.position.width - (Fame.offset.width * Fame_Scale.x))
+      (eventPack.fameValue /eventPack.baseFame) * (Fame.position.width - (Fame.offset.width * viewport.Fame.scaleX))
    );
 
    // Fame Bar
    ctx.fixedUI.drawImage(
       ImgFiles.gameUI,
       522, 529, 26, 48,
-      Fame.position.x + (32 * Fame_Scale.x),
+      Fame.position.x + (32 * viewport.Fame.scaleX),
       Fame.position.y + 19,
       fameBarWidth,
       Fame.position.height - 27
@@ -110,53 +155,44 @@ const FAME_DrawCount = (eventPack) => {
    ctx.fixedUI.font = "40px Dimbo-Regular";
    ctx.fixedUI.fillText(
       eventPack.fameCount,
-      Fame.position.x +Fame.position.width +FameCount_Offset.x,
-      Fame.position.y +FameCount_Offset.y
+      Fame.position.x +Fame.position.width +Fame.countOffset.x,
+      Fame.position.y +Fame.countOffset.y
    );
    ctx.fixedUI.strokeText(
       eventPack.fameCount,
-      Fame.position.x +Fame.position.width +FameCount_Offset.x,
-      Fame.position.y +FameCount_Offset.y
+      Fame.position.x +Fame.position.width +Fame.countOffset.x,
+      Fame.position.y +Fame.countOffset.y
    );
 }
 
 
 // =====================================================================
-// Set Player HUD
+// HUD
 // =====================================================================
-const HUD_Scale = {
-   x: 1.2,
-   y: 1,
-}  
-
-const HUD_Offset = {
-   x: 0,
-   y: 0,
-}
-
 const HUD = {
+   
    position: {
-      x: viewport.width/2 -400/2 *HUD_Scale.x +HUD_Offset.x,
-      y: viewport.height -110 *HUD_Scale.y +HUD_Offset.y,
-      width: 400 *HUD_Scale.x,
-      height: 100 *HUD_Scale.y,
+      x: viewport.width/2 - viewport.HUD.width *viewport.HUD.scaleX /2,
+      y: viewport.height -110 *viewport.HUD.scaleY +viewport.HUD.offsetY,
+      width: viewport.HUD.width *viewport.HUD.scaleX,
+      height: 100 *viewport.HUD.scaleY,
    },
 
-   manaOffset: {
+   mana: {
       x: 82,
       y: 10,
       width: 165,
       height: 8,
    },
 
-   healthOffset: {
+   health: {
       x: 15,
       y: 39,
       width: 30,
       height: 9,
    },
 
-   energyOffset: {
+   energy: {
       x: 82,
       y: 65,
       width: 165,
@@ -174,16 +210,16 @@ const HUD = {
 const HUD_BaseBar = (sx, sy, sw, sh, ratio, offset)  => {
    
    let barWidth = Math.floor(
-      (HUD.position.width - (offset.width * HUD_Scale.x) ) *ratio
+      (HUD.position.width - (offset.width * viewport.HUD.scaleX) ) *ratio
    );
 
    ctx.UI.drawImage(
       ImgFiles.gameUI,
       sx, sy, sw *ratio, sh,
-      HUD.position.x + (offset.x * HUD_Scale.x),
-      HUD.position.y + (offset.y * HUD_Scale.y),
+      HUD.position.x + (offset.x * viewport.HUD.scaleX),
+      HUD.position.y + (offset.y * viewport.HUD.scaleY),
       barWidth,
-      HUD.position.height/3 - (offset.height * HUD_Scale.y)
+      HUD.position.height/3 - (offset.height * viewport.HUD.scaleY)
    );
 }
 
@@ -197,10 +233,10 @@ const HUD_DrawFrame = () => {
    ctx.fixedBack.drawImage(
       ImgFiles.gameUI,
       5, 181, 729, 141,
-      HUD.position.x + (15 * HUD_Scale.x),     // Pos X
-      HUD.position.y + (10 * HUD_Scale.y),     // Pos Y
-      HUD.position.width - (30 * HUD_Scale.x), // Width
-      HUD.position.height - (20 * HUD_Scale.y) // Height
+      HUD.position.x + (15 * viewport.HUD.scaleX),     // Pos X
+      HUD.position.y + (10 * viewport.HUD.scaleY),     // Pos Y
+      HUD.position.width - (30 * viewport.HUD.scaleX), // Width
+      HUD.position.height - (20 * viewport.HUD.scaleY) // Height
    );
 
    // HUD Sprite
@@ -223,14 +259,14 @@ const HUD_DrawMana = (initPack, updatePlayer) => {
    if(updatePlayer.mana >= initPack.healCost) HUD_BaseBar(
       6, 528, 460, 47,
       manaRatio,
-      HUD.manaOffset
+      HUD.mana
    );
    
    // Low Mana
    else HUD_BaseBar(
       5, 475, 461, 47,
       manaRatio,
-      HUD.manaOffset
+      HUD.mana
    ); 
 }
 
@@ -243,7 +279,7 @@ const HUD_DrawHealth = (initPack, updatePlayer) => {
    if(updatePlayer.health > initPack.baseHealth * HUD.flashing.minRatio) HUD_BaseBar(
       5, 327, 729, 45,
       healthRatio,
-      HUD.healthOffset
+      HUD.health
    );
 
    // if Health Under 30% ==> Flashing Bar
@@ -251,7 +287,7 @@ const HUD_DrawHealth = (initPack, updatePlayer) => {
       HUD_BaseBar(
          6, 424, 729, 45,
          healthRatio,
-         HUD.healthOffset
+         HUD.health
       );
 
       HUD.flashing.frame++;
@@ -262,7 +298,7 @@ const HUD_DrawHealth = (initPack, updatePlayer) => {
          HUD_BaseBar(
             5, 327, 729, 45,
             healthRatio,
-            HUD.healthOffset
+            HUD.health
          );
       }
 
@@ -279,6 +315,172 @@ const HUD_DrawEnergy = (initPack, updatePlayer) => {
    HUD_BaseBar(
       6, 582, 460, 46,
       energyRatio,
-      HUD.energyOffset
+      HUD.energy
    );
+}
+
+
+// =====================================================================
+// Init Game UI
+// =====================================================================
+const initGameUI = (socket) => {
+
+   FAME_DrawFrame();
+   HUD_DrawFrame();
+   
+   const mainTexSize = 42;
+
+   // Fame Event
+   socket.on("fameEvent", (eventPack) => {
+      ctx.fixedUI.clearRect(0, 0, viewport.width, viewport.height);
+
+      FAME_DrawBar(eventPack);
+      FAME_DrawCount(eventPack);
+   });
+
+   socket.on("getFame", (playerPos, serverFame) => {
+      
+      initFloatingText(
+         playerPos,
+         {
+            x: 0,
+            y: 180,
+            size: mainTexSize *1.2,
+            color: "darkviolet",
+            value: `+${serverFame.fameCost} Fame`,
+         }
+      );
+      
+      initFluidBar({
+         stateStr: "getFame",
+         scaleX: viewport.Fame.scaleX,
+         position: Fame.position,
+         offset: Fame.offset,
+         baseStat: serverFame.baseFame,
+         stat: serverFame.fameValue,
+         calcStat: serverFame.fameCost,
+         statFluidValue: 0,
+         isFameReseted: false,
+         fame: serverFame.fame,
+         fameCount: serverFame.fameCount,
+         fluidSpeed: serverFame.fluidSpeed,
+      });
+   });
+   
+   socket.on("looseFame", (playerPos, serverFame) => {
+
+      initFloatingText(
+         playerPos,
+         {
+            x: 0,
+            y: 180,
+            size: mainTexSize *1.2,
+            color: "red",
+            value: `-${serverFame.fameCost} Fame`,
+         }
+      );
+
+      initFluidBar({
+         stateStr: "looseFame",
+         scaleX: viewport.Fame.scaleX,
+         position: Fame.position,
+         offset: Fame.offset,
+         baseStat: serverFame.baseFame,
+         stat: serverFame.fameValue,
+         calcStat: serverFame.fameCost,
+         statFluidValue: serverFame.fameCost,
+         isFameReseted: false,
+         fame: serverFame.fame,
+         fameCount: serverFame.fameCount,
+         fluidSpeed: serverFame.fluidSpeed,
+      });
+   });
+
+
+   // Mana Event
+   socket.on("looseMana", (serverMana) => {
+
+      initFluidBar({
+         stateStr: "looseMana",
+         scaleX: viewport.HUD.scaleX,
+         scaleY: viewport.HUD.scaleY,
+         position: HUD.position,
+         offset: HUD.mana,
+         baseStat: serverMana.baseMana,
+         stat: serverMana.mana,
+         calcStat: serverMana.calcManaCost,
+         statFluidValue: serverMana.calcManaCost,
+         fluidSpeed: serverMana.fluidSpeed,
+      });
+   });
+
+
+   // Health Event
+   socket.on("getHeal", (playerPos, serverHealing) => {
+
+      initFloatingText(
+         playerPos,
+         {
+            x: -5,
+            y: -75,
+            size: mainTexSize,
+            color: "lime",
+            value: `+${serverHealing.calcHealing}`,
+         }
+      );
+
+      initFluidBar({
+         stateStr: "getHealth",
+         scaleX: viewport.HUD.scaleX,
+         scaleY: viewport.HUD.scaleY,
+         position: HUD.position,
+         offset: HUD.health,
+         baseStat: serverHealing.baseHealth,
+         stat: serverHealing.health,
+         calcStat: serverHealing.calcHealing,
+         statFluidValue: serverHealing.calcHealing,
+         fluidSpeed: serverHealing.fluidSpeed,
+      });
+   });
+
+   socket.on("giveDamage", (playerPos, calcDamage) => {
+
+      initFloatingText(
+         playerPos,
+         {
+            x: -5,
+            y: -100,
+            size: mainTexSize,
+            color: "yellow",
+            value: `-${calcDamage}`,
+         }
+      );
+   });
+
+   socket.on("getDamage", (playerPos, serverDamage) => {
+
+      initFloatingText(
+         playerPos,
+         {
+            x: -5,
+            y: -85,
+            size: mainTexSize,
+            color: "red",
+            value: `-${serverDamage.calcDamage}`,
+         }
+      );
+
+      initFluidBar({
+         stateStr: "looseHealth",
+         scaleX: viewport.HUD.scaleX,
+         scaleY: viewport.HUD.scaleY,
+         position: HUD.position,
+         offset: HUD.health,
+         baseStat: serverDamage.baseHealth,
+         stat: serverDamage.health,
+         calcStat: serverDamage.calcDamage,
+         statFluidValue: serverDamage.calcDamage,
+         fluidSpeed: serverDamage.fluidSpeed,
+      });
+   });
 }

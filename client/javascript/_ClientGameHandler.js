@@ -104,10 +104,6 @@ const cl_Enemy = {
    barCoordArray:    barCoordArray,
 }
 
-const character = new Character();
-const clientPlayer = new Player(cl_Player, {});
-const clientEnemy = new Enemy(cl_Enemy, {});
-
 
 // =====================================================================
 // Client Update (Every frame)
@@ -148,11 +144,10 @@ const clientUpdate = () => {
       let initEnemy = initMobList[updateEnemy.id];
       initEnemy.render_Enemy(updateEnemy, frame, debugMobs);
    };
-
-   // Draw floating text
-   clientPlayer.drawFloatingText(); // ==> Classe ClientCharacter.js
-   clientPlayer.drawFluidBar();
+   
+   drawFloatingText();
+   drawFluidBar();
+   
    frame++;
-      
    requestAnimationFrame(clientUpdate);
 }
