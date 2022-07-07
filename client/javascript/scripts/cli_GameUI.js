@@ -2,30 +2,6 @@
 "use strict"
 
 // =====================================================================
-// Image Files
-// =====================================================================
-const imgFiles = () => {
-   
-   const gameUI = new Image();
-   gameUI.src = "client/images/playerUI/Game UI.png";
-   
-   const player = new Image();
-   player.src = "client/images/playerAnim/playerAnim_x4.png";
-
-   const mapTile = new Image();
-   mapTile.src = "client/images/map/Map Tiles.png";
-
-   return {
-      gameUI: gameUI,
-      player: player,
-      mapTile: mapTile,
-   }
-}
-
-const ImgFiles = imgFiles();
-
-
-// =====================================================================
 // Floating Text
 // =====================================================================
 let FloatTextArray = [];

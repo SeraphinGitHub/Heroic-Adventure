@@ -8,7 +8,7 @@ class Player extends Character {
    constructor(id) {
       
       super();
-
+      
       // *****************
       this.isDEBUG_Position = false;
       // this.isDEBUG_Position = true;
@@ -29,25 +29,16 @@ class Player extends Character {
          // width: 1950 -1200,
       }
       
-      // Env Variables
-      this.devFPS = process.env.DEV_FRAME_RATE;
-      this.deployFPS = process.env.DEPLOY_FRAME_RATE;
-      this.syncCoeff = process.env.SYNC_COEFF;
-      this.syncFormula = Math.floor(this.syncCoeff *this.devFPS /this.deployFPS *100) /100;
-      
       // Player Hitbox
       this.radius = 45;
-
-      // Attack Hitbox
       this.attkOffset_X = 0;
       this.attkOffset_Y = 45;
       this.attkRadius = 32;
       
       // GcD
-      this.baseGcD = 40; // Lower ==> Faster
-      this.GcD = Math.floor(this.baseGcD *this.syncCoeff);
-      this.speedGcD = this.GcD;
-      this.attackSpeed = Math.floor(this.baseGcD /60 *10) /10;
+      this.attackSpeed = 0.6; // seconds; Lower ==> Faster
+      this.baseGcD = Math.floor(this.attackSpeed *this.attackSpeed_Coeff);
+      this.GcD = this.baseGcD;
 
       // Player Mana
       this.baseMana = 150;
@@ -101,10 +92,10 @@ class Player extends Character {
       // Movements Speed
       this.walkSpeed_Percent = 100;
       this.runSpeed_Percent = 200;
-      this.walkSpeed = Math.floor( this.walkSpeed_Percent /33.33 *this.syncFormula);
-      this.runSpeed = Math.floor( this.runSpeed_Percent /33.33 *this.syncFormula);
-      this.baseWalkSpeed = this.walkSpeed;
-      this.baseRunSpeed = this.runSpeed;
+      this.baseWalkSpeed = Math.floor(this.walkSpeed_Percent /this.moveSpeed_Coeff *this.syncCoeff);
+      this.baseRunSpeed = Math.floor(this.runSpeed_Percent /this.moveSpeed_Coeff *this.syncCoeff);
+      this.walkSpeed = this.baseWalkSpeed;
+      this.runSpeed = this.baseRunSpeed;
 
       // Movements Axis
       this.up = false;
@@ -130,19 +121,34 @@ class Player extends Character {
       this.heal_isAnimable = false;
 
       // Score
-      this.kills = 0;
-      this.playersKills = 0;
-      this.mobsKills = 0;
-      this.died = 0;
+      this.score = {
+         kills: 0,
+         playersKills: 0,
+         mobsKills: 0,
+         died: 0,
+      }
 
       // Fluidity ==> Higher = faster
-      this.fame_FluidSpeed = 25;
-      this.HUD_FluidSpeed = 1.5;
-      this.miniBar_FluidSpeed = 1;
+      this.fluidSpeed = {
+         fame: 25,
+         HUD: 1.5,
+         miniBar: 1,
+      }
 
       // Animation
-      this.state;
+      this.playerState;
       this.frameX = 1;
+
+      // Anim States (depends on sprite sheet)
+      this.states = {
+         idle: 0,
+         walk: 1,
+         run: 2,
+         attack: 3,
+         heal: 4,
+         died: 5,
+      }
+
       this.animSpecs = {
          idle: {
             index: 2,
@@ -343,10 +349,11 @@ class Player extends Character {
       if(this.mana < this.baseMana) this.mana = Math.floor((this.mana + this.regenMana) *100) /100;
       
       // Regen GcD
-      if(this.speedGcD < this.GcD) {
-         this.speedGcD = Math.floor(this.speedGcD + this.syncFormula);
+      if(this.GcD < this.baseGcD -this.syncCoeff) {
+         this.GcD = Math.floor((this.GcD + this.syncCoeff) *10) /10;
          if(this.isAttacking) this.isAttacking = false;
-      }  
+      }
+      else this.GcD = this.baseGcD;
    }
    
    attacking(socketList, playerList, mobList) {
@@ -354,13 +361,13 @@ class Player extends Character {
       // Player Attack
       if(this.isAttacking
       && !this.attack_isAnimable
-      && this.speedGcD >= this.GcD) {
+      && this.GcD >= this.baseGcD) {
 
          // ***************************
          if(this.isDEBUG_Position) this.DEBUG_PlayerPosition();
          // ***************************
          
-         this.speedGcD = 0;
+         this.GcD = 0;
          this.isAttacking = false;
          this.attack_isAnimable = true;
          
@@ -391,7 +398,7 @@ class Player extends Character {
                fameValue: this.fameValue,
                fameCount: this.fameCount,
                fameCost: this.totalFameCost,
-               fluidSpeed: this.fame_FluidSpeed,
+               fluidSpeed: this.fluidSpeed.fame,
             }
             
             // Send Fame data
@@ -404,7 +411,7 @@ class Player extends Character {
    
    casting(socketList) {
       
-      if(this.isCasting && this.speedGcD >= this.GcD) {
+      if(this.isCasting && this.GcD >= this.baseGcD) {
          
          this.isCasting = false;
          let socket = socketList[this.id];
@@ -422,7 +429,7 @@ class Player extends Character {
             baseMana: this.baseMana,
             calcManaCost: this.totalManaCost,
             mana: this.mana,
-            fluidSpeed: this.HUD_FluidSpeed,
+            fluidSpeed: this.fluidSpeed.HUD,
          }
 
          socket.emit("looseMana", serverMana);
@@ -436,7 +443,7 @@ class Player extends Character {
       && this.mana >= this.healCost
       && this.health < this.baseHealth) {
 
-         this.speedGcD = 0;
+         this.GcD = 0;
          this.cast_Heal = false;
          this.heal_isAnimable = true;
 
@@ -454,7 +461,7 @@ class Player extends Character {
             baseHealth: this.baseHealth,
             calcHealing: this.calcHealing,
             health: this.health,
-            fluidSpeed: this.HUD_FluidSpeed,
+            fluidSpeed: this.fluidSpeed.HUD,
          }
 
          socket.emit("getHeal", playerPos, serverHealing);
@@ -503,7 +510,7 @@ class Player extends Character {
          baseHealth: this.baseHealth,
          calcDamage: this.calcDamage,
          health: this.health,
-         fluidSpeed: this.HUD_FluidSpeed,
+         fluidSpeed: this.fluidSpeed.HUD,
       }
 
       socket.emit("getDamage", playerPos, serverDamage);
@@ -514,8 +521,8 @@ class Player extends Character {
 
          // Killer is a Player
          if(enemy.isPlayer) {
-            enemy.kills++;
-            enemy.playersKills++;
+            enemy.score.kills++;
+            enemy.score.playersKills++;
             enemy.totalFameCost += this.getFameCost;
          }
 
@@ -532,7 +539,7 @@ class Player extends Character {
             baseFame: this.baseFame,
             fameValue: this.fameValue,
             fameCost: enemy.looseFameCost,
-            fluidSpeed: this.fame_FluidSpeed,
+            fluidSpeed: this.fluidSpeed.fame,
          }
          
          socket.emit("looseFame", playerPos, serverFame);
@@ -560,7 +567,7 @@ class Player extends Character {
          }
          
          const clientFrameRate = Math.floor(1000/60);
-         const animTimeOut = Math.floor(clientFrameRate *fameCost /this.fame_FluidSpeed);
+         const animTimeOut = Math.floor(clientFrameRate *fameCost /this.fluidSpeed.fame);
 
          // Fame within FameBar
          setTimeout(() => {
@@ -593,10 +600,10 @@ class Player extends Character {
       }
 
       socket.emit("playerScore", {
-         kills: this.kills,
-         playersKills: this.playersKills,
-         mobsKills: this.mobsKills,
-         died: this.died,
+         kills: this.score.kills,
+         playersKills: this.score.playersKills,
+         mobsKills: this.score.mobsKills,
+         died: this.score.died,
          fame: this.fame,
          fameCount: this.fameCount,
       });
@@ -611,9 +618,9 @@ class Player extends Character {
          this.health = 0;
          this.mana = 0;
          this.energy = 0;
-         this.speedGcD = 0;
+         this.GcD = 0;
          
-         this.died++;
+         this.score.died++;
          this.deathCounts++;
 
          if(this.deathCounts === 10) this.deathCounts = 0;
@@ -632,7 +639,7 @@ class Player extends Character {
             this.health = this.baseHealth;
             this.mana = this.baseMana;
             this.energy = this.baseEnergy;
-            this.speedGcD = this.GcD;
+            this.GcD = this.baseGcD;
 
             // Reset Respawn Timer
             this.respawnTimer = this.baseRespawnTimer;
@@ -653,10 +660,10 @@ class Player extends Character {
       if(this.isDead && !this.isRespawning) {
          
          socket.emit("playerScore", {
-            kills: this.kills,
-            playersKills: this.playersKills,
-            mobsKills: this.mobsKills,
-            died: this.died,
+            kills: this.score.kills,
+            playersKills: this.score.playersKills,
+            mobsKills: this.score.mobsKills,
+            died: this.score.died,
             fame: this.fame,
             fameCount: this.fameCount,
          });
@@ -677,25 +684,25 @@ class Player extends Character {
    animState = () => {
       
       // Attack State
-      if(this.attack_isAnimable) return this.state = "attack";
+      if(this.attack_isAnimable) return this.playerState = this.states.attack;
    
       // Heal State
-      if(this.heal_isAnimable) return this.state = "heal";
+      if(this.heal_isAnimable) return this.playerState = this.states.heal;
       
       // Moving State
       if(this.up || this.down || this.left || this.right) {
    
-         if(this.up && this.down || this.left && this.right) return this.state = "idle";
+         if(this.up && this.down || this.left && this.right) return this.playerState = this.states.idle;
    
          // Run State
-         else if(this.isRunning && this.isRunnable) return this.state = "run";
+         else if(this.isRunning && this.isRunnable) return this.playerState = this.states.run;
    
          // Walk State
-         else return this.state = "walk";
+         else return this.playerState = this.states.walk;
       }
    
       // Idle State
-      else return this.state = "idle";
+      else return this.playerState = this.states.idle;
    }
 
    sortingLayer(playerList, mobList) {
@@ -747,7 +754,7 @@ class Player extends Character {
 
    // Update (Sync)
    update(socketList, playerList, mobList, lightPack_PlayerList) {
-
+      
       if(!this.isDead) {
 
 
@@ -764,7 +771,7 @@ class Player extends Character {
          this.sortingLayer(playerList, mobList);
 
       }
-      else this.state = "died";
+      else this.playerState = this.states.died;
 
       lightPack_PlayerList[this.id] = this.lightPack();
    }
@@ -777,7 +784,7 @@ class Player extends Character {
          detectViewport: this.detectViewport,
          attkRadius: this.attkRadius,
          healCost: this.healCost,
-         GcD: this.GcD,
+         GcD: this.baseGcD,
          baseHealth: this.baseHealth,
          baseEnergy: this.baseEnergy,
          baseMana: this.baseMana,
@@ -801,12 +808,12 @@ class Player extends Character {
          y: this.y,
          attkOffset_X: this.attkOffset_X,
          attkOffset_Y: this.attkOffset_Y,
-         speedGcD: this.speedGcD,
+         speedGcD: this.GcD,
          health: this.health,
          energy: this.energy,
          mana: this.mana,
          isCtxPlayer: this.isCtxPlayer,
-         state: this.state,
+         state: this.playerState,
          frameX: this.frameX
       }
    }

@@ -20,7 +20,7 @@ class Enemy {
 
       // Animation
       this.frameY = 0;
-      this.frameToJump = 2;
+      this.numberOfDirections = 2;
       this.isAnimable = true;
       this.animState;
       this.animSpecs = initEnemy.animSpecs;
@@ -175,22 +175,24 @@ class Enemy {
    // Animation
    animation(frame, index, spritesNumber) {
       
-      if(frame % index === 0) {
-         if(this.frameY < spritesNumber -2) this.frameY++;
+      if(this.frameY < spritesNumber -1) {
+         if(frame % index === 0) this.frameY++;
+         else return;
+      }
 
-         else {
-            if(!this.isAnimable) this.isAnimable = true;
-            if(!this.updateEnemy.isDead) this.frameY = 0;
-         }
+      else {
+         if(!this.isAnimable) this.isAnimable = true;
+         if(!this.updateEnemy.isDead) this.frameY = 0;
       }
    }
 
-   enemyState(frame) {
+   enemyState(state, frame) {
+      this.animState = this.numberOfDirections * state;
 
-      switch(this.updateEnemy.state) {
-         case "walk": {
-            
-            this.animState = this.frameToJump * 1;
+      switch(state) {
+      
+         // Walking
+         case 1: {
             this.animation(
                frame,
                this.animSpecs.walk.index,
@@ -199,9 +201,8 @@ class Enemy {
          }
          break;
 
-         case "run": {
-
-            this.animState = this.frameToJump * 1;
+         // Running
+         case 1: {
             this.animation(
                frame,
                this.animSpecs.run.index,
@@ -210,14 +211,13 @@ class Enemy {
          }
          break;
 
-         case "attack": {
-         
+         // Attacking
+         case 2: {
             if(this.isAnimable) {
                this.frameY = 0;
                this.isAnimable = false;
             }
-            
-            this.animState = this.frameToJump * 2;
+
             this.animation(
                frame,
                this.animSpecs.attack.index,
@@ -225,10 +225,9 @@ class Enemy {
             );
          }
          break;
-      
-         case "died": {
-
-            this.animState = this.frameToJump * 3;
+         
+         // Died
+         case 3: {
             this.animation(
                frame,
                this.animSpecs.died.index,
@@ -237,10 +236,10 @@ class Enemy {
          }
          break;
 
+         // Idle
          default: {
-
-            this.animState = this.frameToJump * 0;
-            this.animation(frame,
+            this.animation(
+               frame,
                this.animSpecs.idle.index,
                this.animSpecs.idle.spritesNumber
             );
@@ -259,7 +258,7 @@ class Enemy {
       if(!updateEnemy.isHidden) {
          
          // Animation State
-         this.enemyState(frame);
+         this.enemyState(this.updateEnemy.state, frame);
          
          // ******************************
          if(debugMobs) this.DEBUG_GENERAL();

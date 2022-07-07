@@ -22,10 +22,10 @@ const set_Golems = () => {
       health: 150,
       radius: 55,
       wanderRange: 150,
-      wanderBreakTime: 2 *1000,
+      wanderBreakTime: 3, // Seconds
       chasingRange: 200,
       animationDelay: 0.5,
-      GcD: 60,
+      attackSpeed: 0.9, // Seconds; Lower ==> Faster
       getFameCost: 150,
       looseFameCost: 250,
       looseFameCost: 250,
@@ -33,8 +33,8 @@ const set_Golems = () => {
       respawnTime: 10 *1000,
       damages: 15,
       damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
+      walkSpeed: 100, // Percents
+      runSpeed: 200, // Percents
 
       // Animation
       imageSrc: mobSrc + "golems/golem Ice x2.png",
@@ -97,18 +97,18 @@ const set_Minotaurs = () => {
       health: 150,
       radius: 55,
       wanderRange: 150,
-      wanderBreakTime: 2 *1000,
+      wanderBreakTime: 2, // Seconds
       chasingRange: 200,
       animationDelay: 0.7,
-      GcD: 60,
+      attackSpeed: 0.9, // Seconds; Lower ==> Faster
       getFameCost: 150,
       looseFameCost: 250,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
       damages: 15,
       damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
+      walkSpeed: 100, // Percents
+      runSpeed: 200, // Percents
 
       // Animation
       imageSrc: mobSrc + "minotaurs/minotaur Brown x2.png",
@@ -171,18 +171,18 @@ const set_Orcs = () => {
       health: 150,
       radius: 55,
       wanderRange: 150,
-      wanderBreakTime: 2 *1000,
+      wanderBreakTime: 3, // Seconds
       chasingRange: 200,
       animationDelay: 0.5,
-      GcD: 60,
+      attackSpeed: 0.9, // Seconds; Lower ==> Faster
       getFameCost: 150,
       looseFameCost: 250,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
       damages: 15,
       damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
+      walkSpeed: 100, // Percents
+      runSpeed: 200, // Percents
 
       // Animation
       imageSrc: mobSrc + "orcs/orc Pony Tail x2.png",
@@ -245,18 +245,18 @@ const set_Reapers = () => {
       health: 150,
       radius: 55,
       wanderRange: 150,
-      wanderBreakTime: 2 *1000,
+      wanderBreakTime: 3, // Seconds
       chasingRange: 200,
       animationDelay: 0.6,
-      GcD: 60,
+      attackSpeed: 0.9, // Seconds; Lower ==> Faster
       getFameCost: 150,
       looseFameCost: 250,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
       damages: 15,
       damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
+      walkSpeed: 100, // Percents
+      runSpeed: 200, // Percents
 
       // Animation
       imageSrc: mobSrc + "reapers/reaper Man Green x2.png",
@@ -319,18 +319,18 @@ const set_Wraiths = () => {
       health: 220,
       radius: 55,
       wanderRange: 150,
-      wanderBreakTime: 2 *1000,
+      wanderBreakTime: 4, // Seconds
       chasingRange: 200,
       animationDelay: 0.7,
-      GcD: 60,
+      attackSpeed: 1, // Seconds; Lower ==> Faster
       getFameCost: 200,
       looseFameCost: 300,
       hiddenTime: 4 *1000,
       respawnTime: 10 *1000,
       damages: 20,
       damageRatio: 0.5,
-      walkSpeed: 3,
-      runSpeed: 6,
+      walkSpeed: 100, // Percents
+      runSpeed: 200, // Percents
 
       // Animation
       imageSrc: mobSrc + "wraiths/wraith Purple x2.png",

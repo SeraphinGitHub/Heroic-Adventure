@@ -71,10 +71,10 @@ class Fluidity {
       this.ctx.drawImage(
          this.img,
          sX ,sY, sW, sH,
-         this.bar.position.x + (32 * this.bar.scaleX) +this.origin_X,
-         this.bar.position.y +19,
+         this.bar.position.x + (this.bar.offset.x * this.bar.scaleX) +this.origin_X,
+         this.bar.position.y +this.bar.offset.y,
          this.fluidWidth,
-         this.bar.position.height - 27
+         this.bar.position.height -this.bar.offset.height
       );
    }
 
@@ -118,7 +118,6 @@ class Fluidity {
       }
 
       this.origin_X = this.statRatio *this.fullBarWidth;
-
       this.drawFameFluid(552, 529, 26, 48);
       this.animTimeOut();
    }
@@ -134,8 +133,7 @@ class Fluidity {
       if(this.bar.statFluidValue > 0) this.bar.statFluidValue -= this.fluidSpeed;
       else this.bar.statFluidValue = 0;
 
-      this.origin_X = this.statRatio *this.fullBarWidth
-
+      this.origin_X = this.statRatio *this.fullBarWidth;
       this.drawHUD_Fluid(sX, sY, sW, sH, modifier);
       this.animTimeOut();
    }
@@ -148,7 +146,6 @@ class Fluidity {
       this.ctx.drawImage(
          this.img,
          startX, sY, healWidth, sH,
-
          this.bar.position.x + (this.bar.offset.x * this.bar.scaleX) +this.origin_X,
          this.bar.position.y + (this.bar.offset.y * this.bar.scaleY),
          this.fluidWidth *modifier,

@@ -9,19 +9,13 @@ class Enemy extends Character {
 
       super();
 
-      this.id;      
+      this.id;
       this.x = spawnX;
       this.y = spawnY;
       this.spawnX = spawnX;
       this.spawnY = spawnY;
-      this.name = enemySpecs.name;
       this.radius = enemySpecs.radius;
-
-      // Env Variables
-      this.devFPS = process.env.DEV_FRAME_RATE;
-      this.deployFPS = process.env.DEPLOY_FRAME_RATE;
-      this.syncCoeff = process.env.SYNC_COEFF;
-      this.syncFormula = Math.floor(this.syncCoeff *this.devFPS /this.deployFPS *10) /10;
+      this.name = enemySpecs.name;
 
       // State Machine
       this.calcX = spawnX;
@@ -41,9 +35,8 @@ class Enemy extends Character {
       this.respawnTime = enemySpecs.respawnTime;
 
       // GcD
-      this.baseGcD = enemySpecs.GcD;
-      this.GcD = Math.floor(this.baseGcD *this.syncCoeff); // More high ==> more slow
-      this.speedGcD = this.GcD;
+      this.baseGcD = Math.floor(enemySpecs.attackSpeed *this.attackSpeed_Coeff);
+      this.GcD = this.baseGcD;
 
       // Damages
       this.baseDamage = enemySpecs.damages;
@@ -55,8 +48,8 @@ class Enemy extends Character {
       this.looseFameCost = enemySpecs.looseFameCost;
 
       // Movements Speed
-      this.walkSpeed = Math.round(enemySpecs.walkSpeed *this.syncFormula) /2;
-      this.runSpeed = Math.round(enemySpecs.runSpeed *this.syncFormula) /2;
+      this.walkSpeed = Math.floor(enemySpecs.walkSpeed /this.moveSpeed_Coeff *this.syncCoeff) /2;
+      this.runSpeed = Math.floor(enemySpecs.runSpeed /this.moveSpeed_Coeff *this.syncCoeff) /2;
       this.speed;
 
       // States
@@ -72,12 +65,21 @@ class Enemy extends Character {
       this.attack_isAnimable = false;
 
       // Animation
-      this.state;
+      this.enemyState;
       this.frameY = 1;
       this.animationDelay = enemySpecs.animationDelay;
       this.imageSrc = enemySpecs.imageSrc;
       this.animSpecs = enemySpecs.animSpecs;
       this.sprites = enemySpecs.sprites;
+
+      // Anim States (depends on sprite sheet)
+      this.states = {
+         idle: 0,
+         walk: 1,
+         run: 1,
+         attack: 2,
+         died: 3,
+      }
    }
    
    // Calc Rng
@@ -160,16 +162,18 @@ class Enemy extends Character {
 
    // GcD
    calcGcD() {
-      
+
       // Regen GcD
-      if(this.speedGcD < this.GcD) {
-         this.speedGcD = Math.floor(this.speedGcD + this.syncFormula);
+      if(this.GcD < this.baseGcD -this.syncCoeff) {
+         this.GcD = Math.floor((this.GcD + this.syncCoeff) *10) /10;
          if(this.isAttacking) this.isAttacking = false;
-      }      
+      }
+      else this.GcD = this.baseGcD;   
    }   
 
    // Enemy States
    wandering() {
+      
       if(this.isWandering) {
 
          this.speed = this.walkSpeed;
@@ -179,11 +183,13 @@ class Enemy extends Character {
          // Stop && Renewal calculation (Run once)
          if(this.calcX === this.x && this.calcY === this.y && !this.isReCalc) {
             this.isReCalc = true;
+
+            let randomizedBreakTime = this.RnG(1, this.wanderBreakTime);
             
             setTimeout(() => {
                this.isReCalc = false;
                this.isCalcPos = false
-            }, this.wanderBreakTime);
+            }, randomizedBreakTime *1000);
          }
       }
    }
@@ -209,7 +215,7 @@ class Enemy extends Character {
 
       if(!this.isAttacking
       && !this.attack_isAnimable
-      && this.speedGcD >= this.GcD) {
+      && this.GcD >= this.baseGcD) {
 
          this.isWandering = false;
          this.isChasing = false;
@@ -217,7 +223,7 @@ class Enemy extends Character {
          this.attack_isAnimable = true;
          
          this.speed = 0;
-         this.speedGcD = 0;
+         this.GcD = 0;
          this.damagingPlayers(socket, player);
       }
    }
@@ -343,19 +349,19 @@ class Enemy extends Character {
       if(!this.isDead) {
 
          // Attack State
-         if(this.attack_isAnimable) return this.state = "attack";
+         if(this.attack_isAnimable) return this.enemyState = this.states.attack;
 
          // Idle State
-         if((this.x === this.calcX && this.y === this.calcY) || this.speed === 0) return this.state = "idle";
+         if((this.x === this.calcX && this.y === this.calcY) || this.speed === 0) return this.enemyState = this.states.idle;
       
          // Run State
-         if(this.speed === this.runSpeed) return this.state = "run";
+         if(this.speed === this.runSpeed) return this.enemyState = this.states.run;
 
          // Walk State
-         else return this.state = "walk";
+         else return this.enemyState = this.states.walk;
       }
 
-      else this.state = "died";
+      else this.enemyState = this.states.died;
    }
 
    // Update (Sync)
@@ -401,7 +407,7 @@ class Enemy extends Character {
          chasingRange: this.chasingRange,  // <== DEBUG Only
          isDead: this.isDead,
          isHidden: this.isHidden,
-         state: this.state,
+         state: this.enemyState,
          frameX: this.frameX
       }
    }

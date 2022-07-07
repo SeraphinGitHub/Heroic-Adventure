@@ -26,7 +26,7 @@ class Player {
 
       // Animation
       this.frameY = 0;
-      this.frameToJump = 4;
+      this.numberOfDirections = 4;
       this.isAnimable = true;
       this.animState;
       this.animSpecs = initPack.animSpecs;
@@ -294,12 +294,13 @@ class Player {
       }
    }
 
-   playerState(frame) {
+   playerState(state, frame) {
+      this.animState = this.numberOfDirections * state;
 
-      switch(this.updatePlayer.state) {
-         case "walk": {
-            
-            this.animState = this.frameToJump * 1;
+      switch(state) {
+
+         // Walking
+         case 1: {
             this.animation(
                frame,
                this.animSpecs.walk.index,
@@ -308,9 +309,8 @@ class Player {
          }
          break;
 
-         case "run": {
-
-            this.animState = this.frameToJump * 2;
+         // Running
+         case 2: {
             this.animation(
                frame,
                this.animSpecs.run.index,
@@ -319,14 +319,13 @@ class Player {
          }
          break;
 
-         case "attack": {
-         
+         // Attacking
+         case 3: {
             if(this.isAnimable) {
                this.frameY = 0;
                this.isAnimable = false;
             }
             
-            this.animState = this.frameToJump * 3;
             this.animation(
                frame,
                this.animSpecs.attack.index,
@@ -335,14 +334,13 @@ class Player {
          }
          break;
 
-         case "heal": {
-
+         // Healing
+         case 4: {
             if(this.isAnimable) {
                this.frameY = 0;
                this.isAnimable = false;
             }
 
-            this.animState = this.frameToJump * 4;
             this.animation(
                frame,
                this.animSpecs.heal.index,
@@ -351,9 +349,8 @@ class Player {
          }
          break;
       
-         case "died": {
-
-            this.animState = this.frameToJump * 5;
+         // Died
+         case 5: {
             this.animation(
                frame,
                this.animSpecs.died.index,
@@ -362,9 +359,8 @@ class Player {
          }
          break;
 
+         // Idle
          default: {
-
-            this.animState = this.frameToJump * 0;
             this.animation(frame,
                this.animSpecs.idle.index,
                this.animSpecs.idle.spritesNumber
@@ -382,7 +378,7 @@ class Player {
 
       this.updatePlayer = updatePlayer;
 
-      this.playerState(frame);
+      this.playerState(this.updatePlayer.state, frame);
       this.scrollCam();
       
       // Player
@@ -405,7 +401,7 @@ class Player {
       this.updatePlayer = updatePlayer;
 
       // Animation State
-      this.playerState(frame);
+      this.playerState(this.updatePlayer.state, frame);
 
       // Player
       this.drawRing();

@@ -338,16 +338,5 @@ setInterval(() => {
    }
    
    frame++;
-   if(process.env.SHOW_FPS) frameRate++;
 
-}, Math.floor(1000/process.env.DEPLOY_FRAME_RATE));
-
-
-let frameRate = 0;
-
-if(process.env.SHOW_FPS === "true") {
-   setInterval(() => {
-      console.log(frameRate);
-      frameRate = 0;
-   }, 1000);
-}
+}, Math.floor(1000/process.env.DEPLOY_FPS));

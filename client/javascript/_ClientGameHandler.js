@@ -2,14 +2,27 @@
 "use strict"
 
 // =====================================================================
-// Client Sync with Server
+// Image Files
 // =====================================================================
-let clientID;
-let clientLoaded = false;
-let initPlayerList = {};
-let initMobList = {};
-let updatePlayerList = {};
-let updateMobList = {};
+const imgFiles = () => {
+   
+   const gameUI = new Image();
+   gameUI.src = "client/images/playerUI/Game UI.png";
+   
+   const player = new Image();
+   player.src = "client/images/playerAnim/playerAnim_x4.png";
+
+   const mapTile = new Image();
+   mapTile.src = "client/images/map/Map Tiles.png";
+
+   return {
+      gameUI: gameUI,
+      player: player,
+      mapTile: mapTile,
+   }
+}
+
+const ImgFiles = imgFiles();
 
 
 // =====================================================================
@@ -106,6 +119,17 @@ const cl_Enemy = {
 
 
 // =====================================================================
+// Client Sync with Server
+// =====================================================================
+let clientID;
+let clientLoaded = false;
+let initPlayerList = {};
+let initMobList = {};
+let updatePlayerList = {};
+let updateMobList = {};
+
+
+// =====================================================================
 // Client Update (Every frame)
 // =====================================================================
 let frame = 0;
@@ -113,9 +137,25 @@ let debugPlayer = false;
 let debugMobs = false;
 
 const clientUpdate = () => {
-
+   
    // Clear contexts
    canvasClearing();
+
+   
+   // ***************************************************************
+   // ***************************************************************
+
+   // ctx.player.fillStyle = "blue";
+   // ctx.player.fillRect(
+   //    810 -viewport.x,
+   //    810 -viewport.y +90,
+   //    180 *2,
+   //    90 *2
+   // );
+
+   // ***************************************************************
+   // ***************************************************************
+
 
    // Players Update
    for(let i in updatePlayerList) {
