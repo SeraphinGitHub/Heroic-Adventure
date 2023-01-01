@@ -5,7 +5,7 @@ class Character {
    constructor() {
       this.attackSpeed_Coeff = 23;
       this.moveSpeed_Coeff = 22;
-      this.syncCoeff = Math.floor(process.env.DEPLOY_FPS /process.env.DEV_FPS *100) /100;
+      this.syncCoeff = 0.66;
    }
 
    // Remove Array Index

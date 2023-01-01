@@ -47,7 +47,7 @@ const easyLogin = () => {
    }, 300);
 }
 
-easyLogin();
+// easyLogin();
 // =========================  Development  =========================
 
 
@@ -55,46 +55,6 @@ const removeIndex = (array, item) => {
    let index = array.indexOf(item);
    array.splice(index, 1);
    index--;
-}
-
-
-// =====================================================================
-// Init Scripts
-// =====================================================================
-const instantiate = (scriptName) => {
-   const newScript = document.createElement("script");
-   newScript.type = "text/javascript";
-   newScript.src = `/client/javascript/${scriptName}`;
-   document.body.insertAdjacentElement("beforeend", newScript);
-}
-
-const initClientScripts = () => {
-
-   const scripts = [
-
-      // Classes
-      "classes/ClientEnemy.js",
-      "classes/ClientPlayer.js",
-      "classes/FloatingText.js",
-      "classes/Fluidity.js",
-      "classes/GameBar.js",
-      "classes/Tile.js",
-
-      // Scripts
-      "scripts/cli_MapHandler.js",
-      "scripts/cli_ChatHandler.js",
-      "scripts/cli_PanelsUI.js",
-      "scripts/cli_ViewportHandler.js",
-      "scripts/cli_GameUI.js",
-
-      // Player Handler (BeforeLast)
-      "scripts/cli_PlayerHandler.js",
-      
-      // Game Handler (Last)
-      "_ClientGameHandler.js",
-   ];
-
-   scripts.forEach(script => instantiate(script));
 }
 
 
@@ -218,6 +178,5 @@ const alertMessage = (messageClass) => {
 // =====================================================================
 window.addEventListener("load", () => {
    
-   initClientScripts();
    loginForm();
 });

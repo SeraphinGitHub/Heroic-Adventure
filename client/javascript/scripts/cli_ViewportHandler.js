@@ -29,7 +29,7 @@ const setViewport = () => {
    };
    
    if(document.body.clientWidth <= 1850) {
-      viewport.height = 810;
+      viewport.height = 710;
       viewport.width = 1410;
 
       viewport.Fame.scaleX = 1.3;

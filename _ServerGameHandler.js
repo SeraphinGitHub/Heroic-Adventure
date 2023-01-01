@@ -2,11 +2,11 @@
 "use strict"
 
 require("dotenv").config();
+const http = require("http");
 const express = require("express");
 const app = express();
-const http = require("http");
-const { emit } = require("process");
 const server = http.createServer(app);
+const { emit } = require("process");
 const { Server } = require("socket.io");
 const io = new Server(server);
 
@@ -62,13 +62,14 @@ mobList.forEach(enemy => {
 // =====================================================================
 // Init Players
 // =====================================================================
-let playersID = 0;
+let playerID = 0;
 
 io.on("connection", (socket) => {
    // console.log("User connected !");
 
    // ==========  Generate ID  ==========
-   socket.id = playersID++;
+   playerID++
+   socket.id = playerID;
 
    socketList[socket.id] = socket;
    onConnect(socket); 
@@ -118,10 +119,10 @@ const onConnect = (socket) => {
       
       // Score
       socket.emit("playerScore", {
-         kills: player.kills,
-         playersKills: player.playersKills,
-         mobsKills: player.mobsKills,
-         died: player.died,
+         kills: player.score.kills,
+         playersKills: player.score.playersKills,
+         mobsKills: player.score.mobsKills,
+         died: player.score.died,
          fame: player.fame,
          fameCount: player.fameCount,
       });

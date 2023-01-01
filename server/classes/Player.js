@@ -728,7 +728,6 @@ class Player extends Character {
       };
    }
 
-
    test_unwakable() {
 
       const rect = {
@@ -756,7 +755,6 @@ class Player extends Character {
    update(socketList, playerList, mobList, lightPack_PlayerList) {
       
       if(!this.isDead) {
-
 
          // ***************************
          // this.test_unwakable();

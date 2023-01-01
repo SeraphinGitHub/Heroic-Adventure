@@ -101,8 +101,28 @@ p {
    }
 
    .viewport {
-      height: 820px;
+      height: 710px;
       width: 1400px;
       animation: openGameWindow_1550px;
+   }
+
+   .left-side {
+      transform: translate(-50%) rotate(90deg) scale(52%, 130%) !important;
+   }
+   
+   .right-side {
+      transform: translate(50%) rotate(90deg) scale(52%, -130%) !important;
+   }
+
+   .flag {
+      transform: translate(0, -7%) scale(82%);
+   }
+
+   .field-container {
+      transform: translate(0, -121%);
+   }
+
+   .log-plate {
+      transform: translate(-50%, -81%) !important;
    }
 }

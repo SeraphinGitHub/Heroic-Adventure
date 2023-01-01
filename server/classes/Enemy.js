@@ -253,8 +253,8 @@ class Enemy extends Character {
 
       // Mob's Death
       if(this.health <= 0) {
-         enemy.kills++;
-         enemy.mobsKills++;
+         enemy.score.kills++;
+         enemy.score.mobsKills++;
          this.death(enemy);
          enemy.totalFameCost += this.getFameCost;
       }
