@@ -1,0 +1,30 @@
+
+.plate {
+   width: auto;
+}
+
+.frame {
+   position: relative;
+   height: 90px;
+   width: 356px;
+   background-color: black;
+}
+
+.frame p {
+   user-select: none;
+   width: auto;
+}
+
+.plate:hover .whitePlate {
+   visibility: visible !important;
+}
+
+.clickPlate:active .frame {
+   top: 4px;
+   left: 4px;
+}
+
+
+/* Frames */
+.silverFrame { background-position: -3px -4px; }
+.goldFrame   { background-position: -3px -99px; }

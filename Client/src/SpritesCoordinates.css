@@ -1,0 +1,284 @@
+
+/* ============================================================================================= */
+/* Fame Bar */
+/* ============================================================================================= */
+.fameBar_Half {
+	background-position: -364px -4px;
+	height: 99px;
+	width: 1042px;
+}
+
+.fameBar_Bgd {
+	background-position: -1220px -930px;
+	height: 48px;
+	width: 26px;
+}
+
+.fameBar_Green {
+	background-position: -1220px -982px;
+	height: 48px;
+	width: 26px;
+}
+
+.fameBar_Red {
+	background-position: -1220px -1034px;
+	height: 48px;
+	width: 26px;
+}
+
+
+
+/* ============================================================================================= */
+/* Viewport Frame */
+/* ============================================================================================= */
+.horizontFrameVP {
+	background-position: -374px -108px;
+	height: 18px;
+	width: 844px;
+}
+
+.verticalFrameVP {
+	background-position: -1515px -57px;
+	height: 844px;
+	width: 18px;
+}
+
+.cornerFrameVP {
+	background-position: -577px -949px;
+	height: 84px;
+	width: 146px;
+}
+
+
+
+/* ============================================================================================= */
+/* Corner Panel */
+/* ============================================================================================= */
+.silverCornerPanel {
+	background-position: -439px -946px;
+	height: 113px;
+	width: 132px;
+}
+
+.goldCornerPanel {
+	background-position: -439px -1092px;
+	height: 112px;
+	width: 131px;
+}
+
+
+
+/* ============================================================================================= */
+/* Corner InputField */
+/* ============================================================================================= */
+.silverCornerField {
+	background-position: -300px -945px;
+	height: 132px;
+	width: 131px;
+}
+
+.goldCornerField {
+	background-position: -301px -1092px;
+	height: 132px;
+	width: 133px;
+}
+
+
+
+/* ============================================================================================= */
+/* Icons square */
+/* ============================================================================================= */
+.silverWornSquare {
+	background-position: -3px -945px;
+	height: 144px;
+	width: 144px;
+}
+
+.silverCleanSquare {
+	background-position: -151px -945px;
+	height: 144px;
+	width: 144px;
+}
+
+.goldWornSquare {
+	background-position: -3px -1092px;
+	height: 144px;
+	width: 144px;
+}
+
+.goldCleanSquare {
+	background-position: -151px -1092px;
+	height: 144px;
+	width: 144px;
+}
+
+.darkSquare {
+	background-position: -577px -1092px;
+	height: 144px;
+	width: 144px;
+}
+
+
+/* ============================================================================================= */
+/* HUD */
+/* ============================================================================================= */
+.frameHUD_Half {
+	background-position: -738px -921px;
+	height: 172px;
+	width: 391px;
+}
+
+.bgdHUD_Tip {
+	background-position: -738px -1095px;
+	height: 141px;
+	width: 186px;
+}
+
+.bgdHUD_Bar {
+	background-position: -931px -1095px;
+	height: 141px;
+	width: 26px;
+}
+
+/* HUD Health Green */
+.healthGreenHUD_Tip {
+   background-position: -962px -1095px;
+	height: 45px;
+	width: 135px;
+}
+
+.healthGreenHUD_Bar {
+   background-position: -1103px -1095px;
+	height: 45px;
+	width: 23px;
+}
+
+/* Health Blue */
+.healthBlueHUD_Tip {
+   background-position: -963px -1142px;
+	height: 45px;
+	width: 134px;
+}
+
+.healthBlueHUD_Bar {
+   background-position: -1103px -1142px;
+	height: 45px;
+	width: 23px;
+}
+
+/* Health Red */
+.healthRedHUD_Tip {
+	background-position: -963px -1189px;
+	height: 45px;
+	width: 134px;
+}
+
+.healthRedHUD_Bar {
+	background-position: -1103px -1189px;
+	height: 45px;
+	width: 23px;
+}
+
+/* HUD Mana Dark Blue */
+.manaDarkBlue_Tip {
+	background-position: -1138px -930px;
+	height: 47px;
+	width: 43px;
+}
+
+.manaDarkBlue_Bar {
+	background-position: -1187px -930px;
+	height: 47px;
+	width: 21px;
+}
+
+/* Mana Clear Blue */
+.manaClearBlue_Tip {
+	background-position: -1138px -983px;
+	height: 47px;
+	width: 43px;
+}
+
+.manaClearBlue_Bar {
+	background-position: -1187px -983px;
+	height: 47px;
+	width: 21px;
+}
+
+/* Mana Violet */
+.manaViolet_Tip {
+	background-position: -1140px -1085px;
+	height: 47px;
+	width: 41px;
+}
+
+.manaViolet_Bar {
+	background-position: -1187px -1085px;
+	height: 47px;
+	width: 21px;
+}
+
+/* HUD Energy yellow */
+.energyYellow_Tip {
+	background-position: -1139px -1036px;
+	height: 45px;
+	width: 42px;
+}
+
+.energyYellow_Bar {
+	background-position: -1187px -1036px;
+	height: 45px;
+	width: 21px;
+}
+
+
+/* ============================================================================================= */
+/* Mini Bars */
+/* ============================================================================================= */
+.mini_red {
+	background-position: -1253px -931px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_yellow {
+	background-position: -1253px -946px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_violet {
+	background-position: -1253px -961px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_darkBlue {
+	background-position: -1253px -976px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_clearBlue {
+	background-position: -1253px -991px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_green {
+	background-position: -1253px -1006px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_orange {
+	background-position: -1253px -1021px;
+	height: 13px;
+	width: 7px;
+}
+
+.mini_grey {
+	background-position: -1253px -1036px;
+	height: 13px;
+	width: 7px;
+}

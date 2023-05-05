@@ -1,0 +1,87 @@
+
+html * {
+   margin: 0;
+   padding: 0;
+   cursor: default;
+}
+
+#root {
+   position: fixed;
+   height: 100%;
+   width: 100%;
+   background-color: rgb(30, 30, 30);
+   background: url("images/gameUI/background-tile.jpg") repeat;
+}
+
+.Img {
+   background: url("images/gameUI/elementsUI.png") no-repeat;
+}
+
+.Flex {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   width: 100%;
+}
+
+
+/* Dimbo Regular */
+@font-face {
+   font-family: "Dimbo-Regular";
+   src: url("fonts/Dimbo Regular.ttf");
+}
+
+p,
+input,
+button {
+   font-family: "Dimbo-Regular";
+   text-shadow: black -3px -3px 10px, black 3px 3px 10px;
+}
+
+input,
+button {
+   border: none;
+   background: none;
+}
+
+p {
+   text-align: center;
+   font-size: 50px;
+}
+
+
+/* ===================================================================== */
+/* Full HD
+/* ===================================================================== */
+@media screen and (min-width: 1851px) {
+
+   /* .viewport {
+      height: 870px;
+      width: 1780px;
+      animation: openGameWindow_1920px;
+   } */
+}
+
+
+/* ===================================================================== */
+/* Responsive 17" Screen
+/* ===================================================================== */
+@media screen and (max-width: 1850px) {
+
+   p {
+      line-height: 90%;
+   }
+
+   /* .viewport {
+      height: 750px;
+      width: 1400px;
+      animation: openGameWindow_1550px;
+   } */
+
+   /* .left-side,
+   .right-side {
+      width: 1110px !important;
+      background-position: 0 0;
+   } */
+}

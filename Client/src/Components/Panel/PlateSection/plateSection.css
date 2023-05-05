@@ -1,0 +1,40 @@
+
+.plateSection {
+   align-content: flex-start;
+   height: auto;
+   margin-bottom: 35px;
+}
+
+.plateList,
+.plateList ul {
+   height: auto;
+   max-height: 400px;
+   transition-duration: 0.8s;
+}
+
+.plateList {
+   overflow: hidden;
+}
+
+.plateList ul {
+   position: relative;
+   top: 0;
+}
+
+.plateList li {
+   position: relative;
+   height: 75px;
+   width: 100%;
+}
+
+.plateList li:hover .whitePlate {
+   visibility: visible !important;
+}
+
+.hideList {
+   top: -400px !important;
+}
+
+.hideSection {
+   max-height: 0px !important;
+}

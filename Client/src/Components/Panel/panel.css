@@ -1,0 +1,61 @@
+
+.panel {
+   position: absolute;
+   width: 561px;
+	height: 786px;
+   background-position: -374px -131px;
+}
+
+.content {
+   position: relative;
+   overflow-y: scroll;
+   scrollbar-width: none;
+   align-content: flex-start;
+   height: 80%;
+   width: 92%;
+   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.corners div {
+   position: absolute;
+   height: 113px;
+   width: 132px;
+}
+
+/* Top Left Corner */
+.corners :nth-child(1) {
+   top: 0;
+   left: 0;
+}
+
+/* Top Right Corner */
+.corners :nth-child(2) {
+   z-index: -1;
+   top: 0;
+   right: 0;
+   transform: rotateY(180deg);
+}
+
+/* Bottom Right Corner */
+.corners :nth-child(3) {
+   bottom: -1px;
+   right: -2px;
+   transform: rotate(180deg);
+}
+
+/* Bottom Left Corner */
+.corners :nth-child(4) {
+   z-index: -1;
+   bottom: -1px;
+   left: -1px;
+   transform: rotateX(180deg);
+}
+
+
+.silverPanelCorner {
+	background-position: -439px -946px;
+}
+
+.goldPanelCorner {
+	background-position: -439px -1092px;
+}
