@@ -15,21 +15,23 @@ const server = http.createServer(app);
 // =====================================================================
 // Packages
 // =====================================================================
-import bodyParser from "body-parser";
-// import { emit }   from "process";
-import { Server } from "socket.io";
-const socketIO  = new Server(server);
+import bodyParser    from "body-parser";
+import { DBconnect } from "./DB/DataBase";
+// import { Server }    from "socket.io";
+// const socketIO  = new Server(server);
 
-socketIO.on("connection", (socket) => {
-   console.log("Connected !")
-   socket.on("disconnect", () => console.log("Dis-connected !!!!!!!"));
-});
+DBconnect();
 
+// socketIO.on("connection", (socket) => {
+//    console.log("Connected !")
+//    socket.on("disconnect", () => console.log("Disconnected !"));
+// });
 
 
 // =================================================================================
 // Disable CORS errors
 // =================================================================================
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use((
    req:  Request,
@@ -42,14 +44,12 @@ app.use((
    next();
 });
 
-// app.use("/auth", userRoutes);
-app.use("/auth", (
-   req:  Request,
-   res:  Response,
-   next: NextFunction
-) => {
-   console.log(req.body.email);
-});
+
+// =====================================================================
+// Routes
+// =====================================================================
+import userRoutes from "./API/users/routes";
+app.use("/user", userRoutes);
 
 
 // =================================================================================
