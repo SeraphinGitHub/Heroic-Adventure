@@ -1,2 +1,2 @@
 
-SELECT name FROM users WHERE name = '{{userName}}';
+SELECT * FROM users WHERE name = '{{userName}}';

@@ -1,7 +1,7 @@
 
 import {
-   IString,
-   IUser,
+   ILogin,
+   ISignin,
 } from "../../utils/interfaces";
 
 import { Request, Response } from "express";
@@ -14,22 +14,35 @@ import jwt    from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
+const nameMin: number = 5;
+const nameMax: number = 12;
+const pswMin:  number = 10;
+const pswMax:  number = 20;
 
-// =====================================================================
-// Token Generation
-// =====================================================================
-const generateToken = (
-   // user: IUser,
-   res:  Response
+
+const handleResult = (
+   result:   any,
+   callback: Function,
+   fallback: Function,
 ) => {
 
-   // const token = jwt.sign(
-   //    { userId: user.id },
-   //    process.env.SECURITY_TOKEN!,
-   //    { expiresIn: "24h" }
-   // );
+   if(result.rowCount === 1) callback(result.rows[0]);
+   else fallback();
+}
 
-   // res.status(200).json({ token, message: `Bonjour ${user.name}, vous êtes connecté !` });
+const generateToken = (
+   userID:   number,
+   userName: string,
+   res:      Response,
+) => {
+
+   const token = jwt.sign(
+      { userID },
+      process.env.SECURITY_TOKEN!,
+      { expiresIn: "24h" }
+   );
+
+   res.status(200).json({ token, message: `Logged successfully ! Welcome ${userName}` });
 }
 
 
@@ -41,37 +54,30 @@ export const signin = async (
    res: Response,
 ) => {
 
-   const loginSchema = z.object({
-      userName:      z.string().min(5 ).max(12).regex(nameReg),
-      verifUserName: z.string().min(5 ).max(12).regex(nameReg),
-      password:      z.string().min(10).max(20).regex(pswReg),
-      verifPassword: z.string().min(10).max(20).regex(pswReg),
+   const signinSchema = z.object({
+      userName:      z.string().min(nameMin).max(nameMax).regex(nameReg),
+      verifUserName: z.string().min(nameMin).max(nameMax).regex(nameReg),
+      password:      z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
+      verifPassword: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
    })
    .refine((data) => data.userName === data.verifUserName, { message: "Account names dismatch !" })
    .refine((data) => data.password === data.verifPassword, { message: "Passwords dismatch !"     });
 
-   const result = loginSchema.safeParse(req.body);
+   const result = signinSchema.safeParse(req.body);
 
    if(result.success) {
-      const { userName, password }: IUser = result.data;
+      const { userName, password }: ISignin = result.data;
 
       try {
-         const checkVacancy: any = await DBexecute(__dirname, "SELECT_User_ByName", { userName });
-         if(requestFail(res, 1, checkVacancy, "Account name already exists !")) return;
-         
-         const hashPassword: string = await bcrypt.hash(password, 12);
+         const hashPsw:    string = await bcrypt.hash(password, 12);
+         const savedUser: unknown = await DBexecute(__dirname, "CREATE_User", { userName, hashPsw });
 
-         const user: IString = {
-            userName,
-            hashPassword,
-         };
-
-         const saveUser: any = await DBexecute(__dirname, "CREATE_User", user);
-         if(requestFail(res, 0, saveUser, "Could not register account !")) return;
-
-         res.status(200).json({ message: `User created, welcome ${userName} !` });
+         handleResult(savedUser,
+            () => res.status(200).json({ message: `User created ! Welcome ${userName}` }),
+            () => res.status(500).json({ message: `User already exists !` })
+         );
       }
-      catch(error) { res.status(500).json({ error }) }
+      catch { res.status(500).json({ message: `Could not register account !` }) }
    }
 
    else {
@@ -80,65 +86,60 @@ export const signin = async (
    }
 }
 
-const requestFail = (
-   res:      Response,
-   rowCount: number,
-   rawData:  any,
-   message:  string,
-): boolean => {
-
-   if(rawData.rowCount === rowCount) {
-      res.status(500).json({ message });
-      return false;
-   };
-
-   return true;
-}
-
 
 // =====================================================================
 // Login
 // =====================================================================
-export const login = (
+export const login = async (
    req: Request,
    res: Response,
 ) => {
     
-   // User.find()
-   // .then( async (users) => {
-      
-   //    let userArray = [];
-      
-   //    for (i = 0; i < users.length; i++) {
-   //       let user = users[i];
+   const loginSchema = z.object({
+      userName: z.string().min(nameMin).max(nameMax).regex(nameReg),
+      password: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
+   });
 
-   //       await bcrypt.compare(req.body.email, users[i].email)
-   //       .then(emailValid => {
-               
-   //             if(emailValid) return userArray.push(user);
-   //             else return;
-               
-   //       }).catch(error => res.status(501).json({ error }));
-   //    }
+   const result = loginSchema.safeParse(req.body);
 
+   if(result.success) {
+      const { userName, password }: ILogin = result.data;
 
-   //    const userIdInsideDB = userArray[0]._id;
-   //    const passwordHashed = userArray[0].password;
-      
-   //    bcrypt.compare(req.body.password, passwordHashed)
-   //    .then(passwordValid => {
-   //       if(!passwordValid) return res.status(401).json({ message: "Mot de passe incorrect !" });
+      try {
+         const getUser: unknown = await DBexecute(__dirname, "SELECT_User_ByName", { userName });
 
-   //       res.status(200).json({
-   //             userId: userIdInsideDB,
-   //             token: jwt.sign(
-   //                { userId: userIdInsideDB },
-   //                "RANDOM_TOKEN_SECRET",
-   //                { expiresIn: "24h" }
-   //             )
-   //       });
+         handleResult(getUser,
+            async (user: any) => {
 
-   //    }).catch(error => res.status(502).json({ error }));
+               const isPswValid: boolean = await bcrypt.compare(password, user.password);
+               if(isPswValid) generateToken(user.id, user.name, res);
+            },
+            () => res.status(200).json({ message: `User not found !` })
+         );
+      }
+      catch { res.status(500).json({ message: `Could not log in !` }) }
+   }
 
-   // }).catch(error => res.status(500).json({ error }));
+   else {
+      const message: string = result.error.issues[0].message;
+      res.status(500).json({ success: false, error: message });
+   }
 };
+
+
+
+// ==================================================================================
+// "POST" ==> User Logout
+// ==================================================================================
+// exports.logout = (req, res, next) => {
+
+//    const userIdTok = generic.verifyToken(req, res, next, "userId");
+
+//    User.findOne({ where: { id: userIdTok } })
+//    .then(user => {
+       
+//        res.status(202).json({ message: `${user.userName} déconnecté !` });
+
+//    }).catch(() => res.status(404).json({ message: "Utilisateur non trouvé !" }));
+// };
+

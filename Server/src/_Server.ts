@@ -49,7 +49,7 @@ app.use((
 // Routes
 // =====================================================================
 import userRoutes from "./API/users/routes";
-app.use("/user", userRoutes);
+app.use("/auth", userRoutes);
 
 
 // =================================================================================
