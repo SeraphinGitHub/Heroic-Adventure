@@ -4,15 +4,12 @@ import {
    ISignin,
 } from "../../utils/interfaces";
 
-import { Request, Response } from "express";
-import { nameReg, pswReg }   from "../../utils/regex";
-import { DBexecute }         from "../../DB/DataBase";
-import { z }                 from "zod";
-
-import bcrypt from "bcrypt";
-import jwt    from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import { Request, Response }          from "express";
+import { generateToken, verifyToken } from "./authentification"
+import { nameReg, pswReg }            from "../../utils/regex";
+import { DBexecute }                  from "../../DB/DataBase";
+import { z }                          from "zod";
+import bcrypt                         from "bcrypt";
 
 const nameMin: number = 5;
 const nameMax: number = 12;
@@ -29,22 +26,6 @@ const handleResult = (
    if(result.rowCount === 1) callback(result.rows[0]);
    else fallback();
 }
-
-const generateToken = (
-   userID:   number,
-   userName: string,
-   res:      Response,
-) => {
-
-   const token = jwt.sign(
-      { userID },
-      process.env.SECURITY_TOKEN!,
-      { expiresIn: "24h" }
-   );
-
-   res.status(200).json({ token, message: `Logged successfully ! Welcome ${userName}` });
-}
-
 
 // =====================================================================
 // Signin
@@ -77,7 +58,10 @@ export const signin = async (
             () => res.status(500).json({ message: `User already exists !` })
          );
       }
-      catch { res.status(500).json({ message: `Could not register account !` }) }
+
+      catch {
+         res.status(500).json({ message: `Could not register account !` });
+      }
    }
 
    else {
@@ -110,14 +94,20 @@ export const login = async (
 
          handleResult(getUser,
             async (user: any) => {
-
                const isPswValid: boolean = await bcrypt.compare(password, user.password);
-               if(isPswValid) generateToken(user.id, user.name, res);
+               
+               if(isPswValid) {
+                  const token = generateToken(user.id);
+                  res.status(200).json({ token, message: `Logged successfully ! Welcome ${user.name}` });
+               }
             },
-            () => res.status(200).json({ message: `User not found !` })
+            () => res.status(400).json({ message: `User not found !` })
          );
       }
-      catch { res.status(500).json({ message: `Could not log in !` }) }
+
+      catch {
+         res.status(500).json({ message: `Could not log in !` });
+      }
    }
 
    else {
@@ -127,19 +117,24 @@ export const login = async (
 };
 
 
+// =====================================================================
+// Logout
+// =====================================================================
+export const logout = async (
+   req: Request,
+   res: Response,
+) => {
 
-// ==================================================================================
-// "POST" ==> User Logout
-// ==================================================================================
-// exports.logout = (req, res, next) => {
+   const token: any = verifyToken(req, res);
 
-//    const userIdTok = generic.verifyToken(req, res, next, "userId");
+   if(!token || !token.userID) return;
+   
+   const { userID } = token;
+   const getUser: unknown = await DBexecute(__dirname, "SELECT_User_ByID", { userID });
 
-//    User.findOne({ where: { id: userIdTok } })
-//    .then(user => {
-       
-//        res.status(202).json({ message: `${user.userName} déconnecté !` });
-
-//    }).catch(() => res.status(404).json({ message: "Utilisateur non trouvé !" }));
-// };
+   handleResult(getUser,
+      (user: any) => res.status(200).json({ message: `${user.name} disconnected !` }),
+      (         ) => res.status(400).json({ message: `Could not disconnect !` })
+   );
+};
 
