@@ -4,12 +4,18 @@ import {
    ISignin,
 } from "../../utils/interfaces";
 
-import { Request, Response }          from "express";
-import { generateToken, verifyToken } from "./authentification"
-import { nameReg, pswReg }            from "../../utils/regex";
-import { DBexecute }                  from "../../DB/DataBase";
-import { z }                          from "zod";
-import bcrypt                         from "bcrypt";
+import {
+   handleResult,
+   handleZodError,
+   generateToken,
+   getUserID,
+} from "./auth"
+
+import { Request, Response } from "express";
+import { nameReg, pswReg }   from "../../utils/regex";
+import { DBexecute }         from "../../DB/DataBase";
+import { z }                 from "zod";
+import bcrypt                from "bcrypt";
 
 const nameMin: number = 5;
 const nameMax: number = 12;
@@ -17,18 +23,8 @@ const pswMin:  number = 10;
 const pswMax:  number = 20;
 
 
-const handleResult = (
-   result:   any,
-   callback: Function,
-   fallback: Function,
-) => {
-
-   if(result.rowCount === 1) callback(result.rows[0]);
-   else fallback();
-}
-
 // =====================================================================
-// Signin
+// Signin ==> POST
 // =====================================================================
 export const signin = async (
    req: Request,
@@ -51,7 +47,7 @@ export const signin = async (
 
       try {
          const hashPsw:    string = await bcrypt.hash(password, 12);
-         const savedUser: unknown = await DBexecute(__dirname, "CREATE_User", { userName, hashPsw });
+         const savedUser: unknown = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
 
          handleResult(savedUser,
             () => res.status(200).json({ message: `User created ! Welcome ${userName}` }),
@@ -64,15 +60,12 @@ export const signin = async (
       }
    }
 
-   else {
-      const message: string = result.error.issues[0].message;
-      res.status(500).json({ success: false, error: message });
-   }
+   else handleZodError(res, result);
 }
 
 
 // =====================================================================
-// Login
+// Login ==> POST
 // =====================================================================
 export const login = async (
    req: Request,
@@ -90,7 +83,7 @@ export const login = async (
       const { userName, password }: ILogin = result.data;
 
       try {
-         const getUser: unknown = await DBexecute(__dirname, "SELECT_User_ByName", { userName });
+         const getUser: unknown = await DBexecute(__dirname, "ConnectUser", { userName });
 
          handleResult(getUser,
             async (user: any) => {
@@ -110,31 +103,29 @@ export const login = async (
       }
    }
 
-   else {
-      const message: string = result.error.issues[0].message;
-      res.status(500).json({ success: false, error: message });
-   }
+   else handleZodError(res, result);
 };
 
 
 // =====================================================================
-// Logout
+// Logout ==> POST
 // =====================================================================
 export const logout = async (
    req: Request,
    res: Response,
 ) => {
 
-   const token: any = verifyToken(req, res);
-
-   if(!token || !token.userID) return;
+   try {
+      const userID:  number  = getUserID(req)!;
+      const getUser: unknown = await DBexecute(__dirname, "DisconnectUser", { userID });
    
-   const { userID } = token;
-   const getUser: unknown = await DBexecute(__dirname, "SELECT_User_ByID", { userID });
+      handleResult(getUser,
+         (user: any) => res.status(200).json({ message: `${user.name} disconnected !` }),
+         (         ) => res.status(500).json({ message: `Could not disconnect !` })
+      );
+   }
 
-   handleResult(getUser,
-      (user: any) => res.status(200).json({ message: `${user.name} disconnected !` }),
-      (         ) => res.status(400).json({ message: `Could not disconnect !` })
-   );
+   catch {
+      res.status(500).json({ message: `Session timed out !` })
+   }
 };
-

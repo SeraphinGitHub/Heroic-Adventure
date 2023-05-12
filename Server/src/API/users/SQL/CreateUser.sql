@@ -11,7 +11,7 @@ VALUES (
    '{{userName}}',
    '{{hashPsw}}',
    '{}',
-   FALSE,
+   false,
    CURRENT_TIMESTAMP
 )
 

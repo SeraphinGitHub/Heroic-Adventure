@@ -17,7 +17,7 @@ const tableCreation = () => {
 
    tablesName.forEach(name => {
 
-      DBexecute(__dirname, `CREATE_TABLE_${name}`)
+      DBexecute(__dirname, `CreateTable_${name}`)
       .then(() => console.log(`Table created ! ==> ${name}`))
       .catch((error) => {
 

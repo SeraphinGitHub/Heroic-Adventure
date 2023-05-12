@@ -48,8 +48,11 @@ app.use((
 // =====================================================================
 // Routes
 // =====================================================================
-import userRoutes from "./API/users/routes";
-app.use("/auth", userRoutes);
+import userRoutes    from "./API/users/routes";
+import playerRoutes  from "./API/players/routes";
+
+app.use("/user",   userRoutes  );
+app.use("/player", playerRoutes);
 
 
 // =================================================================================

@@ -7,6 +7,10 @@ export interface INumber {
    [key: string]: number,
 }
 
+export interface IBoolean {
+   [key: string]: boolean,
+}
+
 export interface ILogin {
    userName:      string,
    password:      string,
