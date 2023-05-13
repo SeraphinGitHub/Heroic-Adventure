@@ -29,19 +29,25 @@ DBconnect();
 
 
 // =================================================================================
-// Disable CORS errors
+// Disable Errors
 // =================================================================================
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use((
-   req:  Request,
-   res:  Response,
-   next: NextFunction
+   error: Error,
+   req:   Request,
+   res:   Response,
+   next:  NextFunction,
 ) => {
-   res.setHeader("Access-Control-Allow-Origin", "*");
-   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
-   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-   next();
+   if(error) res.status(400).send({ message: `Invalid request !` });
+   
+   else {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+      
+      next();
+   }
 });
 
 

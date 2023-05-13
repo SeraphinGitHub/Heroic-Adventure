@@ -4,7 +4,7 @@ import {
 } from "utils/interfaces";
 
 import {
-   handleResult,
+   handleResultDB,
    handleZodError,
    getUserID,
 } from "../users/auth";
@@ -64,42 +64,54 @@ export const createPlayer = async (
    res: Response,
 ) => {
    
-   const playerNameSchema = z.object({
+   const schema = z.object({
       playerName: z.string().min(pNameMin).max(pNameMax).regex(nameReg),
-   })
+   });
+   
+   const result = schema.safeParse(req.body);
+   if(!result.success) return handleZodError(res, result);
+   
+   const { playerName }: IString = result.data;
+   
+   try {
+      // =======================================
+      // ==> Check name vacancy
+      // =======================================
+      const vacancyResult: any = await DBexecute(__dirname, "CheckNameVacancy", { playerName });
+      let isAvailalbe: unknown;
+      
+      handleResultDB(vacancyResult,
+         () => isAvailalbe = false,
+         () => isAvailalbe = true,   
+      );
 
-   const result = playerNameSchema.safeParse(req.body);
+      if(!isAvailalbe) throw new Error;
+      
 
-   if(result.success) {
-      const { playerName }: IString = result.data;
+      // =======================================
+      // ==> Create player & save to DB
+      // =======================================
+      const newPlayer: PlayerClassTest = new PlayerClassTest(playerName);
 
-      try {
-         const newPlayer: PlayerClassTest = new PlayerClassTest(playerName);
-
-         const data = {
-            userID:    getUserID(req)!,
-            name:      playerName,
-            ...newPlayer.export(),
-         }
-
-         const getPlayerDB: any = await DBexecute(__dirname, "CreatePlayer", data);
-
-         handleResult(getPlayerDB,
-            (playerDB: any) => {
-
-               newPlayer.id = playerDB.id;
-               res.status(200).json({ message: `New charachter created ! ${ newPlayer.name }`});
-            },   
-            () => res.status(500).json({ message: `Unable to overwrite player !`}),   
-         );
-
-         newPlayer.run();
+      const data = {
+         userID: getUserID(req)!,
+         name:   playerName,
+         ...newPlayer.export(),
       }
 
-      catch {
-         res.status(500).json({ message: `Could not create character !`});
-      }
+      const createdPlayerDB: any = await DBexecute(__dirname, "CreatePlayer", data);
+
+      handleResultDB(createdPlayerDB,
+         (playerDB: any) => {
+
+            newPlayer.id = playerDB.id;
+            res.status(200).json({ message: `New charachter created ! ${ newPlayer.name }`});
+         },
+         () => res.status(500).json({ message: `Could not create character !`}),   
+      );
    }
-
-   else handleZodError(res, result);
+   
+   catch {
+      res.status(500).json({ message: `This player name is unavailable !`});
+   }
 }

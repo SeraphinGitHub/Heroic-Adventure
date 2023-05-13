@@ -9,7 +9,7 @@ const getHeaderToken = (req: Request) => {
    return req.headers.authorization?.split(" ")[1];
 }
 
-export const handleResult = (
+export const handleResultDB = (
    result:   any,
    callback: Function,
    fallback: Function,
@@ -23,7 +23,7 @@ export const handleZodError = (
    res:    Response,
    result: any,
 ) => {
-
+   
    const message: string = result.error.issues[0].message;
    res.status(500).json({ success: false, error: message });
 }

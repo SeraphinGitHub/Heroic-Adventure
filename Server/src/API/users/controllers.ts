@@ -5,7 +5,7 @@ import {
 } from "../../utils/interfaces";
 
 import {
-   handleResult,
+   handleResultDB,
    handleZodError,
    generateToken,
    getUserID,
@@ -31,7 +31,7 @@ export const signin = async (
    res: Response,
 ) => {
 
-   const signinSchema = z.object({
+   const schema = z.object({
       userName:      z.string().min(nameMin).max(nameMax).regex(nameReg),
       verifUserName: z.string().min(nameMin).max(nameMax).regex(nameReg),
       password:      z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
@@ -40,27 +40,24 @@ export const signin = async (
    .refine((data) => data.userName === data.verifUserName, { message: "Account names dismatch !" })
    .refine((data) => data.password === data.verifPassword, { message: "Passwords dismatch !"     });
 
-   const result = signinSchema.safeParse(req.body);
+   const result = schema.safeParse(req.body);
+   if(!result.success) return handleZodError(res, result);
 
-   if(result.success) {
-      const { userName, password }: ISignin = result.data;
+   const { userName, password }: ISignin = result.data;
 
-      try {
-         const hashPsw:    string = await bcrypt.hash(password, 12);
-         const savedUser: unknown = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
+   try {
+      const hashPsw:    string = await bcrypt.hash(password, 12);
+      const savedUser: unknown = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
 
-         handleResult(savedUser,
-            () => res.status(200).json({ message: `User created ! Welcome ${userName}` }),
-            () => res.status(500).json({ message: `User already exists !` })
-         );
-      }
-
-      catch {
-         res.status(500).json({ message: `Could not register account !` });
-      }
+      handleResultDB(savedUser,
+         () => res.status(200).json({ message: `User created ! Welcome ${userName}` }),
+         () => res.status(500).json({ message: `User already exists !` })
+      );
    }
 
-   else handleZodError(res, result);
+   catch {
+      res.status(500).json({ message: `Could not register account !` });
+   }
 }
 
 
@@ -72,38 +69,36 @@ export const login = async (
    res: Response,
 ) => {
     
-   const loginSchema = z.object({
+   const schema = z.object({
       userName: z.string().min(nameMin).max(nameMax).regex(nameReg),
       password: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
    });
 
-   const result = loginSchema.safeParse(req.body);
+   const result = schema.safeParse(req.body);
+   if(!result.success) return handleZodError(res, result);
 
-   if(result.success) {
-      const { userName, password }: ILogin = result.data;
+   const { userName, password }: ILogin = result.data;
 
-      try {
-         const getUser: unknown = await DBexecute(__dirname, "ConnectUser", { userName });
+   try {
+      const getUser: unknown = await DBexecute(__dirname, "ConnectUser", { userName });
 
-         handleResult(getUser,
-            async (user: any) => {
-               const isPswValid: boolean = await bcrypt.compare(password, user.password);
-               
-               if(isPswValid) {
-                  const token = generateToken(user.id);
-                  res.status(200).json({ token, message: `Logged successfully ! Welcome ${user.name}` });
-               }
-            },
-            () => res.status(400).json({ message: `User not found !` })
-         );
-      }
-
-      catch {
-         res.status(500).json({ message: `Could not log in !` });
-      }
+      handleResultDB(getUser,
+         async (user: any) => {
+            const isPswValid: boolean = await bcrypt.compare(password, user.password);
+            
+            if(isPswValid) {
+               const token = generateToken(user.id);
+               res.status(200).json({ token, message: `Logged successfully ! Welcome ${user.name}` });
+            }
+            else res.status(500).json({ message: `Invalid password !` });
+         },
+         () => res.status(400).json({ message: `User not found !` })
+      );
    }
 
-   else handleZodError(res, result);
+   catch {
+      res.status(500).json({ message: `Could not log in !` });
+   }
 };
 
 
@@ -119,7 +114,7 @@ export const logout = async (
       const userID:  number  = getUserID(req)!;
       const getUser: unknown = await DBexecute(__dirname, "DisconnectUser", { userID });
    
-      handleResult(getUser,
+      handleResultDB(getUser,
          (user: any) => res.status(200).json({ message: `${user.name} disconnected !` }),
          (         ) => res.status(500).json({ message: `Could not disconnect !` })
       );
