@@ -1,5 +1,8 @@
 
-import { IBoolean, INumber } from "utils/interfaces";
+import {
+   IBoolean,
+   INumber,
+} from "../../utils/interfaces";
 
 
 // =====================================================================

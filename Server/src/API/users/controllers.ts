@@ -33,12 +33,12 @@ export const signin = async (
 
    const schema = z.object({
       userName:      z.string().min(nameMin).max(nameMax).regex(nameReg),
-      verifUserName: z.string().min(nameMin).max(nameMax).regex(nameReg),
+      verifyUserName: z.string().min(nameMin).max(nameMax).regex(nameReg),
       password:      z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
-      verifPassword: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
+      verifyPassword: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
    })
-   .refine((data) => data.userName === data.verifUserName, { message: "Account names dismatch !" })
-   .refine((data) => data.password === data.verifPassword, { message: "Passwords dismatch !"     });
+   .refine((data) => data.userName === data.verifyUserName, { message: "Account names dismatch !" })
+   .refine((data) => data.password === data.verifyPassword, { message: "Passwords dismatch !"     });
 
    const result = schema.safeParse(req.body);
    if(!result.success) return handleZodError(res, result);

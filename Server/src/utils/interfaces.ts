@@ -17,6 +17,6 @@ export interface ILogin {
 }
 
 export interface ISignin extends ILogin {
-   verifUserName: string,
-   verifPassword: string,
+   verifyUserName: string,
+   verifyPassword: string,
 }

@@ -8,7 +8,8 @@ import express, { Request, Response, NextFunction } from "express";
 import http                                         from "http";
 import dotenv                                       from "dotenv";
 dotenv.config();
-const app    = express();
+
+export const app = express();
 const server = http.createServer(app);
 
 
@@ -67,5 +68,3 @@ app.use("/player", playerRoutes);
 server.listen(process.env.PORT || 2800, () => {
    console.log(`Listening on port ${process.env.PORT}`);
 });
-
-module.exports = app;

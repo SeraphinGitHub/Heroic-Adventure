@@ -1,7 +1,7 @@
 
 import {
    IString,
-} from "utils/interfaces";
+} from "../../utils/interfaces";
 
 import {
    handleResultDB,
