@@ -5,28 +5,16 @@
 // Server
 // =====================================================================
 import express, { Request, Response, NextFunction } from "express";
-import http                                         from "http";
-import dotenv                                       from "dotenv";
+import http          from "http";
+import bodyParser    from "body-parser";
+import dotenv        from "dotenv";
 dotenv.config();
 
-export const app = express();
-const server = http.createServer(app);
+export const app    = express();
+export const server = http.createServer(app);
 
-
-// =====================================================================
-// Packages
-// =====================================================================
-import bodyParser    from "body-parser";
 import { DBconnect } from "./DB/DataBase";
-// import { Server }    from "socket.io";
-// const socketIO  = new Server(server);
-
 DBconnect();
-
-// socketIO.on("connection", (socket) => {
-//    console.log("Connected !")
-//    socket.on("disconnect", () => console.log("Disconnected !"));
-// });
 
 
 // =================================================================================

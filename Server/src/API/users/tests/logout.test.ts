@@ -14,37 +14,35 @@ describe("Test: /user/logout", () => {
       newAgent = agent(app);
    });
    
-   
-   it("Should log out User if exist", async () => {
-      const loginReq = await newAgent.post(`/user/login`).send(varTest.correct);
+   const request = async (tokenTest?: string) => {
 
-      const response = await newAgent
+      const loginReq = await newAgent
+      .post(`/user/login`)
+      .send(varTest.correct);
+
+      let token: string = loginReq.body.token;
+
+      if(tokenTest !== undefined) token = tokenTest;
+
+      return await newAgent
       .post(`/user/logout`)
-      .set('Authorization', `Bearer ${loginReq.body.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send();
-      
+   }
+
+   
+   it("Should log out User if exist with valid token", async () => {
+      const response = await request();
       expect(response.status).to.equal(200);
    });
 
-   it("Should fail to logout with empty token", async () => {
-      await newAgent.post(`/user/login`).send(varTest.correct);
-
-      const response = await newAgent
-      .post(`/user/logout`)
-      .set('Authorization', `Bearer `)
-      .send();
-      
+   it("Should fail to logout if exist with empty token", async () => {
+      const response = await request("");
       expect(response.status).to.equal(500);
    });
 
-   it("Should fail to logout with invalid token", async () => {
-      await newAgent.post(`/user/login`).send(varTest.correct);
-
-      const response = await newAgent
-      .post(`/user/logout`)
-      .set('Authorization', `Bearer $_invalid_token_$`)
-      .send();
-      
+   it("Should fail to logout if exist with invalid token", async () => {
+      const response = await request("$_invalid_token_$");
       expect(response.status).to.equal(500);
    });
 

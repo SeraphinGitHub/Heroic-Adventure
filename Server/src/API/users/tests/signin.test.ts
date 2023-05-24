@@ -21,9 +21,10 @@ describe("Test: /user/signin", () => {
    });
 
    const request = async (data: ISignin) => {
-      return await newAgent.post(`/user/signin`).send(data);
+      return await newAgent
+      .post(`/user/signin`)
+      .send(data);
    }
-
    
    
    it("Should create User if not exist", async () => {

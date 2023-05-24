@@ -9,16 +9,6 @@ const getHeaderToken = (req: Request) => {
    return req.headers.authorization?.split(" ")[1];
 }
 
-export const handleResultDB = (
-   result:   any,
-   callback: Function,
-   fallback: Function,
-) => {
-
-   if(result.rowCount === 1) callback(result.rows[0]);
-   else fallback();
-}
-
 export const handleZodError = (
    res:    Response,
    result: any,

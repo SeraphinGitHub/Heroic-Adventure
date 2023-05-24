@@ -19,9 +19,11 @@ describe("Test: /user/login", () => {
    });
 
    const request = async (data: ILogin) => {
-      return await newAgent.post(`/user/login`).send(data);
+      
+      return await newAgent
+      .post(`/user/login`)
+      .send(data);
    }
-
 
    
    it("Should log User if exist & return a token", async () => {

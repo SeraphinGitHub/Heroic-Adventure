@@ -45,9 +45,9 @@ export const signin = async (
 
    try {
       const hashPsw: string = await bcrypt.hash(password, 12);
-      const { DBcount }:  any = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
+      const { DB_Count }:  any = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
 
-      if(DBcount === 1) {
+      if(DB_Count === 1) {
          res.status(200).json({ message: `User created ! Welcome ${userName}` });
       }
       else res.status(500).json({ message: `User already exists !` });
@@ -78,14 +78,14 @@ export const login = async (
    const { userName, password }: ILogin = result.data;
 
    try {
-      const { DBcount, DBdata }: any = await DBexecute(__dirname, "ConnectUser", { userName });
+      const { DB_Count, DB_GetOne }: any = await DBexecute(__dirname, "ConnectUser", { userName });
 
-      if(DBcount === 1) {
-         const isPswValid: boolean = await bcrypt.compare(password, DBdata.password);
+      if(DB_Count === 1) {
+         const isPswValid: boolean = await bcrypt.compare(password, DB_GetOne.password);
             
          if(isPswValid) {
-            const token = generateToken(DBdata.id);
-            res.status(200).json({ token, message: `Logged successfully ! Welcome ${DBdata.name}` });
+            const token = generateToken(DB_GetOne.id);
+            res.status(200).json({ token, message: `Logged successfully ! Welcome ${DB_GetOne.name}` });
          }
          else res.status(500).json({ message: `Invalid password !` });
       }
@@ -108,10 +108,10 @@ export const logout = async (
 
    try {
       const userID: number = res.locals.userID;
-      const { DBcount, DBdata }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
+      const { DB_Count, DB_GetOne }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
       
-      if(DBcount === 1) {
-         res.status(200).json({ message: `${DBdata.name} disconnected !` });
+      if(DB_Count === 1) {
+         res.status(200).json({ message: `${DB_GetOne.name} disconnected !` });
       }
       else res.status(500).json({ message: `Could not disconnect !` });
    }

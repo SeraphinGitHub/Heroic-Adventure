@@ -43,6 +43,8 @@ export const TestConstants = {
 
    player_API: {
       correct: [
+         "JohnWick",
+         "ChuckNorris",
          "Insomnium",
          "AleStorm",
          "Belakor",

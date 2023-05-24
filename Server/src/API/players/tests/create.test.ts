@@ -2,8 +2,8 @@
 import { SuperAgentTest, agent } from "supertest";
 import { expect }                from "chai";
 import { app }                   from "../../../_Server";
-import { TestConstants }         from "../../../utils/_Constants.test";
 import { DBexecute }             from "../../../DB/DataBase";
+import { TestConstants }         from "../../../utils/_Constants.test";
 
 const { user_API: auth, player_API: varTest } = TestConstants;
 
@@ -15,7 +15,10 @@ describe("Test: /player/create", () => {
    });
    
    const request = async (data: any) => {
-      const loginReq = await newAgent.post(`/user/login`).send(auth.correct);
+
+      const loginReq = await newAgent
+      .post(`/user/login`)
+      .send(auth.correct);
 
       return await newAgent
       .post(`/player/create`)
@@ -38,10 +41,12 @@ describe("Test: /player/create", () => {
    // "Should fail to create player if already exist"
    varTest.correct.forEach(name => {
       
-      it("Should create player if already exist", async () => {
+      it("Should fail to create player if already exist", async () => {
          const response = await request({ playerName: name });
          expect(response.status).to.equal(500);
          
+         if(name === "JohnWick" || name == "ChuckNorris") return;
+
          await DBexecute(__dirname, "DeletePlayer", { playerName: name });
       });
    });

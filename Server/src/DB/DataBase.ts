@@ -54,17 +54,12 @@ export const DBexecute = async (
 
    const { rowCount, rows } = await pgClient.query(request);
 
-   if(rowCount === 0) return {
-      DBcount: rowCount,
-   }
-   
-   if(rowCount === 1) return {
-      DBcount: rowCount,
-      DBdata:  rows[0],
+   const result: any = {
+      DB_Count: rowCount,
    }
 
-   if(rowCount  >  1) return {
-      DBcount: rowCount,
-      DBrows:  rows,
-   }
+   if(rowCount === 1) result["DB_GetOne"] = rows[0];
+   if(rowCount  >  1) result["DB_GetAll"] = rows;
+
+   return result;
 }
