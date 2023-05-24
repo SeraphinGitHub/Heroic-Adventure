@@ -6,7 +6,9 @@ import {
 import { SuperAgentTest, agent } from "supertest";
 import { expect }                from "chai";
 import { app }                   from "../../../_Server";
-import { inputVar }              from "./_Constants.test"
+import { TestConstants }         from "../../../utils/_Constants.test";
+
+const { user_API: varTest } = TestConstants;
 
 
 describe("Test: /user/login", () => {
@@ -23,7 +25,7 @@ describe("Test: /user/login", () => {
 
    
    it("Should log User if exist & return a token", async () => {
-      const response = await request(inputVar.correct);
+      const response = await request(varTest.correct);
       expect(response.status).to.equal(200);
       expect(response.body.token).to.exist;
    });
@@ -42,8 +44,8 @@ describe("Test: /user/login", () => {
    });
 
    // "Should fail to log User if wrong input fields"
-   inputVar.wrongLogin.forEach(set => {
-      const data = inputVar.setInputFields(set);
+   varTest.wrongLogin.forEach(set => {
+      const data = varTest.setInputFields(set);
       
       it("Should fail to log User if wrong input fields", async () => {
 

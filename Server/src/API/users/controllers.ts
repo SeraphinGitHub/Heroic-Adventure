@@ -5,10 +5,8 @@ import {
 } from "../../utils/interfaces";
 
 import {
-   handleResultDB,
    handleZodError,
    generateToken,
-   getUserID,
 } from "./auth"
 
 import { Request, Response } from "express";
@@ -32,9 +30,9 @@ export const signin = async (
 ) => {
 
    const schema = z.object({
-      userName:      z.string().min(nameMin).max(nameMax).regex(nameReg),
+      userName:       z.string().min(nameMin).max(nameMax).regex(nameReg),
       verifyUserName: z.string().min(nameMin).max(nameMax).regex(nameReg),
-      password:      z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
+      password:       z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
       verifyPassword: z.string().min(pswMin ).max(pswMax ).regex(pswReg ),
    })
    .refine((data) => data.userName === data.verifyUserName, { message: "Account names dismatch !" })
@@ -46,13 +44,13 @@ export const signin = async (
    const { userName, password }: ISignin = result.data;
 
    try {
-      const hashPsw:    string = await bcrypt.hash(password, 12);
-      const savedUser: unknown = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
+      const hashPsw: string = await bcrypt.hash(password, 12);
+      const { DBcount }:  any = await DBexecute(__dirname, "CreateUser", { userName, hashPsw });
 
-      handleResultDB(savedUser,
-         () => res.status(200).json({ message: `User created ! Welcome ${userName}` }),
-         () => res.status(500).json({ message: `User already exists !` })
-      );
+      if(DBcount === 1) {
+         res.status(200).json({ message: `User created ! Welcome ${userName}` });
+      }
+      else res.status(500).json({ message: `User already exists !` });
    }
 
    catch {
@@ -80,20 +78,18 @@ export const login = async (
    const { userName, password }: ILogin = result.data;
 
    try {
-      const getUser: unknown = await DBexecute(__dirname, "ConnectUser", { userName });
+      const { DBcount, DBdata }: any = await DBexecute(__dirname, "ConnectUser", { userName });
 
-      handleResultDB(getUser,
-         async (user: any) => {
-            const isPswValid: boolean = await bcrypt.compare(password, user.password);
+      if(DBcount === 1) {
+         const isPswValid: boolean = await bcrypt.compare(password, DBdata.password);
             
-            if(isPswValid) {
-               const token = generateToken(user.id);
-               res.status(200).json({ token, message: `Logged successfully ! Welcome ${user.name}` });
-            }
-            else res.status(500).json({ message: `Invalid password !` });
-         },
-         () => res.status(400).json({ message: `User not found !` })
-      );
+         if(isPswValid) {
+            const token = generateToken(DBdata.id);
+            res.status(200).json({ token, message: `Logged successfully ! Welcome ${DBdata.name}` });
+         }
+         else res.status(500).json({ message: `Invalid password !` });
+      }
+      else res.status(400).json({ message: `User not found !` });
    }
 
    catch {
@@ -111,13 +107,13 @@ export const logout = async (
 ) => {
 
    try {
-      const userID:  number  = getUserID(req)!;
-      const getUser: unknown = await DBexecute(__dirname, "DisconnectUser", { userID });
-   
-      handleResultDB(getUser,
-         (user: any) => res.status(200).json({ message: `${user.name} disconnected !` }),
-         (         ) => res.status(500).json({ message: `Could not disconnect !` })
-      );
+      const userID: number = res.locals.userID;
+      const { DBcount, DBdata }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
+      
+      if(DBcount === 1) {
+         res.status(200).json({ message: `${DBdata.name} disconnected !` });
+      }
+      else res.status(500).json({ message: `Could not disconnect !` });
    }
 
    catch {

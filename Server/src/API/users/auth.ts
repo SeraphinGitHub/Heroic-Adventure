@@ -45,17 +45,20 @@ export const verifyToken = (
    next: NextFunction,
 ) => {
 
-   const token: any = getHeaderToken(req);
+   const token: string | undefined = getHeaderToken(req);
+
+   if(token === undefined) {
+      return res.status(500).json({ message: `Unauthenticated request !` });
+   }
    
-   if(typeof token === "undefined") res.status(400).json({ message: `Unauthenticated request !` });      
-   else next();
+   try {
+      const { userID }: any = jwt.verify(token, process.env.SECURITY_TOKEN!);
+      res.locals.userID = userID;
+      next();
+   }
+   
+   catch {
+      res.status(500).json({ message: `Session timed out !` });
+   }
 }
-
-export const getUserID = (req: Request): number | undefined => {
-   
-   const headerToken:  any = getHeaderToken(req);
-   const decodedToken: any = jwt.verify(headerToken, process.env.SECURITY_TOKEN!);
-
-   if(typeof decodedToken.userID === "number") return decodedToken.userID;
-};
 

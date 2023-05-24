@@ -2,7 +2,7 @@
 import {
    IBoolean,
    INumber,
-} from "../../utils/interfaces";
+} from "../utils/interfaces";
 
 
 // =====================================================================

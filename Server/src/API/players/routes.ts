@@ -11,8 +11,8 @@ import express  from "express"
 const router = express.Router();
 
 // GET
-router.get("/page",    verifyToken, playerPage);
-router.get("/join",    verifyToken, enterWorld);
+router.get("/page", verifyToken, playerPage);
+router.get("/join", verifyToken, enterWorld);
 
 // POST
 router.post("/create", verifyToken, createPlayer);

@@ -7,7 +7,9 @@ import { DBexecute }             from "../../../DB/DataBase";
 import { SuperAgentTest, agent } from "supertest";
 import { expect }                from "chai";
 import { app }                   from "../../../_Server";
-import { inputVar }              from "./_Constants.test"
+import { TestConstants }         from "../../../utils/_Constants.test";
+
+const { user_API: varTest } = TestConstants;
 
 
 describe("Test: /user/signin", () => {
@@ -15,7 +17,7 @@ describe("Test: /user/signin", () => {
 
    before(async () => {
       newAgent = agent(app);
-      await DBexecute(__dirname, "DeleteUser", { userName: inputVar.correct.userName });
+      await DBexecute(__dirname, "DeleteUser", { userName: varTest.correct.userName });
    });
 
    const request = async (data: ISignin) => {
@@ -25,18 +27,18 @@ describe("Test: /user/signin", () => {
    
    
    it("Should create User if not exist", async () => {
-      const response = await request(inputVar.correct);
+      const response = await request(varTest.correct);
       expect(response.status).to.equal(200);
    });
 
    it("Should fail to create User if already exist", async () => {
-      const response = await request(inputVar.correct);
+      const response = await request(varTest.correct);
       expect(response.status).to.equal(500);
    });
 
    // "Should fail to create User if wrong input fields"
-   inputVar.wrongSignin.forEach(set => {
-      const data = inputVar.setInputFields(set);
+   varTest.wrongSignin.forEach(set => {
+      const data = varTest.setInputFields(set);
       
       it("Should fail to create User if wrong input fields", async () => {
 
