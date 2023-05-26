@@ -37,21 +37,21 @@ describe("Test: /player/page", () => {
    }
 
    
-   it("Should return an array and a message", async () => {
+   it("Should return an array of data and a message", async () => {
       
       const { response, userID } = await request();
-      const { DB_GetAll }: any   = await DBexecute(__dirname, "GetAllPlayersID", { userID });
+      const { DB_Data }: any     = await DBexecute(__dirname, "GetAllPlayersID", { userID });
       
       let dataCheck: unknown;
-
+      
       if(!response.body.data) dataCheck = {
          message: "No character found !",
       }
       
       else dataCheck = {
          data: [
-            { id: DB_GetAll[0].id, name: "JohnWick"    },
-            { id: DB_GetAll[1].id, name: "ChuckNorris" },
+            { id: DB_Data[0].id, name: "JohnWick"    },
+            { id: DB_Data[1].id, name: "ChuckNorris" },
          ],
          message: "Success",
       }

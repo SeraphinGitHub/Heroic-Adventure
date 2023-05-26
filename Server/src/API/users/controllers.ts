@@ -22,7 +22,7 @@ const pswMax:  number = 20;
 
 
 // =====================================================================
-// Signin ==> POST
+// POST > Signin
 // =====================================================================
 export const signin = async (
    req: Request,
@@ -60,7 +60,7 @@ export const signin = async (
 
 
 // =====================================================================
-// Login ==> POST
+// POST > Login
 // =====================================================================
 export const login = async (
    req: Request,
@@ -78,14 +78,15 @@ export const login = async (
    const { userName, password }: ILogin = result.data;
 
    try {
-      const { DB_Count, DB_GetOne }: any = await DBexecute(__dirname, "ConnectUser", { userName });
+      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "ConnectUser", { userName });
+      const DB_User: any = DB_Data[0];
 
       if(DB_Count === 1) {
-         const isPswValid: boolean = await bcrypt.compare(password, DB_GetOne.password);
+         const isPswValid: boolean = await bcrypt.compare(password, DB_User.password);
             
          if(isPswValid) {
-            const token = generateToken(DB_GetOne.id);
-            res.status(200).json({ token, message: `Logged successfully ! Welcome ${DB_GetOne.name}` });
+            const userToken = generateToken(DB_User.id);
+            res.status(200).json({ userToken, message: `Logged successfully ! Welcome ${DB_User.name}` });
          }
          else res.status(500).json({ message: `Invalid password !` });
       }
@@ -99,7 +100,7 @@ export const login = async (
 
 
 // =====================================================================
-// Logout ==> POST
+// POST > Logout
 // =====================================================================
 export const logout = async (
    req: Request,
@@ -108,10 +109,11 @@ export const logout = async (
 
    try {
       const userID: number = res.locals.userID;
-      const { DB_Count, DB_GetOne }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
-      
+      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
+      const DB_User: any = DB_Data[0];
+
       if(DB_Count === 1) {
-         res.status(200).json({ message: `${DB_GetOne.name} disconnected !` });
+         res.status(200).json({ message: `${DB_User.name} disconnected !` });
       }
       else res.status(500).json({ message: `Could not disconnect !` });
    }

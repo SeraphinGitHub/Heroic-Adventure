@@ -3,16 +3,14 @@ import {
    IString,
 } from "../../utils/interfaces";
 
-import {
-   handleZodError,
-} from "../users/auth";
-
-import { Request, Response } from "express";
-import { Server }            from "socket.io";
-import { nameReg }           from "../../utils/regex";
-import { DBexecute }         from "../../DB/DataBase";
-import { server }            from "../../_Server";
-import { z }                 from "zod";
+import { NextFunction, Request, Response } from "express";
+import { Server }                          from "socket.io";
+import { nameReg }                         from "../../utils/regex";
+import { DBexecute }                       from "../../DB/DataBase";
+import { server }                          from "../../_Server";
+import { z }                               from "zod";
+import { generateToken, handleZodError }   from "../users/auth";
+import { connectPlayer, disconnectPlayer } from "./socketHandler";
 
 import { PlayerClassTest } from "../../classes/playerClassTest";
 
@@ -21,7 +19,31 @@ const pNameMax: number = 12;
 
 
 // =====================================================================
-// Create Player ==> POST
+// GET > Player Page
+// =====================================================================
+export const playerPage = async (
+   req: Request,
+   res: Response,
+) => {
+   
+   try {
+      const userID: number = res.locals.userID;
+      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "GetAllPlayers_ByUserID", { userID });
+      
+      let message: string = "Success";
+      if(DB_Count === 0) message = "No character found !";
+
+      res.send({ data: DB_Data, message });
+   }
+   
+   catch {
+      res.status(500).json({ message: `Could not load characters page !`});
+   }
+}
+
+
+// =====================================================================
+// POST > Create Player
 // =====================================================================
 export const createPlayer = async (
    req: Request,
@@ -57,10 +79,10 @@ export const createPlayer = async (
          ...newPlayer.export(),
       }
 
-      const { DB_Count, DB_GetOne}: any = await DBexecute(__dirname, "CreatePlayer", data);
+      const { DB_Count, DB_Data}: any = await DBexecute(__dirname, "CreatePlayer", data);
 
       if(DB_Count === 1) {
-         newPlayer.id = DB_GetOne.id;
+         newPlayer.id = DB_Data[0].id;
          res.status(200).json({ message: `New charachter created ! ${ newPlayer.name }`});
       }
    }
@@ -70,73 +92,56 @@ export const createPlayer = async (
    }
 }
 
-
 // =====================================================================
-// Player Page ==> GET
+// POST > Load World ==> Enter World
 // =====================================================================
-export const playerPage = async (
-   req: Request,
-   res: Response,
+export const loadWorld = async (
+   req:  Request,
+   res:  Response,
+   next: NextFunction,
 ) => {
+
+   const schema = z.object({
+      playerName: z.string().min(pNameMin).max(pNameMax).regex(nameReg),
+   });
    
+   const result = schema.safeParse(req.body);
+   if(!result.success) return handleZodError(res, result);
+   
+   const { playerName }: IString = result.data;
+
    try {
       const userID: number = res.locals.userID;
-      const { DB_Count, DB_GetAll }: any = await DBexecute(__dirname, "GetAllPlayers_ByUserID", { userID });
-      
-      let message: string = "Success";
-      if(DB_Count === 0) message = "No character found !";
+      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "GetPlayer_ByName", { playerName, userID });
+      if(DB_Count === 0) throw new Error;
 
-      res.send({ data: DB_GetAll, message });
+      const player:      any    = DB_Data[0];
+      const playerToken: string = generateToken(player.id);
+
+      // ==> Send all files, pict, tiles and world's data (initpack) to client 
+      // ==> When everything's loaded on client side => trigger const socket = io();
+
+      res.send({ playerToken, isWorldReady: true });
+      next();
    }
-   
+
    catch {
-      res.status(500).json({ message: `Could not load characters page !`});
+      res.status(500).json({ message: `Invalid player name !`});
    }
 }
 
-
-// =====================================================================
-// Enter World ==> GET
-// =====================================================================
 export const enterWorld = async (
    req: Request,
    res: Response,
 ) => {
    
-   const socketIO = new Server(server);
-   
-   socketIO.on("connection", (socket) => {
-      console.log("User Connected with Socket.io")
-      
-      socket.on("disconnect", () => {
-         console.log("Disconnected from Socket.io")
-      });
-   });
-
-   // socket.on("authCheck", (authPackage) =>  {
-   //    if(authPackage.token === process.env.SECURITY_TOKEN) {
-         
-   //       playerID++;
-   //       socket.id    = playerID;
-   //       const player = new PlayerClass(playerID, authPackage.playerName);
-         
-   //       socketList     [playerID] = socket;
-   //       playersList    [playerID] = player;
-   //       initPlayersList[playerID] = player.initPack();
-         
-   //       socket.emit("authSucces", playerID);
-   //       playerHandler.run(socket, player);
-
-   //       socket.emit("initMobs", initMobsList);
-   //       socketIO.emit("initPlayers", initPlayersList);
-
-   //       // console.log("User connected !");
-   //    }
-   //    else socket.emit("authFail", "Authentification Failed !");
-   // });  
-
    try {
-      res.status(200).json({ message: `Entered world !`});
+      const socketIO = new Server(server);
+      
+      socketIO.on("connection", (socket) => {
+         connectPlayer(socket);
+         disconnectPlayer(socket);
+      });
    }
 
    catch {

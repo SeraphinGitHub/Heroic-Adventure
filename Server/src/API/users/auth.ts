@@ -19,11 +19,11 @@ export const handleZodError = (
 }
 
 export const generateToken = (
-   userID: number,
+   id: number,
 ) => {
 
    return jwt.sign(
-      { userID },
+      { id },
       process.env.SECURITY_TOKEN!,
       { expiresIn: "24h" }
    );
@@ -37,7 +37,7 @@ export const verifyToken = (
 
    const token: string | undefined = getHeaderToken(req);
 
-   if(token === undefined) {
+   if(typeof token !== "string") {
       return res.status(500).json({ message: `Unauthenticated request !` });
    }
    
