@@ -1,7 +1,6 @@
 
 import {
    playerPage,
-   loadWorld,
    enterWorld,
    createPlayer
 } from "./controllers"
@@ -16,6 +15,6 @@ router.get("/page", verifyToken, playerPage);
 
 // POST
 router.post("/create", verifyToken, createPlayer);
-router.post("/enter",  verifyToken, loadWorld, enterWorld);
+router.post("/enter",  verifyToken, enterWorld);
 
 export default router;

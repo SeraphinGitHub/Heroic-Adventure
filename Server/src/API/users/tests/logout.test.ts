@@ -20,10 +20,10 @@ describe("Test: /user/logout", () => {
       .post(`/user/login`)
       .send(varTest.correct);
 
-      let token: string = loginReq.body.token;
+      let token: string = loginReq.body.userToken;
 
       if(tokenTest !== undefined) token = tokenTest;
-
+      
       return await newAgent
       .post(`/user/logout`)
       .set('Authorization', `Bearer ${token}`)

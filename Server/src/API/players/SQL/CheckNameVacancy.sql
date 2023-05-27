@@ -1,2 +1,2 @@
 
-SELECT name FROM players WHERE name = '{{playerName}}';
+SELECT name FROM players WHERE name = '{{ playerName }}';

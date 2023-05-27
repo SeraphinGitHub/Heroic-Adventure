@@ -13,6 +13,7 @@ CREATE TABLE players (
    score          JSONB,
    spells_list    JSONB,
    booleans       JSONB,
-
+   is_connected   BOOLEAN                     NOT NULL,
+   
    created_at     TIMESTAMP                   NOT NULL
 );

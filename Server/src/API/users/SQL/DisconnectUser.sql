@@ -1,6 +1,6 @@
 
 WITH selected_user AS (
-  SELECT * FROM users WHERE id = '{{userID}}'
+  SELECT * FROM users WHERE id = '{{ userID }}'
 )
 
 UPDATE users SET is_connected = false

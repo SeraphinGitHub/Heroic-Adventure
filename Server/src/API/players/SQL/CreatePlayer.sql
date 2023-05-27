@@ -10,12 +10,13 @@ INSERT INTO players (
    score,
    spells_list,
    booleans,
+   is_connected,
    created_at
 )
 
 VALUES (
-   '{{userID}}',
-   '{{name}}',
+   '{{ userID }}',
+   '{{ playerName }}',
    '{{{ position }}}',
    '{{{ moveSpeed }}}',
    '{{{ baseStats }}}',
@@ -24,9 +25,8 @@ VALUES (
    '{}',
    '{}',
    '{{{ booleans }}}',
+   false,
    CURRENT_TIMESTAMP
 )
 
-ON CONFLICT (name) DO NOTHING
-
-RETURNING id;
+ON CONFLICT (name) DO NOTHING;

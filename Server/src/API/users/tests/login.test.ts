@@ -29,7 +29,7 @@ describe("Test: /user/login", () => {
    it("Should log User if exist & return a token", async () => {
       const response = await request(varTest.correct);
       expect(response.status).to.equal(200);
-      expect(response.body.token).to.exist;
+      expect(response.body.userToken).to.exist;
    });
 
    it("Should fail to log User if not exist", async () => {

@@ -5,16 +5,19 @@
 // Server
 // =====================================================================
 import express, { Request, Response, NextFunction } from "express";
-import http          from "http";
-import bodyParser    from "body-parser";
-import dotenv        from "dotenv";
+import { GameHandlerClass }   from "./classes/_export";
+import { DBconnect }          from "./DB/DataBase";
+import http                   from "http";
+import bodyParser             from "body-parser";
+import dotenv                 from "dotenv";
 dotenv.config();
 
-export const app    = express();
-export const server = http.createServer(app);
+export const app         = express();
+export const appServer   = http.createServer(app);
+export const GameHandler = new GameHandlerClass();
 
-import { DBconnect } from "./DB/DataBase";
 DBconnect();
+GameHandler.start();
 
 
 // =================================================================================
@@ -53,6 +56,6 @@ app.use("/player", playerRoutes);
 // =================================================================================
 // Start Server
 // =================================================================================
-server.listen(process.env.PORT || 2800, () => {
+appServer.listen(process.env.PORT || 2800, () => {
    console.log(`Listening on port ${process.env.PORT}`);
 });

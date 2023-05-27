@@ -22,7 +22,7 @@ describe("Test: /player/create", () => {
 
       return await newAgent
       .post(`/player/create`)
-      .set('Authorization', `Bearer ${loginReq.body.token}`)
+      .set('Authorization', `Bearer ${loginReq.body.userToken}`)
       .send(data);
    }
    

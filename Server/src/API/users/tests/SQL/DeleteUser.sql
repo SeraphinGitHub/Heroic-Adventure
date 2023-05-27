@@ -1,2 +1,2 @@
 
-DELETE FROM users WHERE name = '{{userName}}';
+DELETE FROM users WHERE name = '{{ userName }}';

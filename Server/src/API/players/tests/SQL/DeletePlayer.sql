@@ -1,2 +1,2 @@
 
-DELETE FROM players WHERE name = '{{playerName}}';
+DELETE FROM players WHERE name = '{{ playerName }}';

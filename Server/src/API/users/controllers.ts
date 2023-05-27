@@ -78,8 +78,8 @@ export const login = async (
    const { userName, password }: ILogin = result.data;
 
    try {
-      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "ConnectUser", { userName });
-      const DB_User: any = DB_Data[0];
+      const { DB_Count, DB_Row }: any = await DBexecute(__dirname, "ConnectUser", { userName });
+      const DB_User: any = DB_Row[0];
 
       if(DB_Count === 1) {
          const isPswValid: boolean = await bcrypt.compare(password, DB_User.password);
@@ -109,8 +109,8 @@ export const logout = async (
 
    try {
       const userID: number = res.locals.userID;
-      const { DB_Count, DB_Data }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
-      const DB_User: any = DB_Data[0];
+      const { DB_Count, DB_Row }: any = await DBexecute(__dirname, "DisconnectUser", { userID });
+      const DB_User: any = DB_Row[0];
 
       if(DB_Count === 1) {
          res.status(200).json({ message: `${DB_User.name} disconnected !` });

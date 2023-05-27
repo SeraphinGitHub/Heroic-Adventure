@@ -1,3 +1,3 @@
 
-ALTER TABLE table_name
-ADD COLUMN IF NOT EXISTS column_name data_type;
+ALTER TABLE players
+ADD COLUMN IF NOT EXISTS is_connected  BOOLEAN;

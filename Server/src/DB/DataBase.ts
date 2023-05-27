@@ -56,6 +56,6 @@ export const DBexecute = async (
 
    return {
       DB_Count: rowCount,
-      DB_Data:  rows,
+      DB_Row:   rows,
    }
 }

@@ -8,8 +8,8 @@ INSERT INTO users (
 )
 
 VALUES (
-   '{{userName}}',
-   '{{hashPsw}}',
+   '{{ userName }}',
+   '{{ hashPsw }}',
    '{}',
    false,
    CURRENT_TIMESTAMP

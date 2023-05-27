@@ -42,8 +42,8 @@ export const verifyToken = (
    }
    
    try {
-      const { userID }: any = jwt.verify(token, process.env.SECURITY_TOKEN!);
-      res.locals.userID = userID;
+      const { id }: any = jwt.verify(token, process.env.SECURITY_TOKEN!);
+      res.locals.userID = id;
       next();
    }
    
