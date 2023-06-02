@@ -51,19 +51,14 @@ export class PlayerClass {
       this.name   = entity.playerName;
       this.userID = entity.userID;
    }
-
-   run() {
-      console.log(this.id);
-      console.log(this.name);
-      console.log(this.stats);
-      console.log(this.moveSpeed);
-   }
+   
 
    createDB() {
 
       const data = {
          userID:     this.userID,
          playerName: this.name,
+
          position:   JSON.stringify(this.position),
          moveSpeed:  JSON.stringify(this.moveSpeed),
          baseStats:  JSON.stringify(this.baseStats),
@@ -79,6 +74,7 @@ export class PlayerClass {
       const data = {
          userID:     this.userID,
          playerName: this.name,
+
          position:   JSON.stringify(this.position),
          stats:      JSON.stringify(this.stats),
          booleans:   JSON.stringify(this.booleans),
@@ -96,8 +92,8 @@ export class PlayerClass {
       
       this.id        = data.id;
       this.position  = data.position;
-      this.moveSpeed = data.moveSpeed;
-      this.baseStats = data.baseStats;
+      this.moveSpeed = data.move_speed;
+      this.baseStats = data.base_stats;
       this.stats     = data.stats;
       this.booleans  = data.booleans;
    }

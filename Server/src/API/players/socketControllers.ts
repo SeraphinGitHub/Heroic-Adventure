@@ -1,5 +1,5 @@
 
-import { PlayerClass } from "../../classes/_export";
+import { PlayerClass } from "../../classes/_Export";
 import { Socket }      from "socket.io";
 
    

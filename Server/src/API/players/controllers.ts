@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from "express";
 import { generateToken, handleZodError }   from "../users/auth";
 import { nameReg }                         from "../../utils/regex";
 import { DBexecute }                       from "../../DB/DataBase";
-import { PlayerClass }                     from "../../classes/_export";
+import { PlayerClass }                     from "../../classes/_Export";
 import { z }                               from "zod";
 
 const pNameMin: number = 4;

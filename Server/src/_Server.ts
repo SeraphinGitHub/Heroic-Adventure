@@ -5,19 +5,19 @@
 // Server
 // =====================================================================
 import express, { Request, Response, NextFunction } from "express";
-import { GameHandlerClass }   from "./classes/_export";
+import { ManagerClass }       from "./classes/_Export";
 import { DBconnect }          from "./DB/DataBase";
 import http                   from "http";
 import bodyParser             from "body-parser";
 import dotenv                 from "dotenv";
 dotenv.config();
 
-export const app         = express();
-export const appServer   = http.createServer(app);
-export const GameHandler = new GameHandlerClass();
+export const app       = express();
+export const appServer = http.createServer(app);
+export const Manager   = new ManagerClass();
 
 DBconnect();
-GameHandler.start();
+Manager.start();
 
 
 // =================================================================================
