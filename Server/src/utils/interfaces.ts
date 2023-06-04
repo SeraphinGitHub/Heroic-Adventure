@@ -50,13 +50,22 @@ export interface ISquare extends IPosition, ISize {
    
 }
 
-export interface ICircle extends IPosition {
-   radius: number;
-}
-
 export interface ILine {
    startX: number;
    startY: number;
    endX:   number;
    endY:   number;
+}
+
+export interface IMobAggro {
+   isChased: boolean,
+   distance: number,
+}
+
+export interface INearestPlayer {
+   id:        number,
+   radius:    number,
+   position:  IPosition,
+   booleans:  IBoolean,
+   getDamage: Function,
 }

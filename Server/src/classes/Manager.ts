@@ -27,7 +27,6 @@ export class ManagerClass {
 
    syncRate: number = Math.floor(1000 / Number(process.env.FRAME_RATE));
 
-
    start() {
       this.socketIO.on("connection", (socket) => {
       
@@ -58,8 +57,8 @@ export class ManagerClass {
             
             socket.id = playerID;
 
-            this.socketsMap.set(playerID, socket);
-            this.playersMap.set(playerID, Player);
+            ManagerClass.socketsMap.set(playerID, socket);
+            ManagerClass.playersMap.set(playerID, Player);
             // this.initPlayersMap.set(playerID, Player.initPack());
 
 
@@ -85,8 +84,8 @@ export class ManagerClass {
    
          const playerID: number = socket.id;
          
-         if(this.socketsMap.get(playerID) === undefined
-         || this.playersMap.get(playerID) === undefined) {
+         if(ManagerClass.socketsMap.get(playerID) === undefined
+         || ManagerClass.playersMap.get(playerID) === undefined) {
             return;
          }
          
@@ -94,8 +93,8 @@ export class ManagerClass {
          // this.socketIO.emit("removePlayer", initPack);
          
          // this.initPlayersMap.delete(playerID);
-         this.playersMap.delete(playerID);
-         this.socketsMap.delete(playerID);
+         ManagerClass.playersMap.delete(playerID);
+         ManagerClass.socketsMap.delete(playerID);
          
          console.log("Player disconnected");
       });
@@ -104,8 +103,8 @@ export class ManagerClass {
 
    cyclePlayersMap(callback: Function) {
 
-      this.playersMap.forEach((player, playerID) => {
-         const socket: unknown = this.socketsMap.get(playerID);
+      ManagerClass.playersMap.forEach((player, playerID) => {
+         const socket: unknown = ManagerClass.socketsMap.get(playerID);
          callback(socket, player, playerID);
       });
    }

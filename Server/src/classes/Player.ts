@@ -3,6 +3,7 @@ import {
    IBoolean,
    IEntity,
    INumber,
+   IPosition,
 } from "../utils/interfaces";
 
 import {
@@ -16,11 +17,12 @@ import {
 // =====================================================================
 export class PlayerClass {
 
-   id:      number | undefined = undefined;
-   userID:  number;
-   name:    string;
+   id:        number | undefined = undefined;
+   userID:    number;
+   name:      string;
+   radius:    number  = 45;
 
-   position:  INumber = { x: 250, y: 450 };
+   position:  IPosition = { x: 250, y: 450 };
    
    moveSpeed: INumber = {
       walkSpeed: 100,
@@ -96,5 +98,24 @@ export class PlayerClass {
       this.baseStats = data.base_stats;
       this.stats     = data.stats;
       this.booleans  = data.booleans;
+   }
+
+
+   getDamage() {
+   // getDamage(enemy, socket, damages, killerSocket) {
+
+      // this.stats.health -= damages;
+
+      // const damagPack = {
+      //    baseHealth:  this.baseStats.health,
+      //    health:      this.stats.health,
+      //    damageValue: damages,
+      //    fluidSpeed:  this.fluidSpeed.HUD,
+      // }
+
+      // socket.emit("getDamage", this.position, damagPack);
+      // if(killerSocket) killerSocket.emit("giveDamage", this.position, damages);
+
+      // if(this.stats.health <= 0) this.death(socket, enemy, killerSocket);
    }
 }

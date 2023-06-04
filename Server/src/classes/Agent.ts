@@ -3,14 +3,18 @@ import {
    INumber,
 } from "../utils/interfaces";
 
+import {
+   CollisionClass,
+} from "./_Export";
+
 
 // =====================================================================
 // Agent Class
 // =====================================================================
-export class AgentClass {
+export class AgentClass extends CollisionClass {
 
    constructor() {
-      
+      super();
    }
 
    RnG(

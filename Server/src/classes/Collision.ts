@@ -2,9 +2,7 @@
 import {
    INumber,
    ISquare,
-   ICircle,
    IPosition,
-   ILine,
 } from "../utils/interfaces";
 
 // =====================================================================
@@ -21,8 +19,8 @@ export class CollisionClass {
    }
 
    calcDist(
-      first:  IPosition | ISquare | ICircle,
-      second: IPosition | ISquare | ICircle,
+      first:  IPosition | ISquare,
+      second: IPosition | ISquare,
    ): number {
 
       const distX = second.x -first.x;
@@ -47,15 +45,16 @@ export class CollisionClass {
    }
 
    Sqr_Circ(
-      square: ISquare,
-      circle: ICircle,
+      square:    ISquare,
+      circlePos: IPosition,
+      circleRad: number,
    ): boolean {
 
       const circ: INumber = {
-         top:    circle.y -circle.radius,
-         right:  circle.x +circle.radius,
-         bottom: circle.y +circle.radius,
-         left:   circle.x -circle.radius,
+         top:    circlePos.y -circleRad,
+         right:  circlePos.x +circleRad,
+         bottom: circlePos.y +circleRad,
+         left:   circlePos.x -circleRad,
       }
 
       const sqr: INumber = {
@@ -76,12 +75,14 @@ export class CollisionClass {
    }
 
    Circ_Circ(
-      first:  ICircle,
-      second: ICircle,
+      firstPos:  IPosition,
+      firstRad:  number,
+      secondPos: IPosition,
+      secondRad: number,
    ): boolean {
 
-      const distance    = this.calcDist(first, second);
-      const minDistance = first.radius +second.radius;
+      const distance    = this.calcDist(firstPos, secondPos);
+      const minDistance = firstRad +secondRad;
 
       const isOverLaping: boolean =
          distance <= minDistance
