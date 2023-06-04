@@ -57,15 +57,11 @@ export interface ILine {
    endY:   number;
 }
 
-export interface IMobAggro {
-   isChased: boolean,
-   distance: number,
-}
-
 export interface INearestPlayer {
    id:        number,
    radius:    number,
    position:  IPosition,
-   booleans:  IBoolean,
+   isDead:    boolean,
+   isChased:  boolean,
    getDamage: Function,
 }

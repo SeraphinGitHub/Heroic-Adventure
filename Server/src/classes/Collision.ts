@@ -29,7 +29,7 @@ export class CollisionClass {
       return Math.floor( Math.hypot(distX, distY) );
    }
    
-   Sqr_Sqr(
+   Collision_SqrToSqr(
       first:  ISquare,
       second: ISquare,
    ): boolean {
@@ -44,7 +44,7 @@ export class CollisionClass {
       return this.checkIf(isOverLaping);
    }
 
-   Sqr_Circ(
+   Collision_SqrToCirc(
       square:    ISquare,
       circlePos: IPosition,
       circleRad: number,
@@ -74,7 +74,7 @@ export class CollisionClass {
       return this.checkIf(isOverLaping);
    }
 
-   Circ_Circ(
+   Collision_CircToCirc(
       firstPos:  IPosition,
       firstRad:  number,
       secondPos: IPosition,
