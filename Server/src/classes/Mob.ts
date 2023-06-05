@@ -39,10 +39,11 @@ export class MobClass extends AgentClass {
    sprite:    INumber;
    
    animSide:  number   = 0;
-   animState: number   = 0; // cachedAnimState
+   animState: number   = 0;
    animList:  INumberList;
 
    booleans:  IBoolean = {
+      isMovable:     true,
       isWandering:   true,
       isChasable:    true,
       isAttackable:  true,
@@ -51,8 +52,8 @@ export class MobClass extends AgentClass {
       isSendToSpawn: false,
       isPosCalc:     false,
       isPosReCalc:   false,
-      isAnimated:    false, // melleAttack: isAnim
-      isDecayed:     false, // isHidden
+      isAnimated:    false,
+      isDecayed:     false,
       isDead:        false,
    }
 
@@ -92,6 +93,11 @@ export class MobClass extends AgentClass {
 
          // attackAnimDelay = Math.floor( client frameRate * index * (spritesNumber -1) * props.attackDelay );
 
+         decayTime:   props.stats.decayTime,
+         respawnTime: props.stats.respawnTime,
+         fameReward:  props.stats.fameReward,
+         fameLoss:    props.stats.fameLoss,
+         
          walkSpeed:   Math.round(speedCoeff *props.stats.walkSpeed),
          runSpeed:    Math.round(speedCoeff *props.stats.runSpeed),
          speed:       0,
@@ -132,16 +138,17 @@ export class MobClass extends AgentClass {
 
    moveToTarget() {
       
+      if(!this.booleans.isMovable) return;
+
       const { x: targetX, y: targetY }: IPosition = this.targetPos;
       const { x: posX,    y: posY    }: IPosition = this.position;
       
       if(this.isAtTargetPos()) return;
-      
-      const speed: number = this.stats.speed;
+
       const distX: number = targetX -posX;
       const distY: number = targetY -posY;
       const angle: number = Math.atan2(distX, distY);
-      const distH: number = Math.min(speed, Math.hypot(distX, distY));
+      const distH: number = Math.min(this.stats.speed, Math.hypot(distX, distY));
       
       this.position.x += Math.cos(angle) * distH;
       this.position.y += Math.sin(angle) * distH;
@@ -172,7 +179,9 @@ export class MobClass extends AgentClass {
 
       if(!this.booleans.isWandering) return;
 
+      this.booleans.isMovable = true;
       this.stats.speed = this.stats.walkSpeed;
+      
       this.setTargetPos();
       this.moveToTarget();
 
@@ -189,64 +198,66 @@ export class MobClass extends AgentClass {
       }, breakTime *1000);
    }
 
-   aggroState(        // Aggro
-      mobPos:           IPosition,
-      chaseRange:       number,
-      nearestAggroDist: number,
-      playerID:         number,
-      isPlayerChased:   boolean,
-   ) {
+   aggroState() {     // Aggro
 
+      const mobPos:     IPosition  = this.position;
+      const chaseRange: number     = this.AI.chaseRange;
       const { isChasable, isSendToSpawn }: IBoolean = this.booleans;
 
-      let playerAggroDist: number  = Infinity;
-      let nearestPlayer:   unknown = undefined;
+      let nearestAggroDist: number  = Infinity;
+      let nearestPlayer:    unknown = undefined;
 
-      const {
-         position:  playerPos,
-         radius:    playerRad,
-         booleans:  playerBools,
-         getDamage: playerGetDamage,
-         
-      }: PlayerClass = ManagerClass.playersMap.get(playerID)!;
+      // Foreach detected player ==> Check if aggro Mob
+      this.aggroPlayersMap.forEach((
+         isPlayerChased: boolean,
+         playerID:       number,
+      ) => {
 
-      // If player enter chasing range ==> Aggro player
-      if(!playerBools.isDead
-      && isChasable
-      && this.Collision_CircToCirc(
-         mobPos, chaseRange, playerPos, playerRad
-      )) {
+         let playerAggroDist: number  = Infinity;
 
-         playerAggroDist = this.calcDist(mobPos, playerPos);
-         this.aggroPlayersMap.set(playerID, true);
-      }
-
-      // If player leave range || player die ==> Back to spawn
-      else if(!isSendToSpawn && isPlayerChased) {
-
-         this.setBackToSpawn();
-         this.aggroPlayersMap.set(playerID, false);
-      }
-
-      // Set nearest aggroed player
-      if(playerAggroDist < nearestAggroDist) {
-
-         nearestAggroDist = playerAggroDist;
-         nearestPlayer    = {
-            id:        playerID,
+         const {
             position:  playerPos,
             radius:    playerRad,
-            isDead:    playerBools.isDead,
-            isChased:  isPlayerChased,
+            booleans:  playerBools,
             getDamage: playerGetDamage,
             
-         };
-      }
+         }: PlayerClass = ManagerClass.playersMap.get(playerID)!;
+
+         // If player enter chasing range ==> Aggro player
+         if(!playerBools.isDead
+         && isChasable
+         && this.Collision_CircToCirc(
+            mobPos, chaseRange, playerPos, playerRad
+         )) {
+
+            playerAggroDist = this.calcDist(mobPos, playerPos);
+            this.aggroPlayersMap.set(playerID, true);
+         }
+
+         // If player leave range || player die ==> Back to spawn
+         else if(!isSendToSpawn && isPlayerChased) {
+
+            this.setBackToSpawn();
+            this.aggroPlayersMap.set(playerID, false);
+         }
+
+         // Set nearest aggroed player
+         if(playerAggroDist < nearestAggroDist) {
+
+            nearestAggroDist = playerAggroDist;
+            nearestPlayer    = {
+               id:        playerID,
+               position:  playerPos,
+               radius:    playerRad,
+               isDead:    playerBools.isDead,
+               isChased:  isPlayerChased,
+               getDamage: playerGetDamage,
+               
+            };
+         }
+      });      
       
-      return {
-         aggroDist: nearestAggroDist,
-         player:    nearestPlayer,
-      }
+      return nearestPlayer;
    }
 
    chasingState(      // Chase
@@ -255,6 +266,7 @@ export class MobClass extends AgentClass {
 
       if(!player.isChased) return;
 
+      this.booleans.isMovable   = true;
       this.booleans.isWandering = false;
       this.booleans.isAttacking = false;
       
@@ -269,7 +281,6 @@ export class MobClass extends AgentClass {
 
    attackingState(    // Attack
       player: INearestPlayer,
-      mobPos: IPosition,
    ) {
       const { isAttacking, isAnimated, isAttackOnCD }: IBoolean = this.booleans;
       
@@ -277,28 +288,29 @@ export class MobClass extends AgentClass {
       || isAnimated
       || isAttackOnCD
       ||!this.Collision_CircToCirc(
-         mobPos, this.radius, player.position, player.radius
+         this.position, this.radius, player.position, player.radius
       )) {
          
          return;
       }
 
-      this.stats.speed = 0;
-      
+      this.booleans.isMovable    = false;
       this.booleans.isAttacking  = true;
       this.booleans.isAnimated   = true;
       this.booleans.isAttackOnCD = true;
 
-      this.damagingPlayers(player);
+      this.damagePlayer(player);
    }
    
-   damagingPlayers(player: INearestPlayer) {
+   damagePlayer(
+      player: INearestPlayer,
+   ) {
 
-      if(!player.booleans.isDead) {
+      if(!player.isDead) {
          let damages = this.Ag_StatRnG(this.stats.meleeDamages)
                   
          // Delay the logic to match animation
-         setTimeout(() => player.getDamage(this, socket, damages), this.animDelay *this.stats.meleeDamages.delay);
+         setTimeout(() => player.getDamage(this, damages), this.animDelay *this.stats.meleeDamages.delay);
          setTimeout(() => this.stats.meleeDamages.isAnim = false, this.animDelay);
       }
    }
@@ -321,6 +333,7 @@ export class MobClass extends AgentClass {
 
    setBackToSpawn() {
       
+      this.booleans.isMovable     = true;
       this.booleans.isSendToSpawn = true;
       this.booleans.isAttacking   = false;
       this.booleans.isChasable    = false;
@@ -347,128 +360,75 @@ export class MobClass extends AgentClass {
 
    sateMachine() { // Handle states && behaviors
 
-      const mobPos:     IPosition  = this.position;
-      const chaseRange: number     = this.AI.chaseRange;
-
-      let nearestAggroDist: number = Infinity;
-      let nearestPlayer:   unknown = undefined;
-
-      // Check if each detected player aggro Mob
-      this.aggroPlayersMap.forEach((
-         isPlayerChased: boolean,
-         playerID:       number,
-      ) => {
-
-         const { aggroDist, player }: any = this.aggroState(
-            mobPos, chaseRange, nearestAggroDist, playerID, isPlayerChased
-         );
-         nearestAggroDist = aggroDist;
-         nearestPlayer    = player;
-      });
+      const nearestPlayer: unknown = this.aggroState();
       
       if(nearestPlayer === undefined) return;
       
       this.chasingState  (nearestPlayer as INearestPlayer);
-      this.attackingState(nearestPlayer as INearestPlayer, mobPos);
+      this.attackingState(nearestPlayer as INearestPlayer);
    }
    
    death() {
 
       this.stats.health       = 0;
       this.booleans.isDead    = true;
+      this.booleans.isMovable = false;
             
       setTimeout(() => {
-         this.booleans.isHidden = true
+         this.booleans.isDecayed = true
          
          setTimeout(() => {
             this.booleans.isDead      = false;
-            this.booleans.isHidden    = false;
+            this.booleans.isDecayed   = false;
             this.booleans.isWandering = true;
+            this.booleans.isMovable   = true;
 
             this.stats.health = this.stats.baseHealth;
-            this.position.x   = this.spawn.x;
-            this.position.y   = this.spawn.y;
+            this.position     = this.spawnPos;
    
-         }, this.respawn.time);
-      }, this.respawn.hiddenTime);
+         }, this.stats.respawnTime);
+      }, this.stats.decayTime);
    }
    
-   animationStates() {
+   animation() {
       
-      // if(!this.booleans.isDead) {
+      let state: unknown;
 
-      //    // Attack State
-      //    if(this.stats.meleeDamages.isAnim) {
-      //       return this.animStates.attack.id;
-      //    }
-
-      //    // Idle State
-      //    if((this.position.x  === this.target.x
-      //    &&  this.position.y  === this.target.y)
-      //    ||  this.stats.speed === 0) {
-      //       return this.animStates.idle.id;
-      //    }
-
-      //    // Run State
-      //    if(this.stats.speed === this.stats.runSpeed) {
-      //       return this.animStates.run.id;
-      //    }
-
-      //    // Walk State
-      //    else return this.animStates.walk.id;
-
-      // }
-      // else return this.animStates.died.id;
+      const { runSpeed, walkSpeed, speed     }: INumber     = this.stats;
+      const { isDead, isAttacking, isMovable }: IBoolean    = this.booleans;
+      const { died, attack, idle, run, walk  }: INumberList = this.animList;
 
       // Dead
-      if(this.booleans.isDead) {
-         return this.animStates.died.id;
-      }
+      if(isDead) state = died.id;
 
       // Attack
-      if(this.stats.meleeDamages.isAnim) {
-         return this.animStates.attack.id;
-      }
+      if(isAttacking) state = attack.id;
 
       // Idle
-      if((this.position.x  === this.target.x
-      &&  this.position.y  === this.target.y)
-      ||  this.stats.speed === 0) {       // check if need or not
-         return this.animStates.idle.id;
-      }
-
-      // ((this.position.x  === this.target.x
-      // &&  this.position.y  === this.target.y) {
-      //    return this.animStates.idle.id;
-      // }
+      if(this.isAtTargetPos() || !isMovable) state = idle.id;
 
       // Run
-      if(this.stats.speed === this.stats.runSpeed) {
-         return this.animStates.run.id;
-      }
+      if(speed === runSpeed) state = run.id;
 
       // Walk
-      return this.animStates.walk.id;
+      if(speed === walkSpeed) state = walk.id;
+
+
+      if(this.animState !== state) this.animState = state as number;
    }
 
    // Sync
    update() {
-      let state = this.cachedAnimState;
-
-      if(state !== this.animationStates()) {
-         state = this.animationStates();
-      }
       
-      if(this.booleans.isDead) return; // Maybe need: "return this.lightPack(state);" instead
+      this.animation();
+      
+      if(this.booleans.isDead) return;
 
       this.sateMachine();
-
       this.watchDirection();
       this.attackCooldown();
       this.moveBackToSpawn();
       this.wanderingState();
-
-      return this.lightPack(state);
    }
 
    initPack() {
@@ -479,24 +439,24 @@ export class MobClass extends AgentClass {
          baseHealth:    this.stats.baseHealth,
          wanderRange:   this.AI.wanderRange,
          maxChaseRange: this.AI.maxChaseRange,
-         imageSrc:      this.imageSrc,
-         animStates:    this.animStates,
-         sprites:       this.sprites,
+         imgSrc:        this.imgSrc,
+         animList:      this.animList,
+         sprite:        this.sprite,
       }
    }
 
-   lightPack(state) {
+   updatePack() {
+      
+      this.update();
+
       return {
-         x:            this.position.x,
-         y:            this.position.y,
-         calcX:        this.target.x,
-         calcY:        this.target.y,
-         health:       this.stats.health,
-         chasingRange: this.AI.chaseRange, // ==> DEBUG Only ==> need to create event
-         isDead:       this.booleans.isDead,      // need to send from an event
-         isHidden:     this.booleans.isHidden,
-         state:        state,
-         frameX:       this.frameX,   // need to delete
+         position:  this.position,
+         targetPos: this.targetPos,
+         health:    this.stats.health,       // Remove later ==> Use socket event instead
+         isDead:    this.booleans.isDead,    // Remove later ==> Use socket event instead
+         isDecayed: this.booleans.isDecayed, // Remove later ==> Use socket event instead
+         animSide:  this.animSide,           // Remove later ==> Use socket event instead
+         animState: this.animState,          // Remove later ==> Use socket event instead
       }
    }
 }
