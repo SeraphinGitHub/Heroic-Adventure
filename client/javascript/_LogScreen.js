@@ -127,7 +127,8 @@ const loadClient = (formInput) => {
    const rightBag = document.querySelector(".player-bag-right");
    
    // Send player's name
-   const socket = io();
+   const socket = io("https://heroic-adventure.onrender.com");
+   // const socket = io("http://localhost:3000");
 
    logged_PlayerName = formInput.value;
    socket.emit("send_initClient", formInput.value);

@@ -8,20 +8,23 @@ const app = express();
 const server = http.createServer(app);
 const { emit } = require("process");
 const { Server } = require("socket.io");
+
 const io = new Server(server);
+const cors = require('cors');
+io.use(cors({origin: '*:*'}));
 
 
 // =====================================================================
 // App init
 // =====================================================================
-app.get("/", (req, res) => {
-   res.sendFile(__dirname + "/client/index.html");
-});
+// app.get("/", (req, res) => {
+//    res.sendFile(__dirname + "/client/index.html");
+// });
 
-app.use("/client", express.static(__dirname + "/client"));
+// app.use("/client", express.static(__dirname + "/client"));
 
-server.listen(process.env.PORT || 3000, () => {
-   console.log(`Listening on port ${process.env.PORT}`);
+server.listen(3000, () => {
+   console.log(`Listening on port ${3000}`);
 });
 
 
@@ -65,7 +68,7 @@ mobList.forEach(enemy => {
 let playerID = 0;
 
 io.on("connection", (socket) => {
-   // console.log("User connected !");
+   console.log("User connected !");
 
    // ==========  Generate ID  ==========
    playerID++
@@ -76,7 +79,7 @@ io.on("connection", (socket) => {
 
    // ==========  Disconnection  ==========
    socket.on("disconnect", () => {
-      // console.log("User disconnected !");
+      console.log("User disconnected !");
       onDisconnect(socket);
       delete socketList[socket.id];
    });
