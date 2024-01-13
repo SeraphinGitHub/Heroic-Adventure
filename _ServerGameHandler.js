@@ -8,7 +8,11 @@ const app = express();
 const server = http.createServer(app);
 const { emit } = require("process");
 const { Server } = require("socket.io");
-const io = new Server(server);
+
+const io = new Server(server, {
+   pingInterval: 10 * 1000, // 10 seconds
+   pingTimeout:  15 * 1000, // 15 seconds (slightly longer than the interval)
+ });
 
 
 // =====================================================================
