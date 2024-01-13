@@ -129,9 +129,13 @@ const loadClient = (formInput) => {
    // Send player's name
    const socket = io();
 
-   logged_PlayerName = formInput.value;
-   socket.emit("send_initClient", formInput.value);
    
+   logged_PlayerName     = formInput.value;
+   const LS_PlayerValues = localStorage.getItem(logged_PlayerName);
+
+   socket.emit("send_initClient", [logged_PlayerName, LS_PlayerValues]);
+
+
    // Await for server response
    socket.on("received_initClient", (playerID) => {
 

@@ -133,15 +133,53 @@ let updateMobList = {};
 // Client Update (Every frame)
 // =====================================================================
 let frame = 0;
+let firstSave = false;
 let debugPlayer = false;
 let debugMobs = false;
+
+const saveToLS = (updatePlayer, seconds) => {
+
+   if(frame % (60 * seconds) === 0 || !firstSave) {
+
+      if(!firstSave) firstSave = true;
+
+      let updatePack = {
+
+         x:      updatePlayer.x,
+         y:      updatePlayer.y,
+         state:  updatePlayer.state,
+         frameX: updatePlayer.frameX,
+         health: updatePlayer.health,
+         mana:   updatePlayer.mana,
+         energy: updatePlayer.energy,
+         fame:   updatePlayer.fame,
+      }
+
+      let storedPlayer = JSON.parse( localStorage.getItem(logged_PlayerName) );
+
+      if(storedPlayer) {
+         let score = {};
+
+         if(storedPlayer.score !== undefined) score = storedPlayer.score;
+
+         storedPlayer = {
+            ...updatePack,
+            score,
+         };
+
+         updatePack = storedPlayer;
+      }
+
+      localStorage.setItem(logged_PlayerName, JSON.stringify(updatePack));
+   }
+}
 
 const clientUpdate = () => {
    
    // Clear contexts
    canvasClearing();
 
-   
+
    // ***************************************************************
    // ***************************************************************
 
@@ -165,6 +203,9 @@ const clientUpdate = () => {
       
       if(initPlayer) {
          if(clientID === updatePlayer.id) {
+
+            // Save player data to every 3 seconds
+            saveToLS(updatePlayer, 3);
             
             initPlayer.isClient = true;
             initPlayer.render_ClientPlayer(updatePlayer, frame, debugPlayer);

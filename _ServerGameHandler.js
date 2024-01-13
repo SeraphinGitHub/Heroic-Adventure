@@ -101,39 +101,63 @@ const onConnect = (socket) => {
    // Init Player
    // ================================
    socket.on("send_initClient", (data) =>  {
+
+      const [clientPlayerName, LS_PlayerValues] = data;
+
+      player.name = clientPlayerName;
+
       socket.emit("received_initClient", player.id);
-      
-      player.name = data;
-      socket.emit("initEnemyPack", initPack_MobList);
+      socket.emit("initEnemyPack",       initPack_MobList);
+
+      if(LS_PlayerValues) {
+         const storedPlayer = JSON.parse(LS_PlayerValues);
+
+         player.x           = storedPlayer.x;
+         player.y           = storedPlayer.y;
+         player.state       = storedPlayer.state;
+         player.frameX      = storedPlayer.frameX;
+         player.health      = storedPlayer.health;
+         player.mana        = storedPlayer.mana;
+         player.energy      = storedPlayer.energy;
+         
+         if(storedPlayer.score !== undefined) {
+            player.score     = storedPlayer.score;
+            player.fame      = storedPlayer.score.fame;
+            player.fameValue = storedPlayer.score.fame;
+            player.fameCount = storedPlayer.score.fameCount;
+         }
+      }
+
       socket.emit("fameEvent", player.famePack());
 
+      
       // Inventory
       socket.emit("playerInventory",{
-         name: data,
+         name: clientPlayerName,
       });
-
+      
       // Stats
       socket.emit("playerStats", {         
-         health: player.baseHealth,
-         mana: player.baseMana,
-         regenMana: player.baseRegenMana,
-         energy: player.baseEnergy,
+         health:      player.baseHealth,
+         mana:        player.baseMana,
+         regenMana:   player.baseRegenMana,
+         energy:      player.baseEnergy,
          regenEnergy: player.baseRegenEnergy,
          attackSpeed: player.attackSpeed,
-         minDamage: player.minDamage,
-         maxDamage: player.maxDamage,
-         walkSpeed: player.walkSpeed_Percent,
-         runSpeed: player.runSpeed_Percent,
+         minDamage:   player.minDamage,
+         maxDamage:   player.maxDamage,
+         walkSpeed:   player.walkSpeed_Percent,
+         runSpeed:    player.runSpeed_Percent,
       });
       
       // Score
       socket.emit("playerScore", {
-         kills: player.score.kills,
+         kills:        player.score.kills,
          playersKills: player.score.playersKills,
-         mobsKills: player.score.mobsKills,
-         died: player.score.died,
-         fame: player.fame,
-         fameCount: player.fameCount,
+         mobsKills:    player.score.mobsKills,
+         died:         player.score.died,
+         fame:         player.fame,
+         fameCount:    player.fameCount,
       });
       
 

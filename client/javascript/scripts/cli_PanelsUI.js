@@ -204,6 +204,23 @@ const playerScore = (socket) => {
       died.textContent =  data.died;
       fame.textContent =  data.fame;
       fameCount.textContent =  data.fameCount;
+
+      let storedPlayer = JSON.parse( localStorage.getItem(logged_PlayerName) );
+
+      if(storedPlayer) {
+
+         storedPlayer["score"] = {
+            kills:        data.kills,
+            playersKills: data.playersKills,
+            mobsKills:    data.mobsKills,
+            died:         data.died,
+            fame:         data.fame,
+            fameCount:    data.fameCount
+         }
+
+         localStorage.setItem(logged_PlayerName, JSON.stringify(storedPlayer));
+      }
+
    });
 
    // Toggle Score panel & hide others panels
@@ -260,7 +277,6 @@ const playerBags = () => {
    toggleBottomPane(leftBagButton, leftBagPane, false, "bag");
    toggleBottomPane(rightBagButton, rightBagPane, false, "bag");
 }
-
 
 // =====================================================================
 // Panels UI Handler ==> Socket Listening
